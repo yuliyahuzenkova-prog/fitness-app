@@ -7255,7 +7255,7 @@ function armTwistShare(M) {
 function plantSpot(B, L, grabFix, tap, t) {
   if (!B.plantAll || grabFix || tap || !GL.animNow) return t;
   const pc = PRO.plantCache || (PRO.plantCache = {}), key = GL.animNow + "|" + FIG_STYLE + "|" + L;
-  if (GL.kNow === 0 || !pc[key]) pc[key] = t.clone(); else t.copy(pc[key]);
+  if (!pc[key] && GL.kNow === 0) pc[key] = t.clone(); if (pc[key]) t.copy(pc[key]); // (set once, from the start pose: refreshing it at every start made the hands twitch at the top)
   return t;
 }
 function proPose(B) {
