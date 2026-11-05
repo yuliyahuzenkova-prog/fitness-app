@@ -6694,8 +6694,9 @@ ANIMS.pike_pushup.glChrome = { A: ANIMS.pike_pushup.A, B: pose({ at: [50, 138], 
 { const P = (o) => pose({ props: [{ chair: [PIKE_CHAIR.x, 95, 1, PIKE_CHAIR.d, 20] }], ...o });
   ANIMS.pike_chair = { ...ANIMS.pike_pushup, handsOn: true, handFix: undefined, plantAll: true, plantPole: [40, .35, 1, .4, 1], /* (on the seat the elbows bend up and back, above the seat, never down into it) */ glChrome: null, A: P(PIKE_CHAIR.A), B: P(PIKE_CHAIR.B) }; }
 // Incline push-up with the hands on a chair seat: lower than a table (seat ~45 cm), so the body slopes down more; a chair, not a block
-{ const base = ANIMS.incline_pushup, seat = (o) => pose({ at: [40, 138], props: [{ chair: [118, 95, 1] }], ...o }); // (chair turned round: the seat edge towards the person, the backrest on the far side)
+{ const base = ANIMS.incline_pushup, seat = (o) => pose({ at: [40, 138], props: [{ chair: [118, 95, 1, 40, 20] }], ...o }); // (chair turned round: the seat edge towards the person, the backrest on the far side)
   ANIMS.incline_chair = { ...base, A: seat({ a: -40, b: -40, t: 40, u: 49, f: 49, fd: -40 }), B: seat({ a: -55, b: -55, t: 55, u: -55, f: 65, fd: -52 }) }; }
+for (const id of ["incline_pushup", "incline_chair"]) Object.assign(ANIMS[id], { plantAll: true, plantPole: [40, .7, .5, -1, 1] }); // (palms stay on the edge all rep; elbows down, a little back and out about 45°)
 ANIMS.doorway.glChrome = { A: ANIMS.doorway.A, B: ANIMS.doorway.B, set: { openHand: true } }; // (chrome: open hands flat on the frame)
 // chrome: the press starts from the front rack, the bar on the front of the shoulders by the collarbones, elbows down and a little forward
 // under it (not flared out to the sides), and presses straight up past the face
@@ -7256,16 +7257,19 @@ function armTwistShare(M) {
   }
 }
 // Hands planted all rep (plantAll): the palms stay on the spot they first land on, whatever the pose does after
-function plantSpot(B, L, grabFix, tap, t) {
+function plantSpot(B, L, grabFix, tap, Sm, reach, t) {
   if (!B.plantAll || grabFix || tap || !GL.animNow) return t;
   const pc = PRO.plantCache || (PRO.plantCache = {}), key = GL.animNow + "|" + FIG_STYLE + "|" + L;
-  if (!pc[key] && GL.kNow === 0) pc[key] = t.clone(); if (pc[key]) t.copy(pc[key]); // (set once, from the start pose: refreshing it at every start made the hands twitch at the top)
+  if (!pc[key] && GL.kNow === (B.plantFrom || 0)) { // (at the start pose, a spot the straight arm can't quite reach comes in towards the shoulder, along the surface, so the palm really rests on it)
+    const d = t.clone().sub(Sm), want = reach * .975;
+    if (d.length() > want) { const h = Math.hypot(d.x, d.z), dy = d.y, hn = Math.sqrt(Math.max(0, want * want - dy * dy)); if (h > 1e-3) { t.x = Sm.x + d.x * hn / h; t.z = Sm.z + d.z * hn / h; } }
+    pc[key] = t.clone(); } if (pc[key]) t.copy(pc[key]); // (set once, from the start pose: refreshing it at every start made the hands twitch at the top)
   return t;
 }
 function proPose(B) {
   PRO.reach = {};
   proPose0(B);
-  if (!B.plant || B._tilted) return;
+  if (!B.plant || B._tilted || B.plantAll) return; // (plantAll: the palms' spot is already within reach; tilting the body as well made the elbows flip between frames)
   const T = THREE, upT = V3(B.sh).sub(V3(B.hip)).normalize(), lft = new T.Vector3().crossVectors(upT, V3(B.fwd)).normalize();
   const arms = B.arms.map((a, i) => ({ a, i, L: V3(a[1][0]).sub(V3(B.sh)).dot(lft) >= 0 ? "Left" : "Right" })).filter(({ L, i }) => !(B.tapArm && i === 1) && PRO.reach[L] && PRO.reach[L].planted); // (shoulder taps: the support arm alone sets the tilt, so it doesn't jump as the other hand lands)
   if (!arms.length) return;
@@ -7581,7 +7585,7 @@ function proPose0(B) {
       PRO.group.updateMatrixWorld(true);
       const Sm = new T.Vector3().setFromMatrixPosition(by[L + "Arm"].matrixWorld), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S;
       const E0 = E.clone(), W0 = Wv.clone();
-      const tgt = plantSpot(B, L, grabFix, tap, grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S - Wv.y) * pw, Wv.z)), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
+      const tgt = plantSpot(B, L, grabFix, tap, Sm, l1 + l2, grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S - Wv.y) * pw, Wv.z)), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       let pole = grabFix ? V3(B.hip).sub(Sm) : tapPole ? tapPole.clone() : E.clone().sub(Sm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
       // A hand on the floor or a chair: when the pose's arm is nearly straight its elbow direction is all but undefined and the
@@ -8316,7 +8320,7 @@ function glPose(an, id, k, still) {
   // Optional middle pose: a smooth curve through it (e.g. the foot lifts while stepping back), not a straight blend
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const p = still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantFrom = an.plantFrom || 0; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
