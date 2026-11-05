@@ -6054,7 +6054,7 @@ let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in to
 let PLANT_POLE = 4, PLANT_OUT = .5; // (PLANT_OUT: how far out to the side, against back towards the hips) // chrome, hands planted: how strongly (cm) the elbow leans to its natural direction when the pose's arm is almost straight
 let BEND_HAND = [2, 20]; // chrome arms: the elbow's bend (degrees) over which the upper arm turns from its straight-arm facing to face the bend
 const ROW_SEAT = { x: 50, w: 50, h: 20 }; // seated cable row (chrome): the low seat under the hips (sketch x, width, height in cm)
-let PIKE_CHAIR = { x: 108, d: 50, A: { at: [50, 138], a: -5, b: -5, t: 90, u: 60, f: 60, fd: 0 }, B: { at: [50, 138], a: -26, b: -26, t: 94, u: 72, f: 42, fd: 0 } }; // pike push-up, hands on a chair (feet flat; bottom: shoulders just behind the hands, head ahead of them above the seat) (the bottom: the head stops just above the seat): the chair seat's near edge, the top and bottom poses
+let PIKE_CHAIR = { x: 112, d: 40, A: { at: [50, 138], a: -5, b: -5, t: 90, u: 60, f: 60, fd: 0 }, B: { at: [50, 138], a: -22, b: -22, t: 88, u: 72, f: 42, fd: 0 } }; // pike push-up, hands on a chair (feet flat; bottom: shoulders just behind the hands, head ahead of them above the seat) (the bottom: the head stops just above the seat): the chair seat's near edge, the top and bottom poses
 const PRESS_RACK = { up: 3, fwd: 9 }; // barbell press start (chrome): the hands' height above the shoulder joints and distance in front of them (cm), bar by the collarbones
 const LAT_BAR = { half: 60, flat: 38, drop: 7 }; // lat pulldown bar (chrome): half length, the straight middle's half length, how far the ends bend down (cm)
 const ROW_BENCH_END = 42; // one-arm row: the bench's back end (sketch x), just behind the knee, so the foot hangs relaxed off it
@@ -6703,7 +6703,7 @@ ANIMS.press_bar.wideBar = 19; ANIMS.press_bar.bendHand = undefined; // (the barb
 ANIMS.pike_pushup.plantPole = [40, .35, 1, .4, 1]; ANIMS.pike_pushup.plantAll = true; // (the palms stay on the floor all rep, even when the elbows rise above the shoulders) // (elbows back towards the feet and a little out, in world terms) // (pike push-ups: the elbows bend back along the body towards the legs, a little out, not flared wide)
 ANIMS.pike_pushup.glChrome = { A: ANIMS.pike_pushup.A, B: pose({ at: [50, 138], a: -40, b: -40, t: 130, u: 70, f: -10, fd: -30 }) }; // bottom: shoulders over the hands, head a little ahead of them above the floor, elbows bent back towards the feet
 // Pike push-up with the hands on a chair seat: feet on the floor, hips high over the seat's edge, head lowered towards the seat
-{ const P = (o) => pose({ props: [{ chair: [PIKE_CHAIR.x, 95, 1, PIKE_CHAIR.d, 23] }], ...o });
+{ const P = (o) => pose({ props: [{ chair: [PIKE_CHAIR.x, 95, 1, PIKE_CHAIR.d, 20] }], ...o });
   ANIMS.pike_chair = { ...ANIMS.pike_pushup, handsOn: true, handFix: undefined, plantAll: true, plantPole: [40, .35, 1, .4, 1], /* (on the seat the elbows bend up and back, above the seat, never down into it) */ glChrome: null, A: P(PIKE_CHAIR.A), B: P(PIKE_CHAIR.B) }; }
 // Incline push-up with the hands on a chair seat: lower than a table (seat ~45 cm), so the body slopes down more; a chair, not a block
 { const base = ANIMS.incline_pushup, seat = (o) => pose({ at: [40, 138], props: [{ chair: [118, 95, 1] }], ...o }); // (chair turned round: the seat edge towards the person, the backrest on the far side)
