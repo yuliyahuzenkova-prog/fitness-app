@@ -6400,7 +6400,7 @@ const ANIMS = {
   // feet raised: heels up on a step, the body nearly level under the table, so it's harder
   table_row_feet: { A: pose({ at: [165, 100], a: 87, b: 87, t: -87, u: 165, f: 165, fd: 87, props: [{ box: [-10, 50, 104, 4] }, { stool: [152, 100, 26, 40] }] }), B: pose({ at: [165, 100], a: 76, b: 76, t: -76, u: 165, f: 165, fd: 76, props: [{ box: [-10, 50, 104, 4] }, { stool: [152, 100, 26, 40] }] }) },
   shoulder_press: { frontArms: true, A: pose({ u: 30, f: 170, fu: 78, ff: 172, fx: PRESS_FX[0], props: [{ db: "wrist" }] }), B: pose({ u: 172, f: 175, fu: 162, ff: 172, fx: PRESS_FX[1], props: [{ db: "wrist" }] }), view: "0 -14 200 164" },
-  landmine: { A: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 10, u: 25, f: 165, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }), B: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 15, u: 135, f: 135, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }) },
+  landmine: { A: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 10, u: 25, f: 165, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }), B: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 15, u: 118, f: 118, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }) }, // (the bar is pressed up and forward, the arm ending about 30° above level, not straight overhead)
   // Facing the wall: forearms on it, elbows at shoulder height, then slide up and out into a "Y"
   wall_slide: { A: pose({ u: 86, f: 180, hz: 14, props: [{ wall: 122 }] }), B: pose({ a: -6, b: -6, t: 3, u: 142, f: 174, hz: 32, props: [{ wall: 122 }] }) },
   wall_angel: { front: true, openHand: true, A: { abd: 55, el: 125, wall: 1 }, B: { abd: 150, el: 25, wall: 1 }, view: "0 -14 200 164" },
@@ -6492,7 +6492,7 @@ const EX_MAP = [
   [/^Pike push-up, hands on a chair/, "pike", "pike_chair"], [/^Incline pike/, "pike", "pike_pushup"], [/^Incline push-up, hands on a chair/, "inclinepush", "incline_chair"], [/^Incline push-up/, "inclinepush", "incline_pushup"], [/[Pp]ike [Pp]ush-up/, "pike", "pike_pushup"], [/^Push-up/, "pushup", "pushup"],
   [/^(Barbell bench press|Bench Press)$/, "bench", "bench_bar"], [/[Bb]ench [Pp]ress/, "bench", "bench_press"], [/^Seated cable row/, "cablerow", "row_cable"], [/^Chest-supported/, "csrow", "row_chest"],
   [/^One-arm dumbbell row/, "onearmrow", "row_onearm"], [/^Barbell Row$/, "bbrow", "row_barbell"], [/^Band row/, "bandrow", "band_row"], [/^Table row, feet raised/, "tablerow", "table_row_feet"], [/^Table row/, "tablerow", "table_row"],
-  [/[Bb]arbell overhead press/, "ohp", "press_bar"], [/^Seated .*shoulder press/, "ohp", "shoulder_press_seated"], [/[Ss]houlder press|[Oo]verhead [Pp]ress/, "ohp", "shoulder_press"], [/[Ll]andmine press/, "landmine", "landmine"], [/^Wall slide/, "fwslide", "wall_slide"], [/^Wall angel/, "wallslide", "wall_angel"],
+  [/[Bb]arbell overhead press/, "ohp", "press_bar"], [/^Seated .*shoulder press/, "ohp", "shoulder_press_seated"], [/[Ss]houlder press|[Oo]verhead [Pp]ress/, "ohp", "shoulder_press"], [/^Half-kneeling landmine/, "landmine", "landmine_hk"], [/[Ll]andmine press/, "landmine", "landmine"], [/^Wall slide/, "fwslide", "wall_slide"], [/^Wall angel/, "wallslide", "wall_angel"],
   [/^Pull-up or heavy/, "pullup", "pullup"], [/^Lat pulldown/, "pulldown", "lat_pulldown"], [/^Pull-up negative/, "negative", "pull_neg"], [/^Assisted pull-up/, "assisted", "pull_assist"], [/^Band-assisted pull-up/, "assisted", "pull_band"],
   [/^Pull-up/, "pullup", "pullup"], [/^Dead hang/, "deadhang", "dead_hang"], [/^Single-arm band pulldown/, "bandpulldown", "band_pulldown1"], [/[Bb]and pulldown/, "bandpulldown", "band_pulldown"],
   [/^Prone Y-T-W/, "proney", "prone_ytw"], [/^Prone Y/, "proney", "prone_y"], [/^Superman/, "superman", "superman"], [/^Dead bug with straight legs/, "deadbug", "dead_bug_straight"], [/^Dead bug/, "deadbug", "dead_bug"], [/^Bird dog/, "birddog", "bird_dog"],
@@ -7249,6 +7249,10 @@ function armTwistShare(M) {
     // only when the elbow carries clearly more turn than the shoulder, and never more than a modest roll of the upper arm
     const need = Math.min(1, Math.max(0, (Math.abs(tF) - Math.abs(tA) - 15) / 30)), roll = Math.max(-45, Math.min(45, (tF - tA) * .5));
     if (k > 0 && free > 0 && need > 0) boneRoll(M, L + "Arm", L + "ForeArm", -roll * k * free * need * fade(tF) * fade(tA));
+    // A raised arm whose shoulder and elbow are twisted opposite ways (they cancel out): unwind both, so the shoulder isn't wrung thin.
+    // Only for arms lifted above level (fading in from 70° to 110°), and blended against the step above, so nothing switches mid-rep.
+    const lift = Math.min(1, Math.max(0, (Math.acos(Math.max(-1, Math.min(1, -u.y))) * 180 / Math.PI - 70) / 40)), oppo = tA * tF < 0 ? Math.min(Math.abs(tA), Math.abs(tF), 45) : 0;
+    if (k > 0 && free > 0 && lift > 0 && oppo > 0) boneRoll(M, L + "Arm", L + "ForeArm", Math.sign(tA) * oppo * .8 * lift * (1 - need) * k * free * fade(tF) * fade(tA));
   }
 }
 // Hands planted all rep (plantAll): the palms stay on the spot they first land on, whatever the pose does after
@@ -8230,6 +8234,9 @@ const TECH = {
   clamshell: { lab: ["Open your knee", "Close slowly"] }, side_leg: { lab: ["Lift your leg", "Lower slowly"] }, hip_flexor: { lab: ["Lean in", "Ease off slowly"] }, chin_tuck: { lab: ["Tuck your chin", "Relax"], path: "head" },
   face_pull: { lab: ["Pull to your face", "Return slowly"], path: "wrist" }, foot_arch: { lab: ["Lift your arch, toes relaxed", "Relax slowly"] }, foot_toes: { lab: ["Scrunch the towel", "Relax your toes"] }, doorway: { lab: ["Lean through", "Step back slowly"] },
 };
+// Half-kneeling landmine press: front foot flat with the shin upright, the back knee on the floor under the hip; the same arm work, a little lower
+{ const hk = (o) => ({ ...o, at: [124, 140], a: 90, b: 0, a2: -6, b2: -90, fd: 0, fd2: -90 });
+  ANIMS.landmine_hk = { ...ANIMS.landmine, kneelHold: true, A: hk(ANIMS.landmine.A), B: hk(ANIMS.landmine.B) }; TECH.landmine_hk = TECH.landmine; }
 // Seated dumbbell press: the same arms, sitting on an upright bench (thighs level, shins upright, back against the pad)
 { const sit = (o) => ({ ...o, anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, props: [...(o.props || []), { box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] });
   ANIMS.shoulder_press_seated = { ...ANIMS.shoulder_press, A: sit(ANIMS.shoulder_press.A), B: sit(ANIMS.shoulder_press.B), view: "0 -14 200 164" };
