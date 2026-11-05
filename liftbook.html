@@ -6036,12 +6036,13 @@ const hlc = (part) => HL[part] || "";
 const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
+let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
 let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
 let PLANT_POLE = 4, PLANT_OUT = .5; // (PLANT_OUT: how far out to the side, against back towards the hips) // chrome, hands planted: how strongly (cm) the elbow leans to its natural direction when the pose's arm is almost straight
 let BEND_HAND = [2, 20]; // chrome arms: the elbow's bend (degrees) over which the upper arm turns from its straight-arm facing to face the bend
 const ROW_SEAT = { x: 50, w: 50, h: 20 }; // seated cable row (chrome): the low seat under the hips (sketch x, width, height in cm)
-let PIKE_CHAIR = { x: 108, d: 50, A: { at: [50, 138], a: -5, b: -5, t: 90, u: 60, f: 60, fd: 0 }, B: { at: [50, 138], a: -10, b: -10, t: 95, u: 72, f: 42, fd: 0 } }; // pike push-up, hands on a chair (feet flat) (the bottom: the head stops just above the seat): the chair seat's near edge, the top and bottom poses
+let PIKE_CHAIR = { x: 108, d: 50, A: { at: [50, 138], a: -5, b: -5, t: 90, u: 60, f: 60, fd: 0 }, B: { at: [50, 138], a: -26, b: -26, t: 94, u: 72, f: 42, fd: 0 } }; // pike push-up, hands on a chair (feet flat; bottom: shoulders just behind the hands, head ahead of them above the seat) (the bottom: the head stops just above the seat): the chair seat's near edge, the top and bottom poses
 const PRESS_RACK = { up: 3, fwd: 9 }; // barbell press start (chrome): the hands' height above the shoulder joints and distance in front of them (cm), bar by the collarbones
 const LAT_BAR = { half: 60, flat: 38, drop: 7 }; // lat pulldown bar (chrome): half length, the straight middle's half length, how far the ends bend down (cm)
 const ROW_BENCH_END = 42; // one-arm row: the bench's back end (sketch x), just behind the knee, so the foot hangs relaxed off it
@@ -6376,7 +6377,7 @@ const ANIMS = {
     glChrome: { A: pose({ at: [38, 132], a: -73, b: -73, t: 73, u: 0, f: 0, fd: -60 }), B: pose({ at: [38, 132], a: -80, b: -80, t: 80, u: -60, f: 62, fd: -60 }) } },
   // Hands on a table (top 75 cm up) at its front edge, body in one straight line from the heels; lowers until the chest nears the edge
   incline_pushup: { A: pose({ at: [40, 138], a: -25.5, b: -25.5, t: 25.5, u: 64.5, f: 64.5, fd: -28, props: [{ box: [123.5, 65, 50, 75] }] }), B: pose({ at: [40, 138], a: -42, b: -42, t: 42, u: -40, f: 70, fd: -40, props: [{ box: [123.5, 65, 50, 75] }] }) },
-  pike_pushup: { A: pose({ at: [50, 138], a: -22, b: -22, t: 128, u: 22, f: 22, fd: -30 }), B: pose({ at: [50, 138], a: -22, b: -22, t: 145, u: 70, f: -10, fd: -30 }) },
+  pike_pushup: { A: pose({ at: [50, 138], a: -22, b: -22, t: 128, u: 28, f: 28, fd: -30 }), B: pose({ at: [50, 138], a: -22, b: -22, t: 145, u: 70, f: -10, fd: -30 }) },
   // Barbell bench press: one bar across both hands, grip a little wider than the shoulders, lowered to the lower chest
   bench_bar: { A: { anchor: "hip", at: [100, 104], t: -90, a: 120, b: 15, u: 70, f: 172, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] }, B: { anchor: "hip", at: [100, 104], t: -90, a: 120, b: 15, u: 178, f: 178, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] },
     glChrome: { A: { anchor: "hip", at: [100, 104], t: -90, a: 75, b: -15, u: 70, f: 172, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] }, B: { anchor: "hip", at: [100, 104], t: -90, a: 75, b: -15, u: 178, f: 178, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] } } /* chrome: feet flat on the floor either side of the bench end, knees bent, not lifted into the air */ },
@@ -6687,11 +6688,11 @@ Object.assign(ANIMS.rdl_bar.A, { u: 9, f: 11 });
 Object.assign(ANIMS.press_bar.A, { fu: 62, ff: 150, fx: 14 });
 ANIMS.press_bar.wideBar = 19; ANIMS.press_bar.bendHand = undefined; // (the barbell press turns cleanly with the default handover, unlike the dumbbell press it copies)
 // Pike push-up (chrome): at the bottom the elbows really bend (~90°) and the top of the head comes down close to the floor, hips staying high
-ANIMS.pike_pushup.plantPole = [40, .3, 1, 0]; // (pike push-ups: the elbows bend back along the body towards the legs, a little out, not flared wide)
-ANIMS.pike_pushup.glChrome = { A: ANIMS.pike_pushup.A, B: pose({ at: [50, 138], a: -33, b: -33, t: 145, u: 70, f: -10, fd: -30 }) };
+ANIMS.pike_pushup.plantPole = [40, .35, 1, .4, 1]; ANIMS.pike_pushup.plantAll = true; // (the palms stay on the floor all rep, even when the elbows rise above the shoulders) // (elbows back towards the feet and a little out, in world terms) // (pike push-ups: the elbows bend back along the body towards the legs, a little out, not flared wide)
+ANIMS.pike_pushup.glChrome = { A: ANIMS.pike_pushup.A, B: pose({ at: [50, 138], a: -40, b: -40, t: 130, u: 70, f: -10, fd: -30 }) }; // bottom: shoulders over the hands, head a little ahead of them above the floor, elbows bent back towards the feet
 // Pike push-up with the hands on a chair seat: feet on the floor, hips high over the seat's edge, head lowered towards the seat
 { const P = (o) => pose({ props: [{ chair: [PIKE_CHAIR.x, 95, 1, PIKE_CHAIR.d, 23] }], ...o });
-  ANIMS.pike_chair = { ...ANIMS.pike_pushup, handsOn: true, handFix: undefined, plantPole: [40, .2, 1.2, 1], /* (on the seat the elbows bend up and back, above the seat, never down into it) */ glChrome: null, A: P(PIKE_CHAIR.A), B: P(PIKE_CHAIR.B) }; }
+  ANIMS.pike_chair = { ...ANIMS.pike_pushup, handsOn: true, handFix: undefined, plantAll: true, plantPole: [40, .35, 1, .4, 1], /* (on the seat the elbows bend up and back, above the seat, never down into it) */ glChrome: null, A: P(PIKE_CHAIR.A), B: P(PIKE_CHAIR.B) }; }
 // Incline push-up with the hands on a chair seat: lower than a table (seat ~45 cm), so the body slopes down more; a chair, not a block
 { const base = ANIMS.incline_pushup, seat = (o) => pose({ at: [40, 138], props: [{ chair: [118, 95, 1] }], ...o }); // (chair turned round: the seat edge towards the person, the backrest on the far side)
   ANIMS.incline_chair = { ...base, A: seat({ a: -40, b: -40, t: 40, u: 49, f: 49, fd: -40 }), B: seat({ a: -55, b: -55, t: 55, u: -55, f: 65, fd: -52 }) }; }
@@ -7250,6 +7251,13 @@ function armTwistShare(M) {
     if (k > 0 && free > 0 && need > 0) boneRoll(M, L + "Arm", L + "ForeArm", -roll * k * free * need * fade(tF) * fade(tA));
   }
 }
+// Hands planted all rep (plantAll): the palms stay on the spot they first land on, whatever the pose does after
+function plantSpot(B, L, grabFix, tap, t) {
+  if (!B.plantAll || grabFix || tap || !GL.animNow) return t;
+  const pc = PRO.plantCache || (PRO.plantCache = {}), key = GL.animNow + "|" + FIG_STYLE + "|" + L;
+  if (GL.kNow === 0 || !pc[key]) pc[key] = t.clone(); else t.copy(pc[key]);
+  return t;
+}
 function proPose(B) {
   PRO.reach = {};
   proPose0(B);
@@ -7531,7 +7539,7 @@ function proPose0(B) {
     const bx = (B.boxes || []).find(([a, b]) => Wv.x > a - 5 && Wv.x < b + 5) /* (a little past the edge too: hands resting right on the edge flickered between the top and the floor) */, surf = bx ? bx[2] : null; // the top of a bench or box this hand is over
     // the tapping hand peels off the floor over the first part of its move, by time rather than height, so it never snaps
     const tx = tap ? Math.min(1, B.tapK / .3) : 0;
-    const pw = B.freeArm0 ? (ai === 0 ? 0 : 1) /* (one-arm row: the support hand rests on the bench the whole time) */ : tap ? 1 - tx * tx * (3 - 2 * tx) : B.handsOn ? 1 : !downArm ? 0 : surf != null ? Math.min(1, Math.max(0, 1 - (Math.abs(Wv.y - surf) - 1.5) / 3)) : Math.min(1, Math.max(0, (-Wv.y - 118) / 12)), planted = tap || pw > 0; // on a bench: only the hand that is down on it
+    const pw = B.freeArm0 ? (ai === 0 ? 0 : 1) /* (one-arm row: the support hand rests on the bench the whole time) */ : tap ? 1 - tx * tx * (3 - 2 * tx) : B.handsOn || B.plantAll ? 1 : !downArm ? 0 : surf != null ? Math.min(1, Math.max(0, 1 - (Math.abs(Wv.y - surf) - 1.5) / 3)) : Math.min(1, Math.max(0, (-Wv.y - 118) / 12)), planted = tap || pw > 0; // on a bench: only the hand that is down on it
     PRO.planted = PRO.planted || {}; PRO.planted[L] = pw;
     if (hipHand) PRO.planted[L] = 1; // (the fingers lie flat on the hip)
     if (PRO.armOut && pw < 1 && !B.closeGrip) { // (close grips keep the hands together in front of the body)
@@ -7569,19 +7577,22 @@ function proPose0(B) {
       PRO.group.updateMatrixWorld(true);
       const Sm = new T.Vector3().setFromMatrixPosition(by[L + "Arm"].matrixWorld), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S;
       const E0 = E.clone(), W0 = Wv.clone();
-      const tgt = grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S - Wv.y) * pw, Wv.z), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
+      const tgt = plantSpot(B, L, grabFix, tap, grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S - Wv.y) * pw, Wv.z)), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       let pole = grabFix ? V3(B.hip).sub(Sm) : tapPole ? tapPole.clone() : E.clone().sub(Sm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
       // A hand on the floor or a chair: when the pose's arm is nearly straight its elbow direction is all but undefined and the
       // elbow flipped over mid-rep. Lean on the natural one, back towards the hips and a little out, until the pose bends clearly.
-      if (!grabFix && !tapPole && PRO.chrome) { const pref = (B.plantPole && B.plantPole.length > 2 ? V3(B.fwd).normalize().multiplyScalar(-B.plantPole[2]).add(new T.Vector3(0, B.plantPole[3], 0)) : V3(B.hip).sub(Sm).normalize()) /* (plantPole [weight, out, back, up]: an explicit elbow direction in body terms) */.add(left.clone().multiplyScalar((L === "Left" ? 1 : -1) * (B.plantPole ? B.plantPole[1] : PLANT_OUT))); pref.sub(hd.clone().multiplyScalar(pref.dot(hd)));
+      if (!grabFix && !tapPole && PRO.chrome) { const pref = (B.plantPole && B.plantPole[4] ? new T.Vector3(-B.plantPole[2], B.plantPole[3], 0) /* ("w": in world terms — back towards the feet and up) */ : B.plantPole && B.plantPole.length > 2 ? V3(B.fwd).normalize().multiplyScalar(-B.plantPole[2]).add(new T.Vector3(0, B.plantPole[3], 0)) : V3(B.hip).sub(Sm).normalize()) /* (plantPole [weight, out, back, up]: an explicit elbow direction in body terms) */.add(left.clone().multiplyScalar((L === "Left" ? 1 : -1) * (B.plantPole ? B.plantPole[1] : PLANT_OUT))); pref.sub(hd.clone().multiplyScalar(pref.dot(hd)));
         if (pref.lengthSq() > 1e-4) pole.add(pref.normalize().multiplyScalar(B.plantPole ? B.plantPole[0] : PLANT_POLE)); } if (pole.lengthSq() < 1e-4) pole = V3(B.fwd).negate().projectOnPlane(hd);
-      PRO.reach = PRO.reach || {}; PRO.reach[L] = { Sm: Sm.clone(), tgt: tgt.clone(), L: l1 + l2, planted: pw > .99 };
+      PRO.reach = PRO.reach || {}; PRO.reach[L] = { Sm: Sm.clone(), tgt: tgt.clone(), L: l1 + l2, planted: pw > .99, surf: tgt.y - 2.6 * S };
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.normalize().multiplyScalar(hg)); Wv = Sm.clone().add(hd.clone().multiplyScalar(dl));
       if (!grabFix && !tap && pw < 1) { // (a tapping hand follows the IK all the way, so it lands on the shoulder, not on the sketch's arm) // part-way to the floor: blend from the pose's own arm directions to the floor reach
         const Ed = Sm.clone().add(E0.clone().sub(Sv).normalize().multiplyScalar(l1)), Wd = Ed.clone().add(W0.clone().sub(E0).normalize().multiplyScalar(l2));
         E = Ed.lerp(E, pw); Wv = Wd.lerp(Wv, pw); // (a tapping hand rising through full reach would make the IK elbow pop out, so it fades sooner)
       }
+      if (B.plantAll) { // (palms on the floor all rep: the upper arm faces the way the elbow bends and the forearm carries that on, so neither spins with the sketch)
+        const ud = E.clone().sub(Sm).normalize(), fd = Wv.clone().sub(E).normalize(), pp = fd.clone().sub(ud.clone().multiplyScalar(fd.dot(ud)));
+        if (pp.lengthSq() > 1e-4) { fU.copy(pp.normalize()); const ff = ud.clone().negate(); ff.sub(fd.clone().multiplyScalar(ff.dot(fd))); /* (the forearm's inner side faces back up the upper arm) */ if (ff.lengthSq() > 1e-4) fF.copy(ff.normalize()); } }
       aim(L + "Arm", L + "ForeArm", E.clone().sub(Sm), fU, fwdRest);
     } else {
       // The elbow only bends one way: the front of the upper arm (biceps) faces where the forearm goes.
@@ -7694,6 +7705,16 @@ function proPose0(B) {
         d.normalize(); mm.normalize(); const ang = Math.atan2(new T.Vector3().crossVectors(d, mm).dot(nrm), d.dot(mm)) * (f === "Thumb" ? THUMB_IN : FINGERS_TOGETHER) * fw;
         const qW = f === "Thumb" ? new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(a2.clone().sub(a1).normalize(), tgt), THUMB_IN * fw) /* (the thumb stands out of the palm, not across it: turn it straight towards the index line) */ : new T.Quaternion().setFromAxisAngle(nrm, ang), cur = new T.Quaternion(); b1.getWorldQuaternion(cur); const par = new T.Quaternion(); b1.parent.getWorldQuaternion(par);
         b1.quaternion.copy(par.invert().multiply(qW.multiply(cur))); b1.updateMatrixWorld(true); } }
+    // A hand resting on a surface: the fingertips lie on it, never through it (the palm tips up at the wrist just enough)
+    if (PRO.chrome) for (const Ls of ["Left", "Right"]) { const r = PRO.reach && PRO.reach[Ls], fw = +((PRO.planted && PRO.planted[Ls]) || 0); if (!r || !r.planted || fw < .99 || !by[Ls + "Hand"]) continue;
+      for (let it = 0; it < 3; it++) { PRO.group.updateMatrixWorld(true);
+        const hw = new THREE.Vector3().setFromMatrixPosition(by[Ls + "Hand"].matrixWorld); let low = null;
+        for (const f of ["Index", "Middle", "Ring", "Pinky"]) { const tb = by[Ls + "Hand" + f + "3"]; if (!tb) continue; const tp = new THREE.Vector3().setFromMatrixPosition(tb.matrixWorld); if (!low || tp.y < low.y) low = tp; }
+        if (!low) break; const need = r.surf + FINGER_CLEAR - low.y; if (need <= .05) break;
+        const arm = low.clone().sub(hw), hl = Math.hypot(arm.x, arm.z); if (hl < .5) break;
+        const ax = new THREE.Vector3(-arm.z, 0, arm.x).normalize(), ang = Math.min(.5, need / hl); // (turn about the horizontal line across the wrist)
+        const hq = new THREE.Quaternion(); by[Ls + "Hand"].getWorldQuaternion(hq); const pq = new THREE.Quaternion(); by[Ls + "Hand"].parent.getWorldQuaternion(pq);
+        const nq = new THREE.Quaternion().setFromAxisAngle(ax, ang).multiply(hq); by[Ls + "Hand"].quaternion.copy(pq.invert().multiply(nq)); } }
   }
   PRO.group.updateMatrixWorld(true);
   // Report where the model's hands actually are, so held weights and bars sit in them
@@ -8091,7 +8112,14 @@ function glProps(props, B, an, p) {
       if (!GL.wallGhost) GL.wallGhost = Object.assign(M.wall.clone(), { transparent: true, opacity: .16, depthWrite: false });
       box(v - 1.5, 8, v + 1.5, 140, 50, between ? GL.wallGhost : M.wall);
     }
-    if (k === "chair") { const d = v[3] || 30, hw = v[4] || 15; /* v[3]: seat depth, v[4]: half width */ box(v[0], v[1] - 3, v[0] + d, v[1], hw); if (v[2]) box(v[0] + d, v[1] - 34, v[0] + d + 4, v[1], hw); else box(v[0] - 4, v[1] - 34, v[0], v[1], hw); for (const [dx, o] of [[1, 2 - hw], [d - 1, 2 - hw], [1, hw - 2], [d - 1, hw - 2]]) rod(L(v[0] + dx, v[1], o), L(v[0] + dx, 140, o), 1.2, M.cable); }
+    if (k === "chair" && v[3]) { // a real chair (seat depth v[3], half width v[4]): a padded seat, four legs, and an open back of two posts and rails on the far side (v[2]) or the near side
+      const d = v[3], hw = v[4] || 21, E = M.equip, top = v[1] - 3, bx = v[2] ? v[0] + d - 2 : v[0] + 2;
+      box(v[0], top, v[0] + d, v[1] + 1, hw); // seat
+      for (const [x, z] of [[v[0] + 2.5, -hw + 2.5], [v[0] + d - 2.5, -hw + 2.5], [v[0] + 2.5, hw - 2.5], [v[0] + d - 2.5, hw - 2.5]]) rod(L(x, v[1] + 1, z), L(x, 140, z), 1.4, E); // legs
+      for (const z of [-hw + 2.5, hw - 2.5]) rod(L(bx, top, z), L(bx, top - 36, z), 1.5, E); // back posts
+      for (const y of [top - 36, top - 24]) rod(L(bx, y, -hw + 2.5), L(bx, y, hw - 2.5), 1.6, E); // back rails
+      rod(L(v[0] + 2.5, 128, -hw + 2.5), L(v[0] + 2.5, 128, hw - 2.5), .9, E); rod(L(v[0] + d - 2.5, 128, -hw + 2.5), L(v[0] + d - 2.5, 128, hw - 2.5), .9, E); // stretchers
+    } else if (k === "chair") { const d = v[3] || 30, hw = v[4] || 15; /* v[3]: seat depth, v[4]: half width */ box(v[0], v[1] - 3, v[0] + d, v[1], hw); if (v[2]) box(v[0] + d, v[1] - 34, v[0] + d + 4, v[1], hw); else box(v[0] - 4, v[1] - 34, v[0], v[1], hw); for (const [dx, o] of [[1, 2 - hw], [d - 1, 2 - hw], [1, hw - 2], [d - 1, hw - 2]]) rod(L(v[0] + dx, v[1], o), L(v[0] + dx, 140, o), 1.2, M.cable); }
     if (k === "db") { const axOf = (a) => (a[1][3] ? V3(a[1][3]).normalize() : latv); if (v === "far") dumbbell(wF, axOf(B.arms[1])); else if (together && two) dumbbell(mid.clone().sub(up.clone().multiplyScalar(6)), up); else { dumbbell(wN, axOf(B.arms[0])); if (two) dumbbell(wF, axOf(B.arms[1])); } }
     if (k === "plate") barbell(v === "sh" ? V3(B.sh).add(V3(B.fwd).multiplyScalar(-4.5)).add(up.clone().multiplyScalar(1)) : mid);
     if (k === "cable" && an && an.rope && two) { // rope attachment: the cable ends in a clip, two rope strands run through the fists and end in stopper knots
@@ -8260,6 +8288,7 @@ function mirrorBody(B) {
     legs: B.legs.map(([sd, pts]) => [-sd, pts.map(m)]), arms: B.arms.map(([sd, pts]) => [-sd, pts.map(m)]) };
 }
 function glPose(an, id, k, still) {
+  GL.kNow = k; GL.animNow = arguments[1]; // (planted hands: remember where they land at the start of the rep)
   if (an.front) {
     const B = frontBody(still ? an.B : lerpPose(an.A, an.B, k)); B.openHand = !!an.openHand; if (an.bandGrip && MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome) B.palmDown = true; // (chrome: the band is held in the fists, palms down)
     // Jumps (jumping jacks): the body leaves the floor between the two positions, toes pointing down in the air
@@ -8280,7 +8309,7 @@ function glPose(an, id, k, still) {
   // Optional middle pose: a smooth curve through it (e.g. the foot lifts while stepping back), not a straight blend
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const p = still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
