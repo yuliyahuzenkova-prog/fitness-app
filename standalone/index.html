@@ -6047,6 +6047,7 @@ function setHighlight(muscles) {
 const hlc = (part) => HL[part] || "";
 const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
+let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
 let PLANT_POLE = 4, PLANT_OUT = .5; // (PLANT_OUT: how far out to the side, against back towards the hips) // chrome, hands planted: how strongly (cm) the elbow leans to its natural direction when the pose's arm is almost straight
@@ -6358,7 +6359,7 @@ function drawFoot(p, faded) {
   return s + "</g>";
 }
 let PRESS_FX = [16, 6]; // dumbbell press: how far (cm) the hands come in front of the shoulders at the bottom and top: elbows a little forward of the body's side line, as a shoulder works, not pulled straight out to the sides
-let SHRUG = 26; // raising the arm overhead lifts the collarbone this much (degrees) at full height
+let SHRUG = 40; // raising the arm overhead lifts the collarbone this much (degrees) at full height
 const STAND = { at: [95, 140], t: 0, a: 0, b: 0, u: 0, f: 0 };
 const pose = (o) => ({ ...STAND, ...o });
 const ANIMS = {
@@ -6671,7 +6672,7 @@ const ANIM_3D = {
   rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, hip_thrust: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
-  shoulder_press: { yaw: -40 }, landmine: { yaw: -40, hz: 9, palmIn: true }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
+  shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
   lat_pulldown: { yaw: 145, palmFwd: true, wideBar: 31 }, pullup: { yaw: 145, palmFwd: true, ankle: 42 }, pull_neg: { yaw: 145, palmFwd: true, ankle: 42, stepBox: true }, pull_band: { yaw: 145, palmFwd: true, ankle: 42 }, dead_hang: { yaw: 145, hz: 28, hzk: .9, palmFwd: true, ankle: 42 }, /* (ankle: feet hang relaxed, ~20° pointed, not on tiptoe) */ band_pulldown: { yaw: 145, hz: 20 }, band_pulldown1: { yaw: 145, hz: 18, single: true },
   prone_y: { yaw: 35, hz: 20 }, prone_ytw: { yaw: 60, pitch: 34, armHinge: true }, /* (seen from higher up, so the letter the arms make on the floor reads) */ superman: { yaw: 35 }, dead_bug: { yaw: -30, alt: true, period: 8400 }, dead_bug_straight: { yaw: -30, alt: true, period: 8400 }, bird_dog: { footDown: true, yaw: 30, handFix: -1, handFix2: false, alt: true, period: 8400 }, cat_cow: { yaw: 25, handFix: -1 },
   plank: { yaw: -25, thumbsUp: true }, plank_knee: { yaw: -25, thumbsUp: true }, /* forearm planks: forearms resting on their outer edge, thumbs up, no twist */ side_plank: { yaw: 90, plane: "frontal", stackLegs: true, handOnHip: true }, side_plank_knee: { yaw: 60, plane: "frontal", noKneel: true, handOnHip: true }, shoulder_taps: { yaw: -25, handFix: -1, handFix2: false, alt: true, period: 6400 }, pallof: { yaw: -45, hz: 1.5, palmIn: true, closeGrip: true }, carry: { yaw: -35 }, walk: { yaw: -35 }, bike: { yaw: -30 }, rower: { yaw: -35, period: 3200, glView: "14 12 208 156" },
@@ -7222,6 +7223,45 @@ function proPaint() {
 // Turn the pose (our joints) into bone rotations: each bone is aimed at its next joint, with a twist reference so muscles face the right way
 // Supports on straight arms (push-ups, planks, all fours): the model's arms are longer than the pose's,
 // so tilt the whole body about the feet (or knees) until the arms reach the floor as straight as in the pose
+// Twist of a bone about its own length (degrees), relative to its rest (bind) pose under its parent
+function boneTwist(M, n) {
+  const T = THREE, b = M.by[n]; if (!b || !b.parent) return 0;
+  if (!M.bindW) { M.bindW = {}; const sk = M.meshes.find((m) => m.skeleton).skeleton; sk.bones.forEach((bn, k) => { const q = new T.Quaternion(); sk.boneInverses[k].clone().invert().decompose(new T.Vector3(), q, new T.Vector3()); M.bindW[bn.name] = q; }); }
+  const pn = b.parent.name; if (!M.bindW[pn] || !M.bindW[n]) return 0;
+  const wq = (o) => { const q = new T.Quaternion(); o.getWorldQuaternion(q); return q; };
+  const rl = M.bindW[pn].clone().invert().multiply(M.bindW[n]), cl = wq(b.parent).invert().multiply(wq(b)), d = rl.invert().multiply(cl);
+  const t = new T.Quaternion(0, d.y, 0, d.w); if (t.lengthSq() < 1e-9) return 0; t.normalize();
+  let a = 2 * Math.acos(Math.min(1, Math.abs(t.w))); if (t.w * t.y < 0) a = -a; return a * 180 / Math.PI;
+}
+// Turn bone n about its own length by deg (world), keeping its child (colinear or not) exactly where it was in the world
+function boneRoll(M, n, child, deg) {
+  const T = THREE, b = M.by[n], c = M.by[child]; if (!b || !c || Math.abs(deg) < .01) return;
+  M.group.updateMatrixWorld(true);
+  const p0 = new T.Vector3().setFromMatrixPosition(b.matrixWorld), p1 = new T.Vector3().setFromMatrixPosition(c.matrixWorld), ax = p1.sub(p0).normalize();
+  const cw = new T.Quaternion(); c.getWorldQuaternion(cw); const bw = new T.Quaternion(); b.getWorldQuaternion(bw); const pw = new T.Quaternion(); b.parent.getWorldQuaternion(pw);
+  const nbw = new T.Quaternion().setFromAxisAngle(ax, deg * Math.PI / 180).multiply(bw);
+  b.quaternion.copy(pw.clone().invert().multiply(nbw)); b.updateMatrixWorld(true);
+  c.quaternion.copy(nbw.clone().invert().multiply(cw)); c.updateMatrixWorld(true);
+}
+function armTwistShare(M) {
+  M.group.updateMatrixWorld(true);
+  const wp = (n) => new THREE.Vector3().setFromMatrixPosition(M.by[n].matrixWorld);
+  for (const L of ["Left", "Right"]) {
+    if (!M.by[L + "Hand"] || !M.by[L + "ForeArm"] || !M.by[L + "Arm"]) continue;
+    // wrist ↔ forearm: the wrist hardly twists; the forearm takes the turn (the hand stays exactly where it is)
+    const fade = (t) => { const x = Math.min(1, Math.max(0, (150 - Math.abs(t)) / 50)); return x * x * (3 - 2 * x); }; // (near a half turn the twist's direction is ambiguous and could flip: leave such turns alone)
+    const tH = boneTwist(M, L + "Hand"); boneRoll(M, L + "ForeArm", L + "Hand", -tH * TWIST_SHARE.wrist * fade(tH));
+    // elbow ↔ upper arm: with the elbow fairly straight, share the forearm's turn with the upper arm (none once clearly bent,
+    // where it would tilt the elbow's hinge)
+    const s0 = wp(L + "Arm"), e0 = wp(L + "ForeArm"), w0 = wp(L + "Hand"), u = e0.clone().sub(s0).normalize(), f = w0.clone().sub(e0).normalize();
+    const bend = Math.acos(Math.max(-1, Math.min(1, u.dot(f)))) * 180 / Math.PI, k = Math.min(1, Math.max(0, (TWIST_SHARE.bendMax - bend) / (TWIST_SHARE.bendMax - TWIST_SHARE.bendMin)));
+    const tF = boneTwist(M, L + "ForeArm"), tA = boneTwist(M, L + "Arm");
+    const free = 1 - Math.min(1, (M.planted && M.planted[L]) || 0); // (an arm propped on the floor or a bench keeps its own turn: sharing tipped it over)
+    // only when the elbow carries clearly more turn than the shoulder, and never more than a modest roll of the upper arm
+    const need = Math.min(1, Math.max(0, (Math.abs(tF) - Math.abs(tA) - 15) / 30)), roll = Math.max(-45, Math.min(45, (tF - tA) * .5));
+    if (k > 0 && free > 0 && need > 0) boneRoll(M, L + "Arm", L + "ForeArm", -roll * k * free * need * fade(tF) * fade(tA));
+  }
+}
 function proPose(B) {
   PRO.reach = {};
   proPose0(B);
@@ -7639,6 +7679,11 @@ function proPose0(B) {
     } else if (PRO.curl) { const ax = PRO.curl[L + "HandMiddle1"]; setBone(L + "Hand", q[L + "ForeArm"].clone().multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(...ax), -rad(B.thumbsUp ? 0 : PRO.wristExt ?? 18)))); } // (a hand resting on its side stays in line with the forearm) else aim(L + "Hand", L + "HandMiddle1", Wv.clone().sub(E), fF, fwdRest);
   }
   PRO.group.scale.setScalar(S); PRO.group.updateMatrixWorld(true);
+  // Chrome: spread the arm's twist along it, as a real arm does (the forearm's two bones share pronation from elbow to wrist).
+  // With one bone per segment, all of a twist landing on one joint wrings the skin there thin, like a sweet wrapper
+  // (the shoulder or elbow looked pinched). Each step turns a bone about its own length and puts its child back where it
+  // was, so the pose, hands and grip don't move — only how the turn is shared between joints changes.
+  if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
   // Fingers: wrap around whatever the hand holds, otherwise rest slightly bent
   if (PRO.curl) {
     const nearL = V3(B.arms[0][1][0]).sub(V3(B.sh)).dot(left) >= 0 ? "Left" : "Right";
