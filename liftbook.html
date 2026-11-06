@@ -6697,8 +6697,9 @@ ANIMS.pike_pushup.glChrome = { A: ANIMS.pike_pushup.A, B: pose({ at: [50, 138], 
   ANIMS.pike_chair = { ...ANIMS.pike_pushup, handsOn: true, handFix: undefined, plantAll: true, plantPole: [40, .35, 1, .4, 1], /* (on the seat the elbows bend up and back, above the seat, never down into it) */ glChrome: null, A: P(PIKE_CHAIR.A), B: P(PIKE_CHAIR.B) }; }
 // Incline push-up with the hands on a chair seat: lower than a table (seat ~45 cm), so the body slopes down more; a chair, not a block
 { const base = ANIMS.incline_pushup, seat = (o) => pose({ at: [40, 138], props: [{ chair: [118, 95, 1, 40, 20] }], ...o }); // (chair turned round: the seat edge towards the person, the backrest on the far side)
-  ANIMS.incline_chair = { ...base, A: seat({ a: -40, b: -40, t: 40, u: 49, f: 49, fd: -40 }), B: seat({ a: -55, b: -55, t: 55, u: -55, f: 65, fd: -52 }) }; }
-for (const id of ["incline_pushup", "incline_chair"]) Object.assign(ANIMS[id], { plantAll: true, plantPole: [40, .7, .5, -1, 1] }); // (palms stay on the edge all rep; elbows down, a little back and out about 45°)
+  ANIMS.incline_chair = { ...base, A: seat({ a: -40, b: -40, t: 40, u: 49, f: 49, fd: -40 }), B: seat({ a: -50, b: -50, t: 50, u: -55, f: 65, fd: -52 }) }; }
+for (const id of ["incline_pushup", "incline_chair"]) Object.assign(ANIMS[id], { plantAll: true, plantPole: [40, .7, .5, -1, 1] });
+ANIMS.incline_chair.plantX = 21; // (the heels of the hands right at the seat's front edge, fingers forward on it: the chest comes down to the edge, not into the seat) // (palms stay on the edge all rep; elbows down, a little back and out about 45°)
 ANIMS.doorway.glChrome = { A: ANIMS.doorway.A, B: ANIMS.doorway.B, set: { openHand: true } }; // (chrome: open hands flat on the frame)
 // chrome: the press starts from the front rack, the bar on the front of the shoulders by the collarbones, elbows down and a little forward
 // under it (not flared out to the sides), and presses straight up past the face
@@ -7262,6 +7263,7 @@ function armTwistShare(M) {
 function plantSpot(B, L, grabFix, tap, Sm, reach, t) {
   if (!B.plantAll || grabFix || tap || !GL.animNow) return t;
   const pc = PRO.plantCache || (PRO.plantCache = {}), key = GL.animNow + "|" + FIG_STYLE + "|" + L;
+  if (!pc[key] && GL.kNow === (B.plantFrom || 0) && B.plantX != null) t.x = B.plantX; // (a fixed spot along the body, e.g. right at a seat's edge)
   if (!pc[key] && GL.kNow === (B.plantFrom || 0)) { // (at the start pose, a spot the straight arm can't quite reach comes in towards the shoulder, along the surface, so the palm really rests on it)
     const d = t.clone().sub(Sm), want = reach * .975;
     if (d.length() > want) { const h = Math.hypot(d.x, d.z), dy = d.y, hn = Math.sqrt(Math.max(0, want * want - dy * dy)); if (h > 1e-3) { t.x = Sm.x + d.x * hn / h; t.z = Sm.z + d.z * hn / h; } }
@@ -8324,7 +8326,7 @@ function glPose(an, id, k, still) {
   // Optional middle pose: a smooth curve through it (e.g. the foot lifts while stepping back), not a straight blend
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const p = still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantFrom = an.plantFrom || 0; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
