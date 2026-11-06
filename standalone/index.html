@@ -6360,7 +6360,8 @@ function drawFoot(p, faded) {
   return s + "</g>";
 }
 let PRESS_FX = [16, 6]; // dumbbell press: how far (cm) the hands come in front of the shoulders at the bottom and top: elbows a little forward of the body's side line, as a shoulder works, not pulled straight out to the sides
-let SHRUG = 40; // raising the arm overhead lifts the collarbone this much (degrees) at full height
+let SHRUG = 40;
+let PROTRACT = 18; // chrome: arm reaching forward brings the shoulder this far forward (degrees) // raising the arm overhead lifts the collarbone this much (degrees) at full height
 const STAND = { at: [95, 140], t: 0, a: 0, b: 0, u: 0, f: 0 };
 const pose = (o) => ({ ...STAND, ...o });
 const ANIMS = {
@@ -6673,7 +6674,7 @@ const ANIM_3D = {
   rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, hip_thrust: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
-  shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
+  shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true, flare: .4 }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
   lat_pulldown: { yaw: 145, palmFwd: true, wideBar: 31 }, pullup: { yaw: 145, palmFwd: true, ankle: 42 }, pull_neg: { yaw: 145, palmFwd: true, ankle: 42, stepBox: true }, pull_band: { yaw: 145, palmFwd: true, ankle: 42 }, dead_hang: { yaw: 145, hz: 28, hzk: .9, palmFwd: true, ankle: 42 }, /* (ankle: feet hang relaxed, ~20° pointed, not on tiptoe) */ band_pulldown: { yaw: 145, hz: 20 }, band_pulldown1: { yaw: 145, hz: 18, single: true },
   prone_y: { yaw: 35, hz: 20 }, prone_ytw: { yaw: 60, pitch: 34, armHinge: true }, /* (seen from higher up, so the letter the arms make on the floor reads) */ superman: { yaw: 35 }, dead_bug: { yaw: -30, alt: true, period: 8400 }, dead_bug_straight: { yaw: -30, alt: true, period: 8400 }, bird_dog: { footDown: true, yaw: 30, handFix: -1, handFix2: false, alt: true, period: 8400 }, cat_cow: { yaw: 25, handFix: -1 },
   plank: { yaw: -25, thumbsUp: true }, plank_knee: { yaw: -25, thumbsUp: true }, /* forearm planks: forearms resting on their outer edge, thumbs up, no twist */ side_plank: { yaw: 90, plane: "frontal", stackLegs: true, handOnHip: true }, side_plank_knee: { yaw: 60, plane: "frontal", noKneel: true, handOnHip: true }, shoulder_taps: { yaw: -25, handFix: -1, handFix2: false, alt: true, period: 6400 }, pallof: { yaw: -45, hz: 1.5, palmIn: true, closeGrip: true }, carry: { yaw: -35 }, walk: { yaw: -35 }, bike: { yaw: -30 }, rower: { yaw: -35, period: 3200, glView: "14 12 208 156" },
@@ -7576,8 +7577,10 @@ function proPose0(B) {
     // Raising the arm above the shoulder also lifts the collarbone, so the shoulder doesn't fold in
     {
       const abdA = Math.acos(Math.max(-1, Math.min(1, -E.clone().sub(Sv).normalize().dot(up)))), elev = Math.max(0, (abdA - rad(45)) / rad(135)), sb = L + "Shoulder";
-      if (by[sb] && elev > 0) {
-        const c0 = R[L + "Arm"].clone().sub(R[sb]).normalize().applyQuaternion(q.Spine2), c1 = c0.clone().add(up.clone().multiplyScalar(Math.tan(rad(SHRUG * elev)))).normalize();
+      // reaching forward also brings the shoulder blade round (protraction), so the back of the shoulder isn't pinched thin
+      const reachF = PRO.chrome ? Math.max(0, E.clone().sub(Sv).normalize().dot(fwd)) * Math.min(1, abdA / rad(60)) : 0;
+      if (by[sb] && (elev > 0 || reachF > 0)) {
+        const c0 = R[L + "Arm"].clone().sub(R[sb]).normalize().applyQuaternion(q.Spine2), c1 = c0.clone().add(up.clone().multiplyScalar(Math.tan(rad(SHRUG * elev)))).add(fwd.clone().multiplyScalar(Math.tan(rad(PROTRACT * reachF)))).normalize();
         setBone(sb, new T.Quaternion().setFromUnitVectors(c0, c1).multiply(q.Spine2));
       } else if (by[sb]) setBone(sb, q.Spine2.clone());
     }
