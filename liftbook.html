@@ -8208,10 +8208,15 @@ function glProps(props, B, an, p) {
         rod(c.clone().sub(hu), c.clone().add(hu), 1.2, M.equip); rod(loop, c, .7, M.band); }
     }
     if (k === "barfrom") { // landmine: one end of the bar in a pivot sleeve on a floor base; the other end loaded with a plate, the hand around its tip
-      const E = M.equip, A0 = L(v[0], v[1]), hand = together ? mid : wN, dir = hand.clone().sub(A0).normalize(), Ln = hand.distanceTo(A0);
-      rod(A0, hand.clone().add(dir.clone().multiplyScalar(-14)), 1.4, E); // the bar up to the collar
-      rod(hand.clone().add(dir.clone().multiplyScalar(-26)), hand.clone().add(dir.clone().multiplyScalar(3.5)), 1.9, E); // the sleeve, its tip just past the hand
-      disc(hand.clone().add(dir.clone().multiplyScalar(-15)), dir, 3, 11.5); disc(hand.clone().add(dir.clone().multiplyScalar(-12.4)), dir, 1.6, 3.2); // a plate and its collar
+      const E = M.equip, A0 = L(v[0], v[1]); let hand = together ? mid : wN;
+      if (isMeshStyle() && PRO.group && PRO.group.visible && PRO.by) { // (the bar end sits in the fist: the middle of the palm, between the wrist and the knuckles, not at the wrist)
+        PRO.group.updateMatrixWorld(true); const wp = (n) => PRO.by[n] && new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld);
+        const best = ["Left", "Right"].map((Ls) => ({ w: wp(Ls + "Hand"), k: wp(Ls + "HandMiddle1"), i: wp(Ls + "HandIndex1"), p: wp(Ls + "HandPinky1") })).filter((h) => h.w && h.k).sort((x, y) => x.w.distanceTo(hand) - y.w.distanceTo(hand))[0];
+        if (best) hand = best.w.clone().lerp(best.k, .7).add(best.i && best.p ? best.i.clone().add(best.p).multiplyScalar(.5).sub(best.k).multiplyScalar(.3) : new T.Vector3()); }
+      const dir = hand.clone().sub(A0).normalize(), Ln = hand.distanceTo(A0);
+      rod(A0, hand.clone().add(dir.clone().multiplyScalar(-34)), 1.4, E); // the bar up to the collar
+      rod(hand.clone().add(dir.clone().multiplyScalar(-40)), hand.clone().add(dir.clone().multiplyScalar(2.5)), 1.9, E); // the sleeve, its end held in the fist (tip just showing past the hand)
+      disc(hand.clone().add(dir.clone().multiplyScalar(-31)), dir, 3, 11.5); disc(hand.clone().add(dir.clone().multiplyScalar(-28.4)), dir, 1.6, 3.2); // a plate and its collar, well down the sleeve so the hand is clear
       const base = glMesh("box", g.box, E); base.castShadow = base.receiveShadow = true; glPlace(base, new T.Vector3(A0.x, -139, A0.z), new T.Vector3(1, 0, 0), new T.Vector3(0, 1, 0), new T.Vector3(0, 0, 1), 34, 2, 34); // the floor plate
       rod(new T.Vector3(A0.x, -138, A0.z), A0.clone().add(new T.Vector3(0, 2, 0)), 2.2, E); rod(A0.clone().add(dir.clone().multiplyScalar(-3)), A0.clone().add(dir.clone().multiplyScalar(12)), 2.6, E); // the pivot post and its sleeve, angled with the bar
     }
@@ -8526,7 +8531,7 @@ function glTechnique(ctx, w, h, an, id, B, tp, still) {
     // Arrow heads at both ends show the direction of travel
     const arrow = (a, b) => { const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), L = 8 * u; ctx.fillStyle = acc; ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - L * Math.cos(ang - .5), b[1] - L * Math.sin(ang - .5)); ctx.lineTo(b[0] - L * Math.cos(ang + .5), b[1] - L * Math.sin(ang + .5)); ctx.fill(); };
     if (Math.hypot(sp[18][0] - sp[0][0], sp[18][1] - sp[0][1]) > 6 * u) { arrow(sp[16], sp[18]); arrow(sp[2], sp[0]); }
-    const cur = P(glJoint(B, t.path)); ctx.fillStyle = acc; ctx.strokeStyle = "#fff"; ctx.lineWidth = 2 * u; ctx.beginPath(); ctx.arc(cur[0], cur[1], 5 * u, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    const cur = P(glJoint(B, t.path)); /* (a ring, not a solid dot: the hand and its grip show through) */ ctx.lineWidth = 3.5 * u; ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.beginPath(); ctx.arc(cur[0], cur[1], 7 * u, 0, Math.PI * 2); ctx.stroke(); ctx.lineWidth = 2 * u; ctx.strokeStyle = acc; ctx.beginPath(); ctx.arc(cur[0], cur[1], 7 * u, 0, Math.PI * 2); ctx.stroke();
   }
   // Good-form line between two joints
   if (t.form) {
