@@ -6403,7 +6403,8 @@ const ANIMS = {
   shoulder_press: { frontArms: true, A: pose({ u: 30, f: 170, fu: 78, ff: 172, fx: PRESS_FX[0], props: [{ db: "wrist" }] }), B: pose({ u: 172, f: 175, fu: 162, ff: 172, fx: PRESS_FX[1], props: [{ db: "wrist" }] }), view: "0 -14 200 164" },
   landmine: { A: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 10, u: 25, f: 165, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }), B: pose({ at: [100, 140], a: 10, b: 0, a2: -18, b2: -18, t: 15, u: 118, f: 118, u2: 4, f2: 10, props: [{ barfrom: [222, 138] }] }) }, // (the bar is pressed up and forward, the arm ending about 30° above level, not straight overhead)
   // Facing the wall: forearms on it, elbows at shoulder height, then slide up and out into a "Y"
-  wall_slide: { A: pose({ u: 86, f: 180, hz: 14, props: [{ wall: 122 }] }), B: pose({ a: -6, b: -6, t: 3, u: 142, f: 174, hz: 32, props: [{ wall: 122 }] }) },
+  // Wall slide: facing the wall, forearms on it and parallel, elbows at shoulder height and shoulder width; slide up into a Y (arms ~150°, nearly straight)
+  wall_slide: { hzk: 1, A: pose({ u: 90, f: 180, hz: 17, props: [{ wall: 122 }] }), B: pose({ a: -4, b: -4, t: 2, u: 150, f: 162, hz: 30, props: [{ wall: 122 }] }) },
   wall_angel: { front: true, openHand: true, A: { abd: 55, el: 125, wall: 1 }, B: { abd: 150, el: 25, wall: 1 }, view: "0 -14 200 164" },
   pull_apart: { front: true, A: { abd: 20, el: 0, band: 1 }, B: { abd: 90, el: 0, band: 1 } },
   jacks: { front: true, openHand: true, jump: 16, A: { abd: 10, el: 0, legs: 9 }, B: { abd: 165, el: 0, legs: 27 }, period: 1500, view: "0 -14 200 164" },
