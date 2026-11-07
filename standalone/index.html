@@ -7584,14 +7584,14 @@ function proPose0(B) {
       const wpos = (n) => new T.Vector3().setFromMatrixPosition(by[n].matrixWorld), oppL = L === "Left" ? "Right" : "Left";
       const hipJ = wpos(L + "UpLeg"), out = hipJ.clone().sub(wpos(oppL + "UpLeg")).normalize(), toHead = wpos("Neck").sub(wpos("Hips")).normalize();
       const P0 = hipJ.clone().add(toHead.clone().multiplyScalar(HAND_ON_HIP.up * S)).add(fwd.clone().multiplyScalar(HAND_ON_HIP.fwd * S));
-      const top = proHipTop(PRO, L, out, P0);
+      let top = proHipTop(PRO, L, out, P0); if (top && GL.animNow && B.roll) { const hc = PRO.hipCache || (PRO.hipCache = {}), key = GL.animNow + "|" + FIG_STYLE + "|" + L; if (GL.kNow === 0 || !hc[key]) hc[key] = top.clone().sub(wpos("Hips")); else top = wpos("Hips").add(hc[key]); } // (the hand stays put on the hip: the lifting leg's skin moved it every frame)
       if (top) {
         const f = toHead.clone().negate().multiplyScalar(.35).add(fwd).normalize(); f.sub(out.clone().multiplyScalar(f.dot(out))).normalize(); // fingers forward and a little down the thigh
         const palm = top.clone().add(out.clone().multiplyScalar(HAND_ON_HIP.lift)), handLen = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
         const Wt = palm.clone().sub(f.clone().multiplyScalar(handLen * .75)).add(out.clone().multiplyScalar(1.2));
         const Sm = wpos(L + "Arm"), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S;
         const st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .999), hd = st.normalize(), al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
-        let pole = out.clone().add(fwd.clone().multiplyScalar(-.6)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // elbow out (up) and back
+        let pole = out.clone().add(fwd.clone().multiplyScalar(B.roll ? -.15 : -.6)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // elbow out (up) and back
         const Em = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)), Wm = Sm.clone().add(hd.clone().multiplyScalar(dl));
         E = Sv.clone().add(Em.clone().sub(Sm)); Wv = E.clone().add(Wm.clone().sub(Em));
         const ud = Em.clone().sub(Sm).normalize(), fd = Wm.clone().sub(Em).normalize(), pp = fd.clone().sub(ud.clone().multiplyScalar(fd.dot(ud)));
