@@ -7997,8 +7997,9 @@ function glTowel(B, k) {
   const geo = GL.towel.geometry, pos = geo.attributes.position, start = -8, len = 46 - k * 12;
   for (let i = 0; i < pos.count; i++) {
     const [x, v] = GL.towelUV[i]; // v: 0 near the toes → 1 far end
-    const z = start + len * v, u = Math.max(0, (z - reach - 8) / (len + start - reach - 8)); // u: 0 at the toes → 1 far end
-    const fold = z < reach + 8 ? 0 : k * (2.6 * Math.max(0, Math.sin(Math.PI * (u * 4 + .1))) * Math.max(0, 1 - u * 1.2) * Math.min(1, u * 10) + .25 * Math.sin(x * .5 + u * 9));
+    // the toes pull the towel in: it bunches into a few folds right under the toe tips and just in front of them, flat beyond
+    const z = start + len * v, d = z - (reach - 3), bunch = d < 0 || d > 16 ? 0 : Math.sin(Math.PI * d / 16) ** .8;
+    const fold = k * bunch * (2.2 * Math.max(0, Math.sin(Math.PI * d / 4.2 + .3)) + .9) + k * bunch * .2 * Math.sin(x * .6 + d);
     pos.setXYZ(i, x, .25 + fold, z);
   }
   pos.needsUpdate = true; geo.computeVertexNormals();
