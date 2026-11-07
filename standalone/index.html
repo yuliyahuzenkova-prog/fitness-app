@@ -6698,7 +6698,10 @@ const ANIM_VARIANTS = {
   rdl_bar: ["rdl", (ps) => ps.map((pp) => (pp.db ? { plate: "wrist" } : pp))],
   press_bar: ["shoulder_press", (ps) => ps.map((pp) => (pp.db ? { plate: "wrist" } : pp))],
 };
-for (const [id, [base, f]] of Object.entries(ANIM_VARIANTS)) { const an = (ANIMS[id] = { ...ANIMS[base] }); for (const k of ["A", "M", "B"]) if (an[k]) an[k] = { ...an[k], props: f(an[k].props || []) }; }
+// Step-up onto a low box, the whole movement: standing on the floor, knee up, the foot over the box edge, the whole foot down on
+// the box (lean in), push up while the back leg follows, standing tall on top; stepping down reverses it
+ANIMS.step_up.keys = [{ anchor: "hip", at: [81, 78.5], t: 0, a: 7.0, b: -7.5, fd: 0, a2: 7.0, b2: -7.5, fd2: 0, u: 4, f: 4, props: [{ box: [108, 120, 45, 20] }] }, { anchor: "hip", at: [84, 79], t: 6, a: 82.3, b: -46.4, fd: -14, a2: 6.8, b2: -13.1, fd2: 0, u: 5, f: 5, props: [{ box: [108, 120, 45, 20] }] }, { anchor: "hip", at: [90, 79], t: 12, a: 86.3, b: -3.7, fd: 0, a2: -2.6, b2: -14.6, fd2: 0, u: 6, f: 6, props: [{ box: [108, 120, 45, 20] }] }, { anchor: "hip", at: [101, 77], t: 26, a: 65.2, b: -9.7, fd: 0, a2: -14.5, b2: -20.6, fd2: 0, u: 6, f: 6, props: [{ box: [108, 120, 45, 20] }] }, { anchor: "hip", at: [110, 66], t: 12, a: 40.0, b: -10.7, fd: 0, a2: 24.2, b2: -60.4, fd2: -15, u: 3, f: 3, props: [{ box: [108, 120, 45, 20] }] }, { anchor: "hip", at: [125, 58], t: 0, a: 3.2, b: -3.4, fd: 0, a2: 3.2, b2: -3.4, fd2: 0, u: 0, f: 0, props: [{ box: [108, 120, 45, 20] }] }];
+for (const [id, [base, f]] of Object.entries(ANIM_VARIANTS)) { const an = (ANIMS[id] = { ...ANIMS[base] }); for (const k of ["A", "M", "B"]) if (an[k]) an[k] = { ...an[k], props: f(an[k].props || []) }; if (an.keys) an.keys = an.keys.map((q) => ({ ...q, props: f(q.props || []) })); }
 // a barbell runs between the hands, so it has to pass in front of the body: arms a little forward at the top of the hinge,
 // and the press starts from the front of the shoulders (collarbones) instead of beside the ears
 Object.assign(ANIMS.rdl_bar.A, { u: 9, f: 11 });
@@ -8275,9 +8278,9 @@ const TECH = {
 // Step-up variants with their own heights: a stair (two low steps, ~18 cm each) and a sturdy chair (seat ~45 cm, the knee bent to ~90° at the start)
 { const P = (o, props) => pose({ ...o, props });
   const st = [{ box: [100, 128, 40, 12] }, { box: [140, 116, 40, 24] }];
-  ANIMS.step_up_stair = { ...ANIMS.step_up, A: P({ at: [120, 128], a: 48, b: -12, t: 22, a2: -12, b2: -12, fd2: 0, u: 5, f: 5 }, st), M: P({ at: [120, 128], a: 20, b: -5, t: 10, a2: 22, b2: -60, fd2: -40, u: 3, f: 3 }, st), B: P({ at: [120, 128], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, st) };
+  ANIMS.step_up_stair = { ...ANIMS.step_up, keys: null, A: P({ at: [120, 128], a: 48, b: -12, t: 22, a2: -12, b2: -12, fd2: 0, u: 5, f: 5 }, st), M: P({ at: [120, 128], a: 20, b: -5, t: 10, a2: 22, b2: -60, fd2: -40, u: 3, f: 3 }, st), B: P({ at: [120, 128], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, st) };
   const ch = [{ chair: [104, 111, 1, 40, 20] }];
-  ANIMS.step_up_chair = { ...ANIMS.step_up, A: P({ at: [124, 108], a: 86, b: -4, t: 32, a2: -16, b2: -16, fd2: 0, u: 8, f: 8 }, ch), M: P({ at: [124, 108], a: 40, b: -8, t: 16, a2: 26, b2: -70, fd2: -40, u: 4, f: 4 }, ch), B: P({ at: [124, 108], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, ch) };
+  ANIMS.step_up_chair = { ...ANIMS.step_up, keys: null, A: P({ at: [124, 108], a: 86, b: -4, t: 32, a2: -16, b2: -16, fd2: 0, u: 8, f: 8 }, ch), M: P({ at: [124, 108], a: 40, b: -8, t: 16, a2: 26, b2: -70, fd2: -40, u: 4, f: 4 }, ch), B: P({ at: [124, 108], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, ch) };
   for (const id of ["step_up_stair", "step_up_chair"]) TECH[id] = TECH.step_up; }
 // Half-kneeling landmine press: front foot flat with the shin upright, the back knee on the floor under the hip; the same arm work, a little lower
 { const hk = (o) => ({ ...o, at: [124, 140], a: 90, b: 0, a2: -6, b2: -90, fd: 0, fd2: -90 });
@@ -8360,7 +8363,8 @@ function glPose(an, id, k, still) {
   const A = alt ? alt.A : an.A, Bp = alt ? alt.B : an.B;
   // Optional middle pose: a smooth curve through it (e.g. the foot lifts while stepping back), not a straight blend
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
-  const p = still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
+  const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way)
+  const p = KS ? (still ? KS[KS.length - 1] : (() => { const x = Math.min(1, Math.max(0, k)) * (KS.length - 1), i = Math.min(KS.length - 2, Math.floor(x)), f = x - i, e = f * f * (3 - 2 * f); return lerpPose(KS[i], KS[i + 1], e); })()) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
   const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
