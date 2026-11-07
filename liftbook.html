@@ -6037,6 +6037,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
 let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
@@ -6468,7 +6469,7 @@ const ANIMS = {
   walk: { walk: true, period: 2400 },
   bike: { bike: true },
   rower: { bike: true, row: true },
-  calf_raise: { A: pose({ at: [95, 140], fd: 0 }), B: pose({ at: [97, 131], fd: -55 }) },
+  calf_raise: { A: pose({ at: [95, 140], a: 4, b: -2, fd: 0 }), B: pose({ at: [97, 131], a: 4, b: -2, fd: -55 }) }, // (knees soft, a few degrees bent, never snapping straight)
   tib_raise: { A: pose({ at: [122, 140], a: 18, b: 18, t: -18, u: 0, f: 0, fd: 0, props: [{ wall: 78 }] }), B: pose({ at: [122, 140], a: 18, b: 18, t: -18, u: 0, f: 0, fd: 35, props: [{ wall: 78 }] }) },
   foot_arch: { foot: true, A: { arch: 0 }, B: { arch: 14 }, feet: "arch", glView: "62 96 84 63", gl: { A: pose({ at: [104, 134], a: 90, b: 4, a2: 90, b2: 6, fd2: 0, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }), B: pose({ at: [104, 134], a: 90, b: 4, a2: 90, b2: 6, fd2: 0, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }) } },
   foot_toes: { foot: true, A: { curl: 0, towel: 1 }, B: { curl: 35, towel: 1 }, feet: "towel", glView: "62 96 84 63", gl: { A: pose({ at: [104, 134], a: 90, b: 4, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }), B: pose({ at: [104, 134], a: 90, b: 4, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }) } },
@@ -7455,7 +7456,7 @@ function proPose0(B) {
     const along = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hgt = Math.sqrt(Math.max(0, l1 * l1 - along * along));
     let pole = K.clone().sub(Hm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
     // nearly straight legs: a slight bias to the front, so the knee doesn't flip about as the bend starts
-    if (!B.roll) pole.add(V3(B.fwd).projectOnPlane(hd).multiplyScalar(1.5));
+    if (!B.roll) pole.add(V3(B.fwd).projectOnPlane(hd).multiplyScalar(PRO.chrome ? KNEE_FWD : 1.5)); // (chrome: firmer, so a near-straight knee never flips back and forth, as in calf raises)
     if (pole.lengthSq() < 1e-4) pole = V3(B.fwd).sub(hd.clone().multiplyScalar(V3(B.fwd).dot(hd)));
     const knee = Hm.clone().add(hd.clone().multiplyScalar(along)).add(pole.normalize().multiplyScalar(hgt)), ankle = Hm.clone().add(hd.clone().multiplyScalar(dl));
     aim(L + "UpLeg", L + "Leg", knee.clone().sub(Hm), front(h, k), fwdRest);
