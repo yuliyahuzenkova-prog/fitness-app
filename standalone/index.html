@@ -6503,7 +6503,7 @@ const EX_MAP = [
   [/^(Barbell back squat|Squat)$/, "backsquat", "squat_bar"], [/^(Box squat|Slow squat to a chair)/, "boxsquat", "squat_box"],
   [/^Sit-to-stand/, "sitstand", "sit_to_stand"], [/^Bodyweight [Ss]quat/, "bwsquat", "squat_bw"], [/^Wall sit, a bit deeper/, "wallsit", "wall_sit_deep"], [/^Wall sit/, "wallsit", "wall_sit"],
   [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
-  [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/[Ss]tep-up/, "stepup", "step_up"],
+  [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/^Step-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
   [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
   [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
   [/^Pike push-up, hands on a chair/, "pike", "pike_chair"], [/^Incline pike/, "pike", "pike_pushup"], [/^Incline push-up, hands on a chair/, "inclinepush", "incline_chair"], [/^Incline push-up/, "inclinepush", "incline_pushup"], [/[Pp]ike [Pp]ush-up/, "pike", "pike_pushup"], [/^Push-up/, "pushup", "pushup"],
@@ -8271,6 +8271,13 @@ const TECH = {
   clamshell: { lab: ["Open your knee", "Close slowly"] }, side_leg: { lab: ["Lift your leg", "Lower slowly"] }, hip_flexor: { lab: ["Lean in", "Ease off slowly"] }, chin_tuck: { lab: ["Tuck your chin", "Relax"], path: "head" },
   face_pull: { lab: ["Pull to your face", "Return slowly"], path: "wrist" }, foot_arch: { lab: ["Lift your arch, toes relaxed", "Relax slowly"] }, foot_toes: { lab: ["Scrunch the towel", "Relax your toes"] }, doorway: { lab: ["Lean through", "Step back slowly"] },
 };
+// Step-up variants with their own heights: a stair (two low steps, ~18 cm each) and a sturdy chair (seat ~45 cm, the knee bent to ~90° at the start)
+{ const P = (o, props) => pose({ ...o, props });
+  const st = [{ box: [100, 128, 40, 12] }, { box: [140, 116, 40, 24] }];
+  ANIMS.step_up_stair = { ...ANIMS.step_up, A: P({ at: [120, 128], a: 48, b: -12, t: 22, a2: -12, b2: -12, fd2: 0, u: 5, f: 5 }, st), M: P({ at: [120, 128], a: 20, b: -5, t: 10, a2: 22, b2: -60, fd2: -40, u: 3, f: 3 }, st), B: P({ at: [120, 128], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, st) };
+  const ch = [{ chair: [104, 111, 1, 40, 20] }];
+  ANIMS.step_up_chair = { ...ANIMS.step_up, A: P({ at: [124, 108], a: 86, b: -4, t: 32, a2: -16, b2: -16, fd2: 0, u: 8, f: 8 }, ch), M: P({ at: [124, 108], a: 40, b: -8, t: 16, a2: 26, b2: -70, fd2: -40, u: 4, f: 4 }, ch), B: P({ at: [124, 108], a: 0, b: 0, t: 0, a2: 0, b2: 0, u: 0, f: 0 }, ch) };
+  for (const id of ["step_up_stair", "step_up_chair"]) TECH[id] = TECH.step_up; }
 // Half-kneeling landmine press: front foot flat with the shin upright, the back knee on the floor under the hip; the same arm work, a little lower
 { const hk = (o) => ({ ...o, at: [124, 140], a: 90, b: 0, a2: -6, b2: -90, fd: 0, fd2: -90 });
   ANIMS.landmine_hk = { ...ANIMS.landmine, kneelHold: true, A: hk(ANIMS.landmine.A), B: hk(ANIMS.landmine.B) }; TECH.landmine_hk = TECH.landmine; }
