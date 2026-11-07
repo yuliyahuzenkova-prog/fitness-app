@@ -6040,6 +6040,7 @@ let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit t
 let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
 let HT_BOX = 109; // single-leg hip thrust: the bench top (sketch y)
 let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
+let BOTTOM_ARM_UNWIND = -1; // side-lying: share of the bottom (overhead) arm's twist taken out
 let HIP_ARM_UNWIND = -.45; // hand on hip: share of the upper arm's twist taken out
 let CROSS_ARMS = { inward: .3, down: -4, out: 8, layer: 2.2 }; // arms crossed on the chest: how far each palm sits from the other shoulder towards the sternum, below it (cm), in front of the spine (cm), and the near forearm's extra lift over the far one
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
@@ -7762,6 +7763,8 @@ function proPose0(B) {
   if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
   // hand on the hip: the upper arm keeps none of its own twist (the elbow stays where it is), so the shoulder isn't wrung thin
   if (PRO.chrome && B.handOnHip && PRO.hipHandL) { const L = PRO.hipHandL, tA = boneTwist(PRO, L + "Arm"); boneRoll(PRO, L + "Arm", L + "ForeArm", -tA * HIP_ARM_UNWIND); }
+  // side-lying with the hand on the hip: the bottom arm, stretched overhead along the floor, loses its twist too (the shoulder it lies on was wrung thin)
+  if (PRO.chrome && B.handOnHip && B.roll && PRO.hipHandL) { const L = PRO.hipHandL === "Left" ? "Right" : "Left", tA = boneTwist(PRO, L + "Arm"); boneRoll(PRO, L + "Arm", L + "ForeArm", -tA * BOTTOM_ARM_UNWIND); }
   PRO.hipHandL = null;
   // Fingers: wrap around whatever the hand holds, otherwise rest slightly bent
   if (PRO.curl) {
