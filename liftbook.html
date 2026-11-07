@@ -6037,6 +6037,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
 let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
 let PLANT_POLE = 4, PLANT_OUT = .5; // (PLANT_OUT: how far out to the side, against back towards the hips) // chrome, hands planted: how strongly (cm) the elbow leans to its natural direction when the pose's arm is almost straight
@@ -7479,7 +7480,7 @@ function proPose0(B) {
     const hz = new T.Vector3(sole.x, 0, sole.z);
     if (footEx) {
       // Towel scrunch: the toes curl down and pull; arch lift: toes stay relaxed and flat
-      const curlT = GL.foot.kind === "towel" ? GL.foot.k * 9 : 0, ax = new T.Vector3().crossVectors(sole, new T.Vector3(0, -1, 0)).normalize();
+      const curlT = GL.foot.kind === "towel" ? GL.foot.k * TOE_CURL : 0, ax = new T.Vector3().crossVectors(sole, new T.Vector3(0, -1, 0)).normalize();
       setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(flat(fu, sole)));
     } else {
       let qN = restTop ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) /* relaxed foot: the toes lie on the floor, tops down */ : !B.kneeSide && Tt.y < -137 && sole.y < -.12 && hz.lengthSq() > .01 ? flat(new T.Vector3(0, 1, 0), hz.clone().normalize()) : flat(fu, sole);
@@ -7998,8 +7999,10 @@ function glTowel(B, k) {
   for (let i = 0; i < pos.count; i++) {
     const [x, v] = GL.towelUV[i]; // v: 0 near the toes → 1 far end
     // the toes pull the towel in: it bunches into a few folds right under the toe tips and just in front of them, flat beyond
-    const z = start + len * v, d = z - (reach - 3), bunch = d < 0 || d > 16 ? 0 : Math.sin(Math.PI * d / 16) ** .8;
-    const fold = k * bunch * (2.2 * Math.max(0, Math.sin(Math.PI * d / 4.2 + .3)) + .9) + k * bunch * .2 * Math.sin(x * .6 + d);
+    // the curling toes grip the towel and drag it back under the foot: a bunched ridge forms right at the toe tips and travels
+    // back under them as they curl, with smaller folds trailing in front; the far end slides towards the foot
+    const z = start + len * v, c = reach + 5 - 7 * k, g = Math.exp(-(((z - c) / 4.5) ** 2)), trail = z > c ? Math.exp(-(z - c) / 9) : 0;
+    const fold = k * (3.4 * g + 1.4 * trail * Math.max(0, Math.sin((z - c) * .9))) + k * (g + trail) * .25 * Math.sin(x * .6 + z);
     pos.setXYZ(i, x, .25 + fold, z);
   }
   pos.needsUpdate = true; geo.computeVertexNormals();
