@@ -6037,6 +6037,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
 let HT_BOX = 109; // single-leg hip thrust: the bench top (sketch y)
 let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
@@ -6156,7 +6157,7 @@ function lift(j, an, p) {
   if (p && p.abd2) {
     const pv = legF[0], A = an.clam ? v3.norm(v3.sub(legF[2], pv)) : [1, 0, 0];
     const rot = (q, th) => { const v = v3.sub(q, pv), c = Math.cos(th), sn = Math.sin(th); return v3.add(pv, v3.add(v3.add(v3.mul(v, c), v3.mul(v3.cross(A, v), sn)), v3.mul(A, v3.dot(A, v) * (1 - c)))); };
-    let th = rad(p.abd2); if (rot(legF[1], th)[2] > legF[1][2]) th = -th;
+    let th = rad(Math.abs(p.abd2)); if (rot(legF[1], th)[2] > legF[1][2]) th = -th; if (p.abd2 < 0) th = -th; // (negative: the top leg comes down to rest on the bottom one)
     for (let i = 1; i < 4; i++) legF[i] = rot(legF[i], th);
   }
   let B = { hip, sh, up, fwd, lat, neck: L(j.neck), head: L(j.head), legs: [[1, legN], [-1, legF]], arms: [[1, armN], [-1, armF]], nfOf, nfFront: !!frontal };
@@ -6480,7 +6481,7 @@ const ANIMS = {
   foot_arch: { foot: true, A: { arch: 0 }, B: { arch: 14 }, feet: "arch", glView: "62 96 84 63", gl: { A: pose({ at: [96, 134], a: 90, b: -8, a2: 90, b2: -6, fd2: 0, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }), B: pose({ at: [96, 134], a: 90, b: -8, a2: 90, b2: -6, fd2: 0, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }) } },
   foot_toes: { foot: true, A: { curl: 0, towel: 1 }, B: { curl: 35, towel: 1 }, feet: "towel", glView: "62 96 84 63", gl: { A: pose({ at: [96, 134], a: 90, b: -8, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }), B: pose({ at: [96, 134], a: 90, b: -8, t: -4, u: 28, f: 78, props: [{ chair: [44, 114] }] }) } },
   clamshell: { roll: true, clam: true, A: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 0 }, B: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 42 } },
-  side_leg: { roll: true, A: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: 0 }, B: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: 38 } },
+  side_leg: { roll: true, A: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: SIDE_LEG_REST }, B: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: 38 } },
   // Half-kneeling: only the arm on the kneeling-leg side reaches up (it adds to the stretch); the other hand rests on the front thigh
   hip_flexor: { kneelHold: true, A: pose({ at: [132, 140], a: 90, b: 0, a2: -10, b2: -90, fd2: -90, t: 0, u: 20, f: 70, u2: 4, f2: 6 }), B: pose({ at: [132, 140], a: 75, b: -22, a2: -28, b2: -95, fd2: -90, t: -6, u: 26, f: 72, u2: 172, f2: 175 }) },
   chin_tuck: { A: pose({ hx: 3, h: 0, u: 0, f: 0 }), B: pose({ hx: -3, h: 5, u: 0, f: 0 }), view: "58 -4 84 63", glView: "58 -4 84 63" }, // a small, level glide of the head back (eyes stay level), shown close up
