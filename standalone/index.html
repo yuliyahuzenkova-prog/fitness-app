@@ -6050,7 +6050,8 @@ const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
 let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
-let HT_BOX = 102.6; // single-leg hip thrust: the bench top (sketch y)
+let HT_BOX = 102.6;
+let HT_PAD = [4, 11]; // hip thrust machine: the roller's shift from the hips towards the head, and its height above them // single-leg hip thrust: the bench top (sketch y)
 let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
 let BOTTOM_ARM_UNWIND = -1; // side-lying: share of the bottom (overhead) arm's twist taken out
 let HIP_ARM_UNWIND = -.45; // hand on hip: share of the upper arm's twist taken out
@@ -6517,7 +6518,7 @@ const EX_MAP = [
   [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
   [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/^Reverse lunge, short step/, "revlunge", "reverse_lunge_short"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/[Ss]tep-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
   [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
-  [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/^Single-leg glute bridge/, "bridge", "glute_bridge_single"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
+  [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/^Hip thrust, back on the couch/, "hipthrust", "hip_thrust_couch"], [/^Hip thrust machine/, "hipthrust", "hip_thrust_machine"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/^Single-leg glute bridge/, "bridge", "glute_bridge_single"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
   [/^Pike push-up, hands on a chair/, "pike", "pike_chair"], [/^Incline pike/, "pike", "pike_pushup"], [/^Incline push-up, hands on a chair/, "inclinepush", "incline_chair"], [/^Incline push-up/, "inclinepush", "incline_pushup"], [/[Pp]ike [Pp]ush-up/, "pike", "pike_pushup"], [/^Push-up/, "pushup", "pushup"],
   [/^(Barbell bench press|Bench Press)$/, "bench", "bench_bar"], [/[Bb]ench [Pp]ress/, "bench", "bench_press"], [/^Seated cable row/, "cablerow", "row_cable"], [/^Chest-supported/, "csrow", "row_chest"],
   [/^One-arm dumbbell row/, "onearmrow", "row_onearm"], [/^Barbell Row$/, "bbrow", "row_barbell"], [/^Band row/, "bandrow", "band_row"], [/^Table row, feet raised/, "tablerow", "table_row_feet"], [/^Table row/, "tablerow", "table_row"],
@@ -6704,7 +6705,7 @@ function drawFigure(an, p, cam, cls, small) {
 const ANIM_3D = {
   squat_bw: { yaw: -40, fz: 4 }, squat_goblet: { yaw: -40, fz: 5, hz: 3 }, squat_goblet_box: { yaw: -40, fz: 5, hz: 3 }, squat_bar: { yaw: -40, fz: 5, hz: 20 }, squat_box: { yaw: -40, fz: 4 },
   sit_to_stand: { yaw: -40 }, sit_to_stand_high: { yaw: -40, armsCrossed: true }, wall_sit: { yaw: -50 }, wall_sit_deep: { yaw: -50 }, leg_press: { yaw: -30 }, split_squat: { yaw: -40 }, bulgarian: { yaw: -40 }, reverse_lunge: { yaw: -40 }, reverse_lunge_short: { yaw: -40 }, step_up: { yaw: -40 },
-  rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, glute_bridge_single: { yaw: -25 }, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
+  rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, glute_bridge_single: { yaw: -25 }, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, hip_thrust_couch: { yaw: -25 }, hip_thrust_machine: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
   shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true, flare: .4 }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
@@ -8156,6 +8157,15 @@ function glProps(props, B, an, p) {
         iron(L(x1 - 2.5, hook + 2, z), new T.Vector3(1, 0, 0), new T.Vector3(0, 1, 0), new T.Vector3(0, 0, 1), 5, 2, 3.4); }
       for (const x of [x0, x1]) { rod(L(x, -32, -54), L(x, -32, 54), 2.2, E); rod(L(x, 139, -54), L(x, 139, 54), 2.2, E); } }
     if (k === "assiststack") column(v[0], 0, 0, -1, 0, false); // assisted pull-up machine: its weight stack in front of the person
+    if (k === "couch") { const X = new T.Vector3(1, 0, 0), Y = new T.Vector3(0, 1, 0), Z = new T.Vector3(0, 0, 1), soft = M.box, E = M.equip, x0 = v[0] + 36, top = v[1]; // a couch: the seat's front edge under the shoulder blades, a deep seat, a backrest behind, armrests, short legs
+      const blk = (cx, cy, cz, sx, sy, sz, m = soft) => { const b = glMesh("box", g.box, m); b.castShadow = b.receiveShadow = true; glPlace(b, L(cx, cy, cz), X, Y, Z, sx, sy, sz); };
+      blk(x0 - 28, (top + 134) / 2, 0, 56, 134 - top, 150); blk(x0 - 64, top - 22, 0, 18, 62, 150); for (const z of [-80, 80]) blk(x0 - 28, top - 8, z, 74, 34 + (134 - top), 14);
+      for (const [x, z] of [[x0 - 4, -84], [x0 - 4, 84], [x0 - 70, -84], [x0 - 70, 84]]) rod(L(x, 134, z), L(x, 140, z), 1.6, E); }
+    if (k === "htmachine") { const X = new T.Vector3(1, 0, 0), Y = new T.Vector3(0, 1, 0), Z = new T.Vector3(0, 0, 1), E = M.equip, x0 = v[0], top = v[1]; // hip thrust machine: a padded back rest, a frame on the floor, and a padded roller over the hips that rises with them
+      const pad = glMesh("box", g.box, M.box); pad.castShadow = pad.receiveShadow = true; glPlace(pad, L(x0 + 18, top + 3, 0), X, Y, Z, 36, 6, 44);
+      rod(L(x0 + 18, top + 6, 0), L(x0 + 18, 140, 0), 2.6, E); rod(L(x0 - 30, 139, -30), L(x0 + 120, 139, -30), 2.4, E); rod(L(x0 - 30, 139, 30), L(x0 + 120, 139, 30), 2.4, E); rod(L(x0 - 30, 139, -30), L(x0 - 30, 139, 30), 2.4, E);
+      const hp = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.Hips.matrixWorld) : V3(B.hip), kn = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.LeftLeg.matrixWorld).setZ(0) : V3(B.legs[0][1][1]).setZ(0), rt = hp.clone().add(hp.clone().setZ(0).sub(kn).normalize().multiplyScalar(HT_PAD[0])).add(new T.Vector3(0, HT_PAD[1], 0)); /* (on the hip crease, just above the pelvis) */ rod(rt.clone().add(new T.Vector3(0, 0, -24)), rt.clone().add(new T.Vector3(0, 0, 24)), 5.2, M.box); // the hip pad
+      for (const sz of [-1, 1]) { const end = rt.clone().add(new T.Vector3(0, 0, sz * 27)); rod(end, new T.Vector3(L(x0 + 30, 139, 0).x, -139, sz * 30), 1.8, E); } } // its arms down to the frame (they pivot as the hips rise)
     if (k === "latmachine") { // lat pulldown machine: the seat on a post and floor frame, a knee pad roller over the thighs, a column with the weight stack in front, and the top beam out to the pulley over the head
       const E = M.equip, C = M.cable;
       rod(L(82, 123), L(82, 140), 2.6, E); rod(L(66, 140), L(166, 140), 2.6, E); // seat post and the floor rail to the column
@@ -8338,6 +8348,9 @@ const TECH = {
   clamshell: { lab: ["Open your knee", "Close slowly"] }, side_leg: { lab: ["Lift your leg", "Lower slowly"] }, hip_flexor: { lab: ["Lean in", "Ease off slowly"] }, chin_tuck: { lab: ["Tuck your chin", "Relax"], path: "head" },
   face_pull: { lab: ["Pull to your face", "Return slowly"], path: "wrist" }, foot_arch: { lab: ["Lift your arch, toes relaxed", "Relax slowly"] }, foot_toes: { lab: ["Scrunch the towel", "Relax your toes"] }, doorway: { lab: ["Lean through", "Step back slowly"] },
 };
+// Hip thrust on a couch and on a hip thrust machine: the same lift; hands resting on the chest (no elbows bent back over the edge)
+{ const v = (q, prop, arms) => ({ ...q, ...arms, props: q.props.map((pp) => (pp.box ? prop : pp)) }), H = ANIMS.hip_thrust;
+  for (const [id, prop] of [["hip_thrust_couch", { couch: [18, 104] }], ["hip_thrust_machine", { htmachine: [18, 104] }]]) { ANIMS[id] = { ...H, A: v(H.A, prop, { u: 5, f: 180 }), B: v(H.B, prop, { u: 50, f: 205 }) }; TECH[id] = TECH.hip_thrust; } }
 // Single-leg glute bridge: one foot on the floor, the other leg held straight out, in line with the thigh of the working leg
 ANIMS.glute_bridge_single = { ...ANIMS.glute_bridge, A: { ...ANIMS.glute_bridge.A, a2: SLB[0], b2: SLB[0], fd2: SLB[1] }, B: { ...ANIMS.glute_bridge.B, a2: SLB[2], b2: SLB[2], fd2: SLB[1] } }; TECH.glute_bridge_single = TECH.glute_bridge;
 TECH.reverse_lunge_short = TECH.reverse_lunge;
