@@ -5,7 +5,7 @@
 «Розпакуй архів, прочитай HANDOFF.md і продовжуй роботу над застосунком Relief».
 
 ## Де що лежить
-- Опублікований застосунок (артефакт): https://claude.ai/artifact/PEGciLQxAMRbWY1SPQmpCH — остання версія v282.
+- Опублікований застосунок (артефакт): https://claude.ai/artifact/PEGciLQxAMRbWY1SPQmpCH — остання версія v283.
   Новий чат може прочитати його через Artifact `read` з цим URL і далі оновлювати той самий URL (publish з `url`).
 - Сайт: better-fit-you.netlify.app — туди вручну завантажується `standalone/index.html`.
 - `liftbook.html` — весь застосунок в одному файлі (HTML + JS, three.js 3D-фігури, переклади).
