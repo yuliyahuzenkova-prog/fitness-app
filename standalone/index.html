@@ -7524,11 +7524,13 @@ function proPose0(B) {
             setBone(L + "Foot", flat(f2, s2)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(qr).multiply(flat(fu, sole))); const yy = tipY(); if (!best || yy > best.y) best = { y: yy, f2, s2, qr }; }
           fu = best.f2; sole = best.s2; setBone(L + "Foot", flat(fu, sole)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(flat(fu, sole))); } }
     } else {
-      let qN = restTop ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) /* relaxed foot: the toes lie on the floor, tops down */ : !B.kneeSide && Tt.y < -137 && sole.y < -.12 && hz.lengthSq() > .01 ? flat(new T.Vector3(0, 1, 0), hz.clone().normalize()) : flat(fu, sole);
+      let qN = restTop ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) /* relaxed foot: the toes lie on the floor, tops down */ : !B.kneeSide && hz.lengthSq() > .01 ? (() => { // (toes flatten onto the floor as the ball comes down: blended, not switched, so they don't flicker)
+          let w = cl01((-135.5 - Tt.y) / 2.5) * cl01((-sole.y - .06) / .12) * cl01((hz.length() - .1) / .2); w = w * w * (3 - 2 * w);
+          return w > 0 ? flat(fu, sole).slerp(flat(new T.Vector3(0, 1, 0), hz.clone().normalize()), w) : flat(fu, sole); })() : flat(fu, sole);
       if (PRO.chrome && !restTop && !B.kneeSide && !footEx && !B.roll && V3(h).y > K.y + 5 && K.y < -110 && V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) > -.97) { // (knee bent) // (on all fours, knee near the floor) chrome: the toes ease onto the floor (no flip when the foot passes through upright, as in bird dog)
         const hzF = K.clone().sub(A).setY(0); // the toes bend flat towards the knee, as when kneeling (stable even with the sole pointing straight down)
         let wT = cl01((-133 - Tt.y) / 7) * cl01((-sole.y - .12) / .25) * cl01(hzF.length() / 3) * cl01((-K.y - 110) / 6) * cl01((V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) + .97) / .25); wT = wT * wT * (3 - 2 * wT);
-        qN = wT > 0 ? flat(fu, sole).slerp(flat(new T.Vector3(0, 1, 0), hzF.normalize()), wT) : flat(fu, sole);
+        qN = wT > 0 ? qN.clone().slerp(flat(new T.Vector3(0, 1, 0), hzF.normalize()), wT) : qN;
       }
       // toeDrop (chrome poses): toes in their standing line, bent down from the ankle–ball line, not curled up towards the shin
       if (B.toeDrop && !kneel && !restTop) { const ax = new T.Vector3().crossVectors(sole, fu.clone().negate()).normalize(); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(B.toeDrop)).multiply(flat(fu, sole))); }
