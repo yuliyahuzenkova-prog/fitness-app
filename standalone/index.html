@@ -6049,6 +6049,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
 let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
@@ -7497,6 +7498,13 @@ function proPose0(B) {
       // Towel scrunch: the toes curl down and pull; arch lift: toes stay relaxed and flat
       const curlT = GL.foot.kind === "towel" ? GL.foot.k * TOE_CURL : 0, ax = new T.Vector3().crossVectors(sole, new T.Vector3(0, -1, 0)).normalize();
       setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(flat(fu, sole)));
+      if (curlT > 0) { // curled toes press on the towel, they don't go through the floor: the forefoot lifts a little (heel down) so the tips stay on top
+        const tipY = () => { PRO.group.updateMatrixWorld(true); return new T.Vector3().setFromMatrixPosition(by[L + "Toe_End"].matrixWorld).y; }, lim = -140 + TOE_TIP_CLEAR;
+        for (let it = 0; it < 4; it++) { const y = tipY(); if (y >= lim - .05) break;
+          const an = new T.Vector3().setFromMatrixPosition(by[L + "Foot"].matrixWorld), tp = new T.Vector3().setFromMatrixPosition(by[L + "Toe_End"].matrixWorld), r = Math.hypot(tp.x - an.x, tp.z - an.z) || 1, ang = Math.asin(Math.min(.5, (lim - y) / r));
+          let best = null; for (const sg of [1, -1]) { const qr = new T.Quaternion().setFromAxisAngle(ax, sg * ang), f2 = fu.clone().applyQuaternion(qr), s2 = sole.clone().applyQuaternion(qr);
+            setBone(L + "Foot", flat(f2, s2)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(qr).multiply(flat(fu, sole))); const yy = tipY(); if (!best || yy > best.y) best = { y: yy, f2, s2, qr }; }
+          fu = best.f2; sole = best.s2; setBone(L + "Foot", flat(fu, sole)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(flat(fu, sole))); } }
     } else {
       let qN = restTop ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) /* relaxed foot: the toes lie on the floor, tops down */ : !B.kneeSide && Tt.y < -137 && sole.y < -.12 && hz.lengthSq() > .01 ? flat(new T.Vector3(0, 1, 0), hz.clone().normalize()) : flat(fu, sole);
       if (PRO.chrome && !restTop && !B.kneeSide && !footEx && !B.roll && V3(h).y > K.y + 5 && K.y < -110 && V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) > -.97) { // (knee bent) // (on all fours, knee near the floor) chrome: the toes ease onto the floor (no flip when the foot passes through upright, as in bird dog)
