@@ -6399,7 +6399,7 @@ const ANIMS = {
   sl_rdl: { A: pose({ at: [100, 140], b: 0, a2: 0, b2: 0, fd2: 0, u: 0, f: 0, u2: 0, f2: 0, props: [{ db: "far" }] }), B: pose({ at: [100, 140], a: 22, b: -8, t: 68, a2: -72, b2: -74, fd2: -90, u: 0, f: 0, u2: 0, f2: 0, props: [{ db: "far" }] }) },
   glute_bridge: { A: pose({ at: [125, 140], a: 128, b: 19, t: -90, u: 90, f: 90 }), B: pose({ at: [125, 140], a: 96, b: 15, t: -122, u: 92, f: 92 }) },
   // Upper back (shoulder blades) on the bench edge, head and arms over the bench; the hips drop and drive up to a flat table
-  hip_thrust: { A: pose({ at: [130, 140], a: 108.1, b: 30.1, t: -43.5, h: 30, u: -100, f: -30, props: [{ box: [18, 104, 36, 36] }] }), B: pose({ at: [130, 140], a: 61.2, b: 9.5, t: -90, h: 35, u: -100, f: -30, props: [{ box: [18, 104, 36, 36] }] }) },
+  hip_thrust: { hz: 22, hzk: 1, A: pose({ at: [130, 140], a: 108.1, b: 30.1, t: -43.5, h: 30, u: 40, f: 40, props: [{ box: [18, 104, 36, 36] }] }), B: pose({ at: [130, 140], a: 70, b: 14, t: -80, h: 30, u: 82, f: 82, props: [{ box: [18, 104, 36, 36] }] }) },
   pull_through: { A: pose({ at: [110, 140], a: 30, b: -12, t: 70, u: -25, f: -25, props: [{ cable: [48, 136] }, { column: [45, 0, 136, 1, 0] }] }), B: pose({ at: [110, 140], u: 0, f: 0, props: [{ cable: [48, 136] }, { column: [45, 0, 136, 1, 0] }] }) },
   pushup: { A: pose({ at: [38, 138], a: -64, b: -64, t: 64, u: 0, f: 0, fd: -60 }), B: pose({ at: [38, 138], a: -78, b: -78, t: 78, u: -60, f: 62, fd: -60 }),
     // chrome figures: the toes on the floor (not sunk into it) and the body low enough that straight arms reach it, so the hands never lift off at the top
@@ -8350,13 +8350,13 @@ const TECH = {
 };
 // Hip thrust on a couch and on a hip thrust machine: the same lift; hands resting on the chest (no elbows bent back over the edge)
 { const v = (q, prop, arms) => ({ ...q, ...arms, props: q.props.map((pp) => (pp.box ? prop : pp)) }), H = ANIMS.hip_thrust;
-  for (const [id, prop] of [["hip_thrust_couch", { couch: [18, 104] }], ["hip_thrust_machine", { htmachine: [18, 104] }]]) { ANIMS[id] = { ...H, A: v(H.A, prop, { u: 5, f: 180 }), B: v(H.B, prop, { u: 50, f: 205 }) }; TECH[id] = TECH.hip_thrust; } }
+  for (const [id, prop] of [["hip_thrust_couch", { couch: [18, 104] }], ["hip_thrust_machine", { htmachine: [18, 104] }]]) { ANIMS[id] = { ...H, A: v(H.A, prop, {}), B: v(H.B, prop, {}) }; TECH[id] = TECH.hip_thrust; } }
 // Single-leg glute bridge: one foot on the floor, the other leg held straight out, in line with the thigh of the working leg
 ANIMS.glute_bridge_single = { ...ANIMS.glute_bridge, A: { ...ANIMS.glute_bridge.A, a2: SLB[0], b2: SLB[0], fd2: SLB[1] }, B: { ...ANIMS.glute_bridge.B, a2: SLB[2], b2: SLB[2], fd2: SLB[1] } }; TECH.glute_bridge_single = TECH.glute_bridge;
 TECH.reverse_lunge_short = TECH.reverse_lunge;
 // Single-leg hip thrust: the same with the other knee held up towards the chest the whole rep (arms resting along the bench)
 { const box = (q) => q.props.map((pp) => (pp.box ? { box: [18, HT_BOX, 36, 140 - HT_BOX] } : pp)); // (the bench top just under the shoulder blades, not through them)
-  ANIMS.hip_thrust_single = { ...ANIMS.hip_thrust, A: { ...ANIMS.hip_thrust.A, a2: 150, b2: 60, u: 5, f: 180, props: box(ANIMS.hip_thrust.A) }, B: { ...ANIMS.hip_thrust.B, a2: 125, b2: 35, u: 50, f: 205, props: box(ANIMS.hip_thrust.B) } }; } // (hands resting on the chest, elbows down by the sides) TECH.hip_thrust_single = TECH.hip_thrust;
+  ANIMS.hip_thrust_single = { ...ANIMS.hip_thrust, A: { ...ANIMS.hip_thrust.A, a2: 150, b2: 60,  props: box(ANIMS.hip_thrust.A) }, B: { ...ANIMS.hip_thrust.B, a2: 125, b2: 35,  props: box(ANIMS.hip_thrust.B) } }; } // (hands resting on the chest, elbows down by the sides) TECH.hip_thrust_single = TECH.hip_thrust;
 TECH.sit_to_stand_high = TECH.sit_to_stand;
 // Step-up variants with their own heights: a stair (two low steps, ~18 cm each) and a sturdy chair (seat ~45 cm, the knee bent to ~90° at the start)
 { const P = (o, props) => pose({ ...o, props });
