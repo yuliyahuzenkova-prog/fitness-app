@@ -6049,6 +6049,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
@@ -6511,7 +6512,7 @@ const EX_MAP = [
   [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
   [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/^Reverse lunge, short step/, "revlunge", "reverse_lunge_short"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/^Step-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
   [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
-  [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
+  [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/^Single-leg glute bridge/, "bridge", "glute_bridge_single"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
   [/^Pike push-up, hands on a chair/, "pike", "pike_chair"], [/^Incline pike/, "pike", "pike_pushup"], [/^Incline push-up, hands on a chair/, "inclinepush", "incline_chair"], [/^Incline push-up/, "inclinepush", "incline_pushup"], [/[Pp]ike [Pp]ush-up/, "pike", "pike_pushup"], [/^Push-up/, "pushup", "pushup"],
   [/^(Barbell bench press|Bench Press)$/, "bench", "bench_bar"], [/[Bb]ench [Pp]ress/, "bench", "bench_press"], [/^Seated cable row/, "cablerow", "row_cable"], [/^Chest-supported/, "csrow", "row_chest"],
   [/^One-arm dumbbell row/, "onearmrow", "row_onearm"], [/^Barbell Row$/, "bbrow", "row_barbell"], [/^Band row/, "bandrow", "band_row"], [/^Table row, feet raised/, "tablerow", "table_row_feet"], [/^Table row/, "tablerow", "table_row"],
@@ -6698,7 +6699,7 @@ function drawFigure(an, p, cam, cls, small) {
 const ANIM_3D = {
   squat_bw: { yaw: -40, fz: 4 }, squat_goblet: { yaw: -40, fz: 5, hz: 3 }, squat_goblet_box: { yaw: -40, fz: 5, hz: 3 }, squat_bar: { yaw: -40, fz: 5, hz: 20 }, squat_box: { yaw: -40, fz: 4 },
   sit_to_stand: { yaw: -40 }, sit_to_stand_high: { yaw: -40 }, wall_sit: { yaw: -50 }, wall_sit_deep: { yaw: -50 }, leg_press: { yaw: -30 }, split_squat: { yaw: -40 }, bulgarian: { yaw: -40 }, reverse_lunge: { yaw: -40 }, reverse_lunge_short: { yaw: -40 }, step_up: { yaw: -40 },
-  rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
+  rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25 }, glute_bridge_single: { yaw: -25 }, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
   shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true, flare: .4 }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
@@ -8308,6 +8309,8 @@ const TECH = {
   clamshell: { lab: ["Open your knee", "Close slowly"] }, side_leg: { lab: ["Lift your leg", "Lower slowly"] }, hip_flexor: { lab: ["Lean in", "Ease off slowly"] }, chin_tuck: { lab: ["Tuck your chin", "Relax"], path: "head" },
   face_pull: { lab: ["Pull to your face", "Return slowly"], path: "wrist" }, foot_arch: { lab: ["Lift your arch, toes relaxed", "Relax slowly"] }, foot_toes: { lab: ["Scrunch the towel", "Relax your toes"] }, doorway: { lab: ["Lean through", "Step back slowly"] },
 };
+// Single-leg glute bridge: one foot on the floor, the other leg held straight out, in line with the thigh of the working leg
+ANIMS.glute_bridge_single = { ...ANIMS.glute_bridge, A: { ...ANIMS.glute_bridge.A, a2: SLB[0], b2: SLB[0], fd2: SLB[1] }, B: { ...ANIMS.glute_bridge.B, a2: SLB[2], b2: SLB[2], fd2: SLB[1] } }; TECH.glute_bridge_single = TECH.glute_bridge;
 TECH.reverse_lunge_short = TECH.reverse_lunge;
 // Single-leg hip thrust: the same with the other knee held up towards the chest the whole rep (arms resting along the bench)
 ANIMS.hip_thrust_single = { ...ANIMS.hip_thrust, A: { ...ANIMS.hip_thrust.A, a2: 150, b2: 60 }, B: { ...ANIMS.hip_thrust.B, a2: 125, b2: 35 } }; TECH.hip_thrust_single = TECH.hip_thrust;
