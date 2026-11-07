@@ -6054,7 +6054,7 @@ let HT_BOX = 102.6; // single-leg hip thrust: the bench top (sketch y)
 let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
 let BOTTOM_ARM_UNWIND = -1; // side-lying: share of the bottom (overhead) arm's twist taken out
 let HIP_ARM_UNWIND = -.45; // hand on hip: share of the upper arm's twist taken out
-let CROSS_ARMS = { inward: .3, down: -2, out: 12, layer: 3.5 }; // arms crossed on the chest: how far each palm sits from the other shoulder towards the sternum, below it (cm), in front of the spine (cm), and the near forearm's extra lift over the far one
+let CROSS_ARMS = { inward: .3, down: -2, out: 13, layer: 3.5 }; // arms crossed on the chest: how far each palm sits from the other shoulder towards the sternum, below it (cm), in front of the spine (cm), and the near forearm's extra lift over the far one
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
@@ -7615,7 +7615,7 @@ function proPose0(B) {
       const Wt = palm.clone().sub(f.clone().multiplyScalar(handLen * .6)).add(nrm.clone().multiplyScalar(1.2 * S));
       const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S;
       const st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .999), hd = st.normalize(), al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
-      const outS = Sm.clone().sub(So).normalize(); let pole = toHead.clone().multiplyScalar(.2).add(outS.clone().multiplyScalar(.3)).add(nrm.clone().multiplyScalar(1)); /* (elbows forward at chest height, forearms across the chest) */ pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // elbow down by the side, a little out and forward
+      const outS = Sm.clone().sub(So).normalize(); let pole = toHead.clone().multiplyScalar(-1).add(outS.clone().multiplyScalar(.3)).add(nrm.clone().multiplyScalar(1)); /* (elbows down, forearms crossed in front of the chest) */ pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // elbow down by the side, a little out and forward
       const Em = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)), Wm = Sm.clone().add(hd.clone().multiplyScalar(dl));
       E = Sv.clone().add(Em.clone().sub(Sm)); Wv = E.clone().add(Wm.clone().sub(Em));
       const ud = Em.clone().sub(Sm).normalize(), fd = Wm.clone().sub(Em).normalize(), pp = fd.clone().sub(ud.clone().multiplyScalar(fd.dot(ud))); if (pp.lengthSq() > 1e-4) fU.copy(pp.normalize());
