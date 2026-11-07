@@ -8385,7 +8385,7 @@ function mirrorBody(B) {
 function glPose(an, id, k, still) {
   GL.kNow = k; GL.animNow = arguments[1]; // (planted hands: remember where they land at the start of the rep)
   if (an.front) {
-    const B = frontBody(still ? an.B : lerpPose(an.A, an.B, k)); B.openHand = !!an.openHand; if (an.bandGrip && MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome) B.palmDown = true; // (chrome: the band is held in the fists, palms down)
+    const B = frontBody(still ? an.B : lerpPose(an.A, an.B, k)); B.bendHand = "old"; /* (arms moving in the body's frontal plane, e.g. wall angels: the side-plane facing rule doesn't apply and spun the upper arm) */ B.openHand = !!an.openHand; if (an.bandGrip && MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome) B.palmDown = true; // (chrome: the band is held in the fists, palms down)
     // Jumps (jumping jacks): the body leaves the floor between the two positions, toes pointing down in the air
     if (an.jump && !still) {
       // a smooth arc in the air, and a soft landing: around touchdown the knees bend a little forward over the toes and the body dips
