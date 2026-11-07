@@ -8315,7 +8315,7 @@ ANIMS.glute_bridge_single = { ...ANIMS.glute_bridge, A: { ...ANIMS.glute_bridge.
 TECH.reverse_lunge_short = TECH.reverse_lunge;
 // Single-leg hip thrust: the same with the other knee held up towards the chest the whole rep (arms resting along the bench)
 { const box = (q) => q.props.map((pp) => (pp.box ? { box: [18, HT_BOX, 36, 140 - HT_BOX] } : pp)); // (the bench top just under the shoulder blades, not through them)
-  ANIMS.hip_thrust_single = { ...ANIMS.hip_thrust, A: { ...ANIMS.hip_thrust.A, a2: 150, b2: 60, u: -64, f: -64, props: box(ANIMS.hip_thrust.A) }, B: { ...ANIMS.hip_thrust.B, a2: 125, b2: 35, u: -90, f: -90, props: box(ANIMS.hip_thrust.B) } }; } // (arms lying straight back along the bench, relaxed) TECH.hip_thrust_single = TECH.hip_thrust;
+  ANIMS.hip_thrust_single = { ...ANIMS.hip_thrust, A: { ...ANIMS.hip_thrust.A, a2: 150, b2: 60, u: 20, f: 160, props: box(ANIMS.hip_thrust.A) }, B: { ...ANIMS.hip_thrust.B, a2: 125, b2: 35, u: 65, f: 180, props: box(ANIMS.hip_thrust.B) } }; } // (hands resting on the chest, elbows down by the sides) TECH.hip_thrust_single = TECH.hip_thrust;
 TECH.sit_to_stand_high = TECH.sit_to_stand;
 // Step-up variants with their own heights: a stair (two low steps, ~18 cm each) and a sturdy chair (seat ~45 cm, the knee bent to ~90° at the start)
 { const P = (o, props) => pose({ ...o, props });
