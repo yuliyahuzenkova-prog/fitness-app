@@ -8352,6 +8352,8 @@ const TECH = {
 // Hip thrust on a couch and on a hip thrust machine: the same lift; hands resting on the chest (no elbows bent back over the edge)
 { const v = (q, prop, arms) => ({ ...q, ...arms, props: q.props.map((pp) => (pp.box ? prop : pp)) }), H = ANIMS.hip_thrust;
   for (const [id, prop] of [["hip_thrust_couch", { couch: [18, 104] }], ["hip_thrust_machine", { htmachine: [18, 104] }]]) { ANIMS[id] = { ...H, A: v(H.A, prop, {}), B: v(H.B, prop, {}) }; TECH[id] = TECH.hip_thrust; } }
+// the machine: hands hold the hip pad's handles at its ends, all rep
+Object.assign(ANIMS.hip_thrust_machine, { hz: 16 }); Object.assign(ANIMS.hip_thrust_machine.A, { u: 20, f: 120 }); Object.assign(ANIMS.hip_thrust_machine.B, { u: 80, f: 140 });
 // Single-leg glute bridge: one foot on the floor, the other leg held straight out, in line with the thigh of the working leg
 ANIMS.glute_bridge_single = { ...ANIMS.glute_bridge, A: { ...ANIMS.glute_bridge.A, a2: SLB[0], b2: SLB[0], fd2: SLB[1] }, B: { ...ANIMS.glute_bridge.B, a2: SLB[2], b2: SLB[2], fd2: SLB[1] } }; TECH.glute_bridge_single = TECH.glute_bridge;
 TECH.reverse_lunge_short = TECH.reverse_lunge;
