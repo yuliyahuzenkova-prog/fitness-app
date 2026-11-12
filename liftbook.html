@@ -6693,7 +6693,7 @@ function drawFigure(an, p, cam, cls, small) {
 // Default camera angle per exercise (degrees; 0 = side view, -90 = front, 90 = back), hand and foot spacing, and poses drawn facing the viewer
 const ANIM_3D = {
   squat_bw: { yaw: -40, fz: 4 }, squat_goblet: { yaw: -40, fz: 5, hz: 3 }, squat_goblet_box: { yaw: -40, fz: 5, hz: 3 }, squat_bar: { yaw: -40, fz: 5, hz: 20 }, squat_box: { yaw: -40, fz: 4 },
-  sit_to_stand: { yaw: -40 }, sit_to_stand_high: { yaw: -40, armsCrossed: true }, wall_sit: { yaw: -50 }, wall_sit_deep: { yaw: -50 }, leg_press: { yaw: -30 }, split_squat: { yaw: -40 }, bulgarian: { yaw: -40 }, reverse_lunge: { yaw: -40 }, reverse_lunge_short: { yaw: -40 }, step_up: { yaw: -40 },
+  sit_to_stand: { yaw: -40 }, sit_to_stand_high: { yaw: -40, armsCrossed: true }, wall_sit: { yaw: -30 }, wall_sit_deep: { yaw: -30 }, leg_press: { yaw: -30 }, split_squat: { yaw: -40 }, bulgarian: { yaw: -40 }, reverse_lunge: { yaw: -40 }, reverse_lunge_short: { yaw: -40 }, step_up: { yaw: -40 },
   rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25, plantAll: true, plantPole: [10, .3, 0, -1, 1] }, glute_bridge_single: { yaw: -25, plantAll: true, plantPole: [10, .3, 0, -1, 1] } /* (arms lie flat on the floor beside the body, palms down) */, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, hip_thrust_couch: { yaw: -25 }, hip_thrust_machine: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, closeGrip: true, rope: true },
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
@@ -6745,6 +6745,14 @@ ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.p
 // The front of the body is at yaw -90, except poses drawn facing the viewer
 const frontYaw = (an) => (an.plane === "frontal" ? 90 : -90);
 const VIEWS = { front: 0, q: 45, side: 90, back: 180 };
+// A wall is solid: the camera stays on the open side of it and never looks through it. wallOpen = the yaw facing the wall
+// head-on from the open side (the wall behind the feet: -90, in front of them: 90), or null with no wall.
+const wallOpen = (an) => { const P = an && an.A, w = P && P.props && P.props.find((q) => q.wall != null); return w && P.at ? (w.wall < P.at[0] ? -90 : 90) : null; };
+const yawOff = (y, c) => ((y - c) % 360 + 540) % 360 - 180;
+// a yaw behind the wall is mirrored to the open side (a view button), or held at the wall's edge (dragging)
+const wallYaw = (an, y, hold) => { const c = wallOpen(an); if (c == null) return y; let d = hold ? y - c : yawOff(y, c);
+  if (hold) d = Math.max(-90, Math.min(90, d)); else if (d > 90) d = 180 - d; else if (d < -90) d = -180 - d; return c + d; };
+const wallHides = (an, k) => wallOpen(an) != null && Math.abs(yawOff(frontYaw(an) + VIEWS[k], wallOpen(an))) > 135; // the view straight through the wall
 
 // ---------- Real 3D (WebGL, three.js): smooth body with light, shadow and muscle relief ----------
 // Uses the same poses as the drawn figure (lift() above). Falls back to the drawn figure if WebGL or three.js isn't available.
@@ -8210,7 +8218,7 @@ function glProps(props, B, an, p) {
     }
     if (k === "wall") {
       // A wall between the camera and the figure turns see-through
-      const wc = L(v, 74), between = GL.camDir && GL.camDir.dot(wc.clone().sub(V3(B.hip))) > 0;
+      const wc = L(v, 74), between = GL.camDir && GL.camDir.dot(wc.clone().sub(V3(B.hip)).setY(0)) > 2; // (level only: how low the hips sit must not count; side-on it stays solid)
       if (!GL.wallGhost) GL.wallGhost = Object.assign(M.wall.clone(), { transparent: true, opacity: .16, depthWrite: false });
       box(v - 1.5, 8, v + 1.5, 140, 50, between ? GL.wallGhost : M.wall);
     }
@@ -8700,7 +8708,7 @@ function animSvg(name, big) {
   if (!big || (an.foot && !GL.ok)) return svg;
   const cur = Object.entries(VIEWS).reduce((best, [k, off]) => (Math.abs(((yaw - frontYaw(an) - off) % 360 + 540) % 360 - 180) < Math.abs(((yaw - frontYaw(an) - VIEWS[best]) % 360 + 540) % 360 - 180) ? k : best), "front");
   const dragHint = `<span class="draghint ${lsGet("liftbook-dragged") ? "seen" : ""}" aria-hidden="true"><svg viewBox="0 0 48 32" width="44" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13c0-4 7.6-7 17-7s17 3 17 7"/><path d="M37 9.5l4 3.5-5 1.6"/><path d="M11 9.5l-4 3.5 5 1.6"/><path d="M21 30v-4l-3.4-4.2a1.7 1.7 0 0 1 2.6-2.2l1.8 2V13.5a1.8 1.8 0 0 1 3.6 0v5.2l4.6.8a2.4 2.4 0 0 1 2 2.6L31.6 30"/></svg></span>`;
-  return `<div class="anim3d"><div class="stage">${glInit() ? '<div class="repsteps" data-notr aria-live="off"></div>' : ""}${svg}${dragHint}</div><div class="seg viewseg" role="group" aria-label="View">${[["front", scanL("Front", "Спереду")], ["q", "¾"], ["side", scanL("Side", "Збоку")], ["back", scanL("Back", "Ззаду")]].map(([k, l]) => `<button type="button" data-act="animview" data-v="${k}" aria-pressed="${k === cur}" data-notr>${l}</button>`).join("")}</div>
+  return `<div class="anim3d"><div class="stage">${glInit() ? '<div class="repsteps" data-notr aria-live="off"></div>' : ""}${svg}${dragHint}</div><div class="seg viewseg" role="group" aria-label="View">${[["front", scanL("Front", "Спереду")], ["q", "¾"], ["side", scanL("Side", "Збоку")], ["back", scanL("Back", "Ззаду")]].filter(([k]) => !wallHides(an, k)).map(([k, l]) => `<button type="button" data-act="animview" data-v="${k}" aria-pressed="${k === cur}" data-notr>${l}</button>`).join("")}</div>
     ${animChoice(name) ? `<div class="row" style="gap:6px"><span class="label">${scanL("Show", "Показати")}</span><div class="seg" role="group" aria-label="${scanL("Show", "Показати")}">${animChoice(name).map(([id, l]) => `<button type="button" data-act="animpick" data-v="${id}" aria-pressed="${id === info.anim}">${tr(l)}</button>`).join("")}</div></div>` : ""}
     ${GL.ok ? `<div class="row" style="gap:6px"><span class="label">Figure</span><div class="chips">${[["chromeF", "Chrome woman"], ["chrome", "Chrome man"]].map(([k, l]) => `<button type="button" class="chipbtn small" data-act="figstyle" data-v="${k}" aria-pressed="${FIG_STYLE === k}">${l}</button>`).join("")}</div></div>` : ""}</div>`;
 }
@@ -8743,7 +8751,8 @@ function setAnimView(btn) {
   const wrap = btn.closest(".anim3d"), svg = wrap && wrap.querySelector(".anim[data-anim]"); if (!svg) return;
   const an = ANIMS[svg.dataset.anim], cur = +svg.dataset.yaw;
   let ty = frontYaw(an) + VIEWS[btn.dataset.v];
-  ty = cur + ((ty - cur) % 360 + 540) % 360 - 180; // shortest way round
+  if (wallOpen(an) != null) ty = wallYaw(an, ty); // (turns along the open side, not through the wall)
+  else ty = cur + ((ty - cur) % 360 + 540) % 360 - 180; // shortest way round
   svg.dataset.ty = ty;
   wrap.querySelectorAll("[data-act=animview]").forEach((b) => b.setAttribute("aria-pressed", b === btn));
 }
@@ -8758,7 +8767,7 @@ function setAnimView(btn) {
     if (!drag || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.x; if (Math.abs(dx) < 3) return;
     if (!drag.moved) { drag.moved = true; lsSet("liftbook-dragged", 1); drag.svg.parentElement.querySelector(".draghint")?.classList.add("seen"); }
-    const y = drag.yaw - dx * 0.9; drag.svg.dataset.yaw = y; drag.svg.dataset.ty = y;
+    const y = wallYaw(ANIMS[drag.svg.dataset.anim], drag.yaw - dx * 0.9, true); drag.svg.dataset.yaw = y; drag.svg.dataset.ty = y;
     drag.svg.closest(".anim3d")?.querySelectorAll("[data-act=animview]").forEach((b) => b.setAttribute("aria-pressed", "false"));
   });
   const end = () => { if (drag) drag.svg.parentElement.querySelector(".draghint")?.classList.remove("dragging"); drag = null; };
@@ -9849,7 +9858,7 @@ $("#app").addEventListener("click", async (e) => {
   if (a === "guide") {
     S.guide = b.dataset.name; render(); $(".sheet")?.focus();
     // the figure spins in to its starting view as the exercise opens
-    const c = $(".sheet .anim.big[data-anim]"); if (c && !reduceMotion()) c.dataset.yaw = +c.dataset.ty - 220;
+    const c = $(".sheet .anim.big[data-anim]"); if (c && !reduceMotion()) c.dataset.yaw = wallYaw(ANIMS[c.dataset.anim], +c.dataset.ty - 220, true); // (by a wall: only along its open side)
   }
   if (a === "animview") setAnimView(b);
   if (a === "animpick") { // switch the big animation to the other way of doing the exercise
