@@ -1140,7 +1140,7 @@ function glDrawHero(canvas, t, forceW) {
   const body = frontBody({ abd: 12, el: 10, legs: 9 });
   proPose(body); proPaintBody(st);
   const lean = .85 * (1 - st.relief);
-  for (const mesh of M.meshes) if (mesh.morphTargetInfluences) { mesh.morphTargetInfluences[0] = 0; mesh.morphTargetInfluences[1] = lean; mesh.morphTargetInfluences[2] = mesh.morphTargetInfluences[3] = 0; }
+  for (const mesh of M.meshes) if (mesh.morphTargetInfluences) { mesh.morphTargetInfluences[0] = 0; mesh.morphTargetInfluences[1] = lean; mesh.morphTargetInfluences.fill(0, 2); mesh.morphTargetInfluences[1] = lean; }
   if (GL.towel) GL.towel.visible = false;
   for (const [key, list] of Object.entries(GL.pool)) list.forEach((m) => (m.visible = false));
   const yaw = +canvas.dataset.yaw, target = V3([0, 74, 0]), cp = Math.cos(rad(6)), sp = Math.sin(rad(6)), dir = V3([-Math.sin(rad(yaw)) * cp, -sp, Math.cos(rad(yaw)) * cp]);
@@ -6035,6 +6035,7 @@ function setHighlight(muscles) {
 const hlc = (part) => HL[part] || "";
 const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
+let ARM_TWIST = [95, .25]; // chrome, straight arms: beyond this turn (degrees) of the upper arm about its length relative to the collarbone, only this share of the rest is kept (an arm swung overhead the "other" way round turns ~180° and wrings the shoulder's skin thin)
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
 let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
@@ -6698,7 +6699,7 @@ const ANIM_3D = {
   pushup: { yaw: -25, hz: 15, handFix: 1 }, incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
   row_chest: { yaw: 35, hz: 19 }, row_onearm: { yaw: 35, hand2At: [110, 113], hand2Bend: -1, palmIn: true, kneelFoot: true }, row_barbell: { yaw: 35, hz: 22 }, band_row: { yaw: 35, hz: 9 }, table_row: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true }, table_row_feet: { yaw: -30, hz: 15, handFix: 1, hook: true, tableAtHands: true, stoolHeels: true },
   shoulder_press: { yaw: -40, palmFwd: true }, /* (dumbbell press: palms face forward) */ landmine: { yaw: -40, hz: 9, palmIn: true, flare: .4 }, wall_angel: { yaw: -90 }, wall_slide: { yaw: 150 }, pull_apart: { yaw: -90, bandGrip: true }, jacks: { yaw: -90 },
-  lat_pulldown: { yaw: 145, palmFwd: true, wideBar: 31 }, pullup: { yaw: 145, palmFwd: true, ankle: 42 }, pull_neg: { yaw: 145, palmFwd: true, ankle: 42, stepBox: true }, pull_band: { yaw: 145, palmFwd: true, ankle: 42 }, dead_hang: { yaw: 145, hz: 28, hzk: .9, palmFwd: true, ankle: 42 }, /* (ankle: feet hang relaxed, ~20° pointed, not on tiptoe) */ band_pulldown: { yaw: 145, hz: 20 }, band_pulldown1: { yaw: 145, hz: 18, single: true },
+  lat_pulldown: { yaw: 145, palmFwd: true, wideBar: 31 }, pullup: { yaw: 145, palmFwd: true, ankle: 42 }, pull_neg: { yaw: 145, palmFwd: true, ankle: 42, stepBox: true }, pull_band: { yaw: 145, palmFwd: true, ankle: 42 }, dead_hang: { yaw: 145, hz: 28, hzk: .9, palmFwd: true, ankle: 42 }, /* (ankle: feet hang relaxed, ~20° pointed, not on tiptoe) */ band_pulldown: { yaw: 145, hz: 20, palmMid: true }, band_pulldown1: { yaw: 145, hz: 18, single: true, palmMid: true } /* (neutral grip on the band's handle: palms facing in, the forearm turning half at the elbow and half at the wrist) */,
   prone_y: { yaw: 35, hz: 20 }, prone_ytw: { yaw: 60, pitch: 34, armHinge: true }, /* (seen from higher up, so the letter the arms make on the floor reads) */ superman: { yaw: 35 }, dead_bug: { yaw: -30, alt: true, period: 8400 }, dead_bug_straight: { yaw: -30, alt: true, period: 8400 }, bird_dog: { footDown: true, yaw: 30, handFix: -1, handFix2: false, alt: true, period: 8400 }, cat_cow: { yaw: 25, handFix: -1 },
   plank: { yaw: -25, thumbsUp: true }, plank_knee: { yaw: -25, thumbsUp: true }, /* forearm planks: forearms resting on their outer edge, thumbs up, no twist */ side_plank: { yaw: 90, plane: "frontal", stackLegs: true, handOnHip: true }, side_plank_knee: { yaw: 60, plane: "frontal", noKneel: true, handOnHip: true }, shoulder_taps: { yaw: -25, handFix: -1, handFix2: false, alt: true, period: 6400 }, pallof: { yaw: -45, hz: 1.5, palmIn: true, closeGrip: true }, carry: { yaw: -35 }, walk: { yaw: -35 }, bike: { yaw: -30 }, rower: { yaw: -35, period: 3200, glView: "14 12 208 156" },
   calf_raise: { yaw: 145 }, tib_raise: { yaw: -35 }, clamshell: { yaw: -55 }, side_leg: { yaw: -65, handOnHip: true, openHand: true } /* (top hand resting on the hip, the bottom arm relaxed along the floor) */, hip_flexor: { yaw: -35 },
@@ -7052,6 +7053,7 @@ const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the h
 const KNEEL_REST = { ankle: 7, toe: 1.5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
+let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
 const KNEE_FIX = 7, KNEE_GAIN = 1.7; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
 // How far each foot's skin reaches behind the ankle (heel) and in front of it (toes), along the foot, in the rest pose (model units).
 function proFootExt(PRO) {
@@ -7220,7 +7222,27 @@ function proArchMorph(PRO) {
       for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) kd[i * 3 + c] = Lk[wid[i] * 3 + c];
       return kd;
     });
-    g.morphAttributes.position = [new THREE.Float32BufferAttribute(d, 3), new THREE.Float32BufferAttribute(lean, 3), ...knees.map((kd) => new THREE.Float32BufferAttribute(kd, 3))]; g.morphTargetsRelative = true;
+    // Fifth to eighth morphs, one per elbow and one per shoulder: plain skinning pinches the inside of a bent elbow (its front:
+    // the model's elbows bend forward) and squashes the top of the shoulder as the arm rises, so the arm looks thin there.
+    // These fill the skin back out round the joint, most on the pinched side; the influence follows the bend or the lift.
+    const smoothK = (kd, it0) => { let Lk = new Float32Array(W * 3); for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) Lk[wid[i] * 3 + c] += kd[i * 3 + c] / (cnt[wid[i]] || 1);
+      for (let it = 0; it < it0; it++) { const N = new Float32Array(W * 3); for (let w = 0; w < W; w++) { const q = nbA[w]; for (let c = 0; c < 3; c++) { let sum = 0; for (const j of q) sum += Lk[j * 3 + c]; N[w * 3 + c] = q.length ? Lk[w * 3 + c] * .4 + (sum / q.length) * .6 : Lk[w * 3 + c]; } } Lk = N; }
+      for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) kd[i * 3 + c] = Lk[wid[i] * 3 + c]; return kd; };
+    const joint = (side, A, B, C, aSet, bSet, amp, wd, side0) => { // the joint at B between bones A→B and B→C; aSet/bSet: the bones each side
+      const kd = new Float32Array(n * 3); if (!A || !B || !C) return kd;
+      const ax = B.clone().sub(A).normalize().add(C.clone().sub(B).normalize()).normalize(), v = new THREE.Vector3();
+      for (let i = 0; i < n; i++) {
+        let wa = 0, wb = 0; for (let k = 0; k < 4; k++) { const nm = names[SI.array[i * 4 + k]], w = SW.array[i * 4 + k]; if (aSet.has(nm)) wa += w; else if (bSet.has(nm)) wb += w; }
+        if (wa + wb < .5) continue;
+        v.set(P.getX(i), P.getY(i), P.getZ(i)).sub(B); const along = v.dot(ax); v.sub(ax.clone().multiplyScalar(along)); const rl = v.length(); if (rl < .1) continue;
+        const pin = Math.max(0, v.dot(side0) / rl), amt = amp * Math.min(1, 4 * wa * wb) * Math.exp(-((along / wd) ** 2)) * (.45 + .55 * pin * pin);
+        kd[i * 3] = (v.x / rl) * amt; kd[i * 3 + 1] = (v.y / rl) * amt; kd[i * 3 + 2] = (v.z / rl) * amt;
+      }
+      return smoothK(kd, 10);
+    };
+    const elbows = ["Left", "Right"].map((sd) => joint(sd, R[sd + "Arm"], R[sd + "ForeArm"], R[sd + "Hand"], new Set([sd + "Arm"]), new Set([sd + "ForeArm", sd + "ForeArmTwist"]), ARM_FIX.elbow, ARM_FIX.elbowW, new THREE.Vector3(0, 0, 1)));
+    const shoulders = ["Left", "Right"].map((sd) => joint(sd, R[sd + "Shoulder"], R[sd + "Arm"], R[sd + "ForeArm"], new Set([sd + "Shoulder", "Spine2", "Neck"]), new Set([sd + "Arm"]), ARM_FIX.shoulder, ARM_FIX.shoulderW, new THREE.Vector3(0, 1, 0)));
+    g.morphAttributes.position = [new THREE.Float32BufferAttribute(d, 3), new THREE.Float32BufferAttribute(lean, 3), ...knees.map((kd) => new THREE.Float32BufferAttribute(kd, 3)), ...elbows.map((kd) => new THREE.Float32BufferAttribute(kd, 3)), ...shoulders.map((kd) => new THREE.Float32BufferAttribute(kd, 3))]; g.morphTargetsRelative = true;
     m.updateMorphTargets(); m.morphTargetInfluences.fill(0);
   }
 }
@@ -7281,6 +7303,21 @@ function boneRoll(M, n, child, deg) {
   const nbw = new T.Quaternion().setFromAxisAngle(ax, deg * Math.PI / 180).multiply(bw);
   b.quaternion.copy(pw.clone().invert().multiply(nbw)); b.updateMatrixWorld(true);
   c.quaternion.copy(nbw.clone().invert().multiply(cw)); c.updateMatrixWorld(true);
+}
+// Elbow and shoulder correctives (morphs 4–7): the elbow's by how much more it bends than at rest, the shoulder's by how far the
+// upper arm is raised above its rest angle from the trunk
+function proArmMorphs(M) {
+  const ms = M.meshes.filter((m) => m.morphTargetInfluences && m.morphTargetInfluences.length > 7); if (!ms.length) return;
+  M.group.updateMatrixWorld(true);
+  const wp = (n) => new THREE.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), R = M.rest, ang = (a, b) => Math.acos(Math.max(-1, Math.min(1, a.dot(b))));
+  const down = wp("Hips").sub(wp("Neck")).normalize(), down0 = R.Hips.clone().sub(R.Neck).normalize();
+  ["Left", "Right"].forEach((L, k) => {
+    if (!M.by[L + "Hand"]) return;
+    const s = wp(L + "Arm"), e = wp(L + "ForeArm"), h = wp(L + "Hand"), u = e.clone().sub(s).normalize(), f = h.clone().sub(e).normalize();
+    const u0 = R[L + "ForeArm"].clone().sub(R[L + "Arm"]).normalize(), f0 = R[L + "Hand"].clone().sub(R[L + "ForeArm"]).normalize();
+    const bend = Math.max(0, ang(u, f) - ang(u0, f0)) / (Math.PI / 2), lift = Math.max(0, ang(u, down) - ang(u0, down0)) / (Math.PI / 2);
+    for (const m of ms) { m.morphTargetInfluences[4 + k] = Math.min(1.6, bend); m.morphTargetInfluences[6 + k] = Math.min(1.6, lift); }
+  });
 }
 function armTwistShare(M) {
   M.group.updateMatrixWorld(true);
@@ -7369,6 +7406,21 @@ function proPose0(B) {
     const r = R[child].clone().sub(R[name]).normalize();
     const M = basis(dir, ref).multiply(basis(r, restRef).transpose());
     setBone(name, new T.Quaternion().setFromRotationMatrix(M));
+  };
+  // Straight arm: how far the upper arm would turn about its own length relative to the collarbone, and the turn (radians, about
+  // the arm) that brings it back within ARM_TWIST; k fades it out as the elbow bends (a bent elbow fixes the arm's facing)
+  const armTwistFix = (L, ud, fU, k) => {
+    const sb = L + "Shoulder"; if (!ARM_TWIST || k <= 0 || !q[sb]) return 0;
+    const r = R[L + "ForeArm"].clone().sub(R[L + "Arm"]).normalize();
+    const D = new T.Quaternion().setFromRotationMatrix(basis(ud, fU).multiply(basis(r, fwdRest).transpose())), Q = q[sb].clone().invert().multiply(D);
+    let tw = 2 * Math.atan2(Q.x * r.x + Q.y * r.y + Q.z * r.z, Q.w); tw = Math.atan2(Math.sin(tw), Math.cos(tw));
+    // near a half turn "how far round" is ambiguous and flips sign from one frame to the next: carry on from the side this
+    // exercise's arm was on last time, so the eased turn stays continuous through the rep
+    const mk = (B.animId || "") + L, mem = (PRO.twMem = PRO.twMem || new Map()), prev = mem.get(mk);
+    if (prev != null) { while (tw - prev > Math.PI) tw -= 2 * Math.PI; while (tw - prev < -Math.PI) tw += 2 * Math.PI; if (Math.abs(tw) > rad(250)) tw -= Math.sign(tw) * 2 * Math.PI; }
+    mem.set(mk, tw);
+    const a = Math.abs(tw), lim = rad(ARM_TWIST[0]); if (a <= lim) return 0;
+    return (Math.sign(tw) * (lim + (a - lim) * ARM_TWIST[1]) - tw) * k;
   };
   // Hips and spine follow the torso
   const qT = new T.Quaternion().setFromRotationMatrix(basis(up, fwd));
@@ -7562,7 +7614,7 @@ function proPose0(B) {
   for (const [ai, [side, [s, e, w]]] of B.arms.entries()) {
     const tap = B.tapArm && ai === 1; // shoulder taps: the hand that lifts off and reaches across
     const L = V3(s).sub(V3(B.sh)).dot(left) >= 0 ? "Left" : "Right";
-    const Sv = V3(s), fU = front(s, e), fF = front(e, w);
+    const Sv = V3(s), fU = front(s, e), fF = front(e, w); let armRoll = 0;
     let E = V3(e), Wv = V3(w);
     // A broad body needs the arms a little away from the sides, or they sink into the torso
     // Pressing lying down: elbows flare out to the sides (about 45°) instead of dropping straight down into the bench.
@@ -7701,6 +7753,7 @@ function proPose0(B) {
         let wP = pn ? (() => { const x = Math.min(1, Math.max(0, (bend - rad(BH[0])) / rad(BH[1]))); return x * x * (3 - 2 * x); })() : 0;
         if (pn && wH > 0 && pn.dot(hint) < 0 && Math.abs(pn.dot(left)) < .5) wP *= 1 - wH; // (overstraightened in the side plane)
         fU.copy(wP > 0 ? base.clone().lerp(pn, wP).normalize() : base);
+        armRoll = armTwistFix(L, ud, fU, 1 - wP); if (armRoll) fU.applyAxisAngle(ud, armRoll); // (the forearm turns with it below, so the elbow isn't wrung instead)
       } else if (wB > 0 && perp.lengthSq() > 1e-4) fU.lerp(perp.normalize(), wB).normalize(); // ("old": the earlier, slow handover)
       aim(L + "Arm", L + "ForeArm", E.clone().sub(Sv), fU, fwdRest);
     }
@@ -7710,6 +7763,7 @@ function proPose0(B) {
       const t = Math.min(1, tu.lengthSq() / Math.max(1e-6, Sv.distanceToSquared(E)) / .6), st = t * t * (3 - 2 * t);
       if (f0.lengthSq() > 1e-4) { f0.normalize(); fF.copy(tu.lengthSq() > 1e-6 ? f0.lerp(tu.normalize(), st).normalize() : f0); }
     }
+    if (armRoll && !B.palmIn && !B.armHinge) fF.applyAxisAngle(Wv.clone().sub(E).normalize(), armRoll);
     aim(L + "ForeArm", L + "Hand", Wv.clone().sub(E), fF, fwdRest);
     // The wrist stays straight: the hand keeps its natural, relaxed line with the forearm (as in the model's rest pose)
     const headDir = V3(B.sh).sub(V3(B.hip)); headDir.y = 0;
@@ -7728,13 +7782,13 @@ function proPose0(B) {
       const f = headDir.lengthSq() > 4 ? headDir.clone().normalize() : fd.clone(), dn = new T.Vector3(0, -1, 0);
       const Mr = new T.Matrix4().makeBasis(dR, pR, new T.Vector3().crossVectors(dR, pR)), Mt = new T.Matrix4().makeBasis(f, dn, new T.Vector3().crossVectors(f, dn));
       setBone(L + "Hand", qTap.slerp(new T.Quaternion().setFromRotationMatrix(Mt.multiply(Mr.transpose())), pw));
-    } else if (PRO.curl && (B.openHand || B.palmFwd || B.palmDown || B.palmHead) && (!planted || B.palmHead)) { // palmHead (chrome table rows): palms face the head, so the hooked fingers go over the top of the table edge // palmDown: an overhand grip with flat wrists (rowing machine handle) // palmFwd: an overhand grip on a bar (pulldown, pull-up), palms facing forward
+    } else if (PRO.curl && (B.openHand || B.palmFwd || B.palmDown || B.palmHead || B.palmMid) && (!planted || B.palmHead)) { // palmMid: a neutral grip on a handle, the palm facing the body's midline // palmHead (chrome table rows): palms face the head, so the hooked fingers go over the top of the table edge // palmDown: an overhand grip with flat wrists (rowing machine handle) // palmFwd: an overhand grip on a bar (pulldown, pull-up), palms facing forward
       // Open hands (wall angel, jumping jacks): palms face forward, the forearm turns with the hand so the wrist isn't twisted
       const ax = new T.Vector3(...PRO.curl[L + "HandMiddle1"]), dR = R[L + "HandMiddle1"].clone().sub(R[L + "Hand"]).normalize(), pR = new T.Vector3().crossVectors(ax, dR).normalize(); // palm normal
       const fd = Wv.clone().sub(E).normalize(), ud = E.clone().sub(Sv).normalize(), toUpper = ud.clone().negate().sub(fd.clone().multiplyScalar(-ud.dot(fd)));
       // The forearm follows the elbow hinge (its inner side faces the upper arm), so the elbow doesn't twist;
       // the turn of the palm happens towards the wrist, like the real forearm bones rolling over each other
-      const palmTo = B.palmDown ? new T.Vector3(0, -1, 0) : B.palmHead ? V3(B.sh).sub(V3(B.hip)).setY(0).normalize() : fwd; aim(L + "ForeArm", L + "Hand", fd, palmTo, pR); const qPalm = q[L + "ForeArm"].clone();
+      const palmTo = B.palmMid ? left.clone().multiplyScalar(L === "Left" ? -1 : 1) : B.palmDown ? new T.Vector3(0, -1, 0) : B.palmHead ? V3(B.sh).sub(V3(B.hip)).setY(0).normalize() : fwd; aim(L + "ForeArm", L + "Hand", fd, palmTo, pR); const qPalm = q[L + "ForeArm"].clone();
       // (the hinge only tells which way the elbow bends while the arm is bent: fade it out smoothly as the arm straightens, rather than switching it off)
       const wHinge = PRO.chrome && B.palmHead ? Math.min(1, Math.max(0, toUpper.lengthSq() / 2e-4)) : PRO.chrome && (B.hang || B.wideBar) ? Math.min(1, Math.max(0, toUpper.lengthSq() / 2e-3)) : toUpper.lengthSq() > .05 ? 1 : 0; // (table rows: the arms pass through straight, so keep the hinge; elsewhere a straight arm has no hinge to follow)
       // chrome: as the arm straightens, the hinge hands over to the upper arm's own front (the way the elbow would bend),
@@ -7771,6 +7825,7 @@ function proPose0(B) {
   // (the shoulder or elbow looked pinched). Each step turns a bone about its own length and puts its child back where it
   // was, so the pose, hands and grip don't move — only how the turn is shared between joints changes.
   if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
+  proArmMorphs(PRO);
   // hand on the hip: the upper arm keeps none of its own twist (the elbow stays where it is), so the shoulder isn't wrung thin
   if (PRO.chrome && B.handOnHip && PRO.hipHandL) { const L = PRO.hipHandL, tA = boneTwist(PRO, L + "Arm"); boneRoll(PRO, L + "Arm", L + "ForeArm", -tA * HIP_ARM_UNWIND); }
   // side-lying with the hand on the hip: the bottom arm, stretched overhead along the floor, loses its twist too (the shoulder it lies on was wrung thin)
@@ -8485,7 +8540,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
