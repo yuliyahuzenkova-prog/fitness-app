@@ -6442,8 +6442,8 @@ const ANIMS = {
   // Assisted pull-up machine: kneeling on the moving pad, both knees bent, shins back (chrome figures; the others keep the band version)
   pull_assist: { frontArms: true, A: null, B: null,
     glChrome: { A: { anchor: "hand", at: [110, -30], t: 0, u: 180, f: 180, fu: 158, ff: 166, fx: 0, a: 6, b: -86, fd: -40, props: [{ hbar: [110, -30] }, { kneepad: 1 }, { assiststack: [140] }] }, B: { anchor: "hand", at: [110, -30], t: -12, u: 40, f: 165, fu: 62, ff: 172, fx: 12, a: 14, b: -78, fd: -40, props: [{ hbar: [110, -30] }, { kneepad: 1 }, { assiststack: [140] }] } } },
-  // Band-assisted: a band looped over the bar, one knee bent with the foot in the loop
-  pull_band: { frontArms: true, bandFoot: true, A: { anchor: "hand", at: [110, -30], t: 0, u: 180, f: 180, fu: 158, ff: 166, fx: 0, a: 8, b: -80, a2: 4, b2: -6, fd: -40, fd2: -60, props: [{ hbar: [110, -30] }, { bandloop: [110, -30] }] }, B: { anchor: "hand", at: [110, -30], t: -12, u: 40, f: 165, fu: 62, ff: 172, fx: 12, a: 16, b: -70, a2: 14, b2: 0, fd: -40, fd2: -60, props: [{ hbar: [110, -30] }, { bandloop: [110, -30] }] } },
+  // Band-assisted: a band looped over the bar, one knee resting in the loop (thigh a little forward, shin hanging back), the other leg long
+  pull_band: { frontArms: true, bandKnee: true, A: { anchor: "hand", at: [110, -30], t: 0, u: 180, f: 180, fu: 158, ff: 166, fx: 0, a: 42, b: -88, a2: 6, b2: -12, fd: -40, fd2: -60, props: [{ hbar: [110, -30] }, { bandloop: [110, -30] }] }, B: { anchor: "hand", at: [110, -30], t: -12, u: 40, f: 165, fu: 62, ff: 172, fx: 12, a: 46, b: -88, a2: 14, b2: -14, fd: -40, fd2: -60, props: [{ hbar: [110, -30] }, { bandloop: [110, -30] }] } },
   dead_hang: { A: { anchor: "hand", at: [110, -30], t: 0, u: 180, f: 180, a: 4, b: -4, fd: -60, props: [{ hbar: [110, -30] }] }, B: { anchor: "hand", at: [110, -30], t: 0, u: 177, f: 179, a: 4, b: -4, fd: -60, props: [{ hbar: [110, -30] }] } },
   // the band is looped over the top of a door in front (doorband: [door x, door top]); a band end with a handle in each hand
   band_pulldown: { A: pose({ at: [95, 140], a: 10, b: -5, u: 160, f: 165, props: [{ doorband: [138, -56] }] }), B: pose({ at: [95, 140], a: 10, b: -5, u: -15, f: 160, props: [{ doorband: [138, -56] }] }), view: "0 -70 200 214" },
@@ -6589,7 +6589,7 @@ function renderProps(props, B, cam, an, p) {
     }
     if (k === "plate") items.push({ z: v === "sh" ? pr(B.sh)[2] - 3 : handZ, s: barbell(v === "sh" ? v3.add(B.sh, v3.add(v3.mul(B.fwd, -4), v3.mul(B.up, -1))) : handMid) });
     if (k === "cable") items.push({ z: handZ, s: line(L(v[0], v[1]), together || twoHands ? handMid : wN, "cable") });
-    if (k === "bandloop") items.push({ z: handZ, s: line(L(v[0], v[1]), B.legs[0][1][2], "cable") });
+    if (k === "bandloop") items.push({ z: handZ, s: line(L(v[0], v[1]), B.legs[0][1][an && an.bandKnee ? 1 : 2], "cable") });
     if (k === "sidecable") { back(line(L(v[0], 140, v[2]), L(v[0], -40, v[2]), "prop")); items.push({ z: handZ, s: line(L(v[0], v[1], v[2]), handMid, "cable") }); }
     if (k === "vgrip") items.push({ z: handZ, s: line(wN, v3.add(handMid, v3.mul(v3.norm(v3.sub(L(v[0], v[1]), handMid)), 9)), "bar") + line(wF, v3.add(handMid, v3.mul(v3.norm(v3.sub(L(v[0], v[1]), handMid)), 9)), "bar") });
     if (k === "doorband") { back(line(L(v[0], 140), L(v[0], v[1]), "prop")); items.push({ z: handZ, s: line(L(v[0], v[1]), wN, "cable") + (an && an.single ? "" : line(L(v[0], v[1]), wF, "cable")) }); }
@@ -6709,7 +6709,7 @@ const ANIM_3D = {
 for (const [id, bh] of Object.entries({ face_pull: [.2, 1.3], pullup: [1, 12], pull_neg: [1, 12], pull_assist: [1, 12], pull_band: [1, 12], shoulder_press: "old", prone_ytw: "old" })) if (ANIMS[id]) ANIMS[id].bendHand = bh;
 ANIMS.pull_apart = { front: true, A: { hor: 14, band: 1 }, B: { hor: 86, band: 1 } };
 for (const [id, o] of Object.entries(ANIM_3D)) if (ANIMS[id]) Object.assign(ANIMS[id], o);
-Object.assign(ANIMS.pull_assist, { A: ANIMS.pull_band.A, B: ANIMS.pull_band.B, bandFoot: ANIMS.pull_band.bandFoot, yaw: 145, palmFwd: true, ankle: 42 }); // (non-chrome figures: the band version)
+Object.assign(ANIMS.pull_assist, { A: ANIMS.pull_band.A, B: ANIMS.pull_band.B, bandKnee: ANIMS.pull_band.bandKnee, yaw: 145, palmFwd: true, ankle: 42 }); // (non-chrome figures: the band version)
 // Loaded variants: the same movement, holding the equipment the exercise names (dumbbells at the sides, or a barbell)
 const ANIM_VARIANTS = {
   reverse_lunge_db: ["reverse_lunge", (ps) => [...ps, { db: "wrist" }]],
@@ -8085,6 +8085,40 @@ function glTowel(B, k) {
   pos.needsUpdate = true; geo.computeVertexNormals();
   glPlace(GL.towel, new T.Vector3(ankle.x, -140, ankle.z), lat, up, fw, 1, 1, 1); GL.towel.visible = true;
 }
+// Band from the bar to a knee resting in its loop, on the posed chrome model: the loop cups the knee from below (sized to the
+// knee's real skin), and the strands run taut from the bar to it, lying on the front of the chest, belly or thigh wherever a
+// straight line would pass through the body (the front side of the body seen from the side, like a string pulled over it)
+function bandRoute(top, kneeAt, fwd) {
+  const T = THREE, names = PRO.bones.map((b) => b.name.replace("mixamorig:", "")), bp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld);
+  const S = bp("LeftLeg").distanceTo(kneeAt) < bp("RightLeg").distanceTo(kneeAt) ? "Left" : "Right";
+  if (!PRO.bandCand) { // once per model: front-facing skin of the trunk, and the skin round each knee (rest pose)
+    const R = PRO.rest, trunk = new Set(["Hips", "Spine", "Spine1", "Spine2", "Neck", "Head", "LeftShoulder", "RightShoulder", "LeftUpLeg", "RightUpLeg"]), c = { trunk: [], Left: [], Right: [] };
+    PRO.meshes.forEach((m, mi) => { const g = m.geometry, P = g.attributes.position, N = g.attributes.normal, SI = g.attributes.skinIndex, SW = g.attributes.skinWeight; if (!SI || !N) return;
+      const kr = Math.abs(R.LeftUpLeg.y - R.LeftLeg.y) * .2;
+      for (let i = 0; i < P.count; i++) { let wt = 0; const wl = { Left: 0, Right: 0 };
+        for (let k = 0; k < 4; k++) { const nm = names[SI.array[i * 4 + k]], w = SW.array[i * 4 + k]; if (trunk.has(nm)) wt += w; for (const sd of ["Left", "Right"]) if (nm === sd + "Leg" || nm === sd + "UpLeg") wl[sd] += w; }
+        if (wt > .5 && N.getZ(i) > .15 && i % 8 === 0) c.trunk.push([mi, i]); // (a sample is plenty for a hull, and keeps it cheap every frame)
+        for (const sd of ["Left", "Right"]) if (wl[sd] > .5 && Math.abs(P.getY(i) - R[sd + "Leg"].y) < kr && i % 3 === 0) c[sd].push([mi, i]); } });
+    PRO.bandCand = c;
+  }
+  PRO.group.updateMatrixWorld(true);
+  const v = new T.Vector3(), world = ([mi, i]) => { const m = PRO.meshes[mi]; v.fromBufferAttribute(m.geometry.attributes.position, i); m.boneTransform(i, v); return v.applyMatrix4(m.matrixWorld).clone(); };
+  const K = bp(S + "Leg"), A = bp(S + "Foot"), Hp = bp(S + "UpLeg"), sd = A.clone().sub(K).normalize(), lat = Hp.clone().sub(K).cross(sd).normalize(); // (the knee's own sideways axis)
+  const cup = new T.Vector3(0, -1, 0).projectOnPlane(sd).normalize(), kp = PRO.bandCand[S].map(world); if (!kp.length) return null;
+  let dn = 0, wd = 0; for (const q of kp) { const d = q.clone().sub(K); dn = Math.max(dn, d.dot(cup)); wd = Math.max(wd, Math.abs(d.dot(lat))); }
+  const low = K.clone().add(sd.clone().multiplyScalar(2)), hw = wd + .9, depth = dn + .9; // the loop's ends level with the knee's sides, its curve just under the skin
+  // the strands' path, seen from the side: the upper (front) hull of the bar, the knee and any skin in the way
+  const tp = PRO.bandCand.trunk.map(world), mid = ["Hips", "Spine", "Spine1", "Spine2"].reduce((a, n) => a.add(bp(n)), new T.Vector3()).multiplyScalar(.25);
+  fwd = tp.reduce((a, q) => a.add(q), new T.Vector3()).multiplyScalar(1 / (tp.length || 1)).sub(mid).setY(0).normalize(); // (the way the chest and belly face, from the skin itself)
+  const h0 = top.y, h1 = low.y, f = (q) => q.dot(fwd), lt = (q) => q.dot(lat);
+  const pts = [[top.y, f(top), top]];
+  for (const q of tp) { const t = (h0 - q.y) / (h0 - h1); if (t <= .02 || t >= .9) continue; const cl = lt(top) + (lt(low) - lt(top)) * t; if (Math.abs(lt(q) - cl) > hw + 1.5) continue; pts.push([q.y, f(q) + .9, null]); }
+  pts.push([low.y, f(low), low]); pts.sort((a, b) => b[0] - a[0]);
+  const hull = []; for (const p of pts) { while (hull.length > 1) { const [a, b] = hull.slice(-2), cr = (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]); if (cr <= 0) hull.pop(); else break; } hull.push(p); }
+  // back to 3D: height and forward from the hull, sideways along the straight line from the bar to the knee
+  const route = hull.map(([h, fw, q]) => { if (q) return q; const t = (h0 - h) / (h0 - h1), base = top.clone().lerp(low, t); return base.add(fwd.clone().multiplyScalar(fw - f(base))); });
+  return { low, side: lat, hw, cup, depth, route };
+}
 function glProps(props, B, an, p) {
   const T = THREE, M = GL.mat, g = GL.geo, frontal = an && an.plane === "frontal";
   const L = (x, y, off = 0) => V3(frontal ? [off, y, x - 100] : [x - 100, y, off]);
@@ -8255,18 +8289,22 @@ function glProps(props, B, an, p) {
       rod(new T.Vector3(c.x - 14, top - 6, c.z), new T.Vector3(c.x - 14, -140, c.z), 2.4, M.equip); rod(new T.Vector3(c.x - 14, -140, c.z - 22), new T.Vector3(c.x - 14, -140, c.z + 22), 2.2, M.equip);
       rod(new T.Vector3(c.x - 14, top - 6, c.z), new T.Vector3(c.x + 8, top - 6, c.z), 1.8, M.equip);
     }
-    if (k === "bandloop") { // a band looped over the bar, hanging down to the foot of the bent leg
-      let foot = V3(B.legs[0][1][2]).add(new T.Vector3(0, -2, 0)), side = new T.Vector3(0, 0, 1), hw = 2.8; const top = L(v[0], v[1]);
-      if (isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.feet) { // (chrome: the loop passes under the arch of the model's own foot, not through the heel)
+    if (k === "bandloop") { // a band looped over the bar, hanging down to the bent leg: cupping the knee (an.bandKnee) or under the foot
+      const top = L(v[0], v[1]), knee = !!(an && an.bandKnee), fwd = V3(B.fwd).setY(0).normalize();
+      let low = V3(B.legs[0][1][knee ? 1 : 2]).add(new T.Vector3(0, -2, 0)), side = new T.Vector3(0, 0, 1), hw = 2.8, cup = new T.Vector3(0, -1, 0), depth = 3.2, route = null;
+      const chrome = isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible;
+      if (chrome && knee) { const r = bandRoute(top, V3(B.legs[0][1][1]), fwd); if (r) ({ low, side, hw, cup, depth, route } = r); }
+      else if (chrome && PRO.feet) { // (chrome: the loop passes under the arch of the model's own foot, not through the heel)
         const bp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), a0 = V3(B.legs[0][1][2]), Ls = bp("LeftFoot").distanceTo(a0) < bp("RightFoot").distanceTo(a0) ? "Left" : "Right", F = PRO.feet[Ls];
-        if (F) { const an0 = bp(Ls + "Foot"), toe = bp(Ls + "ToeBase"); foot = an0.clone().lerp(toe, .55).sub(F.u.clone().multiplyScalar(F.h * .55 + 1.4)); side = new T.Vector3().crossVectors(F.s, F.u).normalize(); hw = 5; } // (the strands pass either side of the foot)
+        if (F) { const an0 = bp(Ls + "Foot"), toe = bp(Ls + "ToeBase"); low = an0.clone().lerp(toe, .55).sub(F.u.clone().multiplyScalar(F.h * .55 + 1.4)); side = new T.Vector3().crossVectors(F.s, F.u).normalize(); hw = 5; low.add(cup.clone().multiplyScalar(2.2)); } // (the strands pass either side of the foot)
       }
-      // a round loop: over the bar at the top, two strands down, and a curve cupping under the sole at the bottom
-      const dnU = new T.Vector3(0, -1, 0); // (the loop hangs straight down from the bar and cups the underside of the foot)
-      const arc = (c, dir, r, depth) => { let prev = null; for (let i = 0; i <= 10; i++) { const t = Math.PI * i / 10, q = c.clone().add(side.clone().multiplyScalar(-r * Math.cos(t))).add(dir.clone().multiplyScalar(depth * Math.sin(t))); if (prev) rod(prev, q, .7, M.band); prev = q; } };
-      const fc = foot.clone().sub(dnU.clone().multiplyScalar(2.2)); // (the loop's bottom centre sits just inside the sole line, so the curve wraps under it)
-      for (const dz of [-hw, hw]) rod(top.clone().add(side.clone().multiplyScalar(dz)), fc.clone().add(side.clone().multiplyScalar(dz)), .7, M.band);
-      arc(fc, dnU, hw, 3.2); arc(top, new T.Vector3(0, 1, 0), hw, 2.6); // under the sole, and round over the bar
+      // a round loop: over the bar at the top, two strands down (narrow at the bar, as wide as the knee or foot at the bottom),
+      // resting on the front of the body where they would otherwise cut through it, and a curve cupping the knee or the sole
+      const arc = (c, dir, r, dp) => { let prev = null; for (let i = 0; i <= 10; i++) { const t = Math.PI * i / 10, q = c.clone().add(side.clone().multiplyScalar(-r * Math.cos(t))).add(dir.clone().multiplyScalar(dp * Math.sin(t))); if (prev) rod(prev, q, .7, M.band); prev = q; } };
+      const pts = route || [top, low], w0 = 2.4, h0 = top.y, h1 = low.y;
+      for (const sg of [-1, 1]) for (let i = 1; i < pts.length; i++) { const wa = w0 + (hw - w0) * Math.min(1, (h0 - pts[i - 1].y) / ((h0 - h1) || 1)), wb = w0 + (hw - w0) * Math.min(1, (h0 - pts[i].y) / ((h0 - h1) || 1));
+        rod(pts[i - 1].clone().add(side.clone().multiplyScalar(sg * wa)), pts[i].clone().add(side.clone().multiplyScalar(sg * wb)), .7, M.band); }
+      arc(low, cup, hw, depth); { const s0 = side; side = latv.clone(); arc(top, new T.Vector3(0, 1, 0), w0, 2.6); side = s0; } // under the knee or sole, and round over the bar
     }
     if (k === "sidecable") { // a cable column to one side at chest height: post, pulley, cable to a single handle held in both hands
       const anc = L(v[0], v[1], v[2]), base = L(v[0], 140, v[2] + 4), top = L(v[0], -40, v[2] + 4);
