@@ -6744,6 +6744,8 @@ ANIMS.doorway.glChrome = { A: ANIMS.doorway.A, B: ANIMS.doorway.B, set: { openHa
 // chrome: the press starts from the front rack, the bar on the front of the shoulders by the collarbones, elbows down and a little forward
 // under it (not flared out to the sides), and presses straight up past the face
 ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.press_bar.B, rk: 0 }, set: { barPole: 1, palmFwd: true } }; // (chrome: the hands keep one width on the bar, just outside the shoulders, the whole press)
+for (const id of ["deadlift", "rdl_bar", "bench_bar"]) if (ANIMS[id]) ANIMS[id].barHug = true;
+for (const id of ["squat_goblet", "squat_goblet_box"]) if (ANIMS[id]) ANIMS[id].goblet = true; // (chrome: one dumbbell upright at the chest in both hands) // (chrome: the bar stays on the body — the front of the legs, the chest at the bottom of a bench press)
 // The front of the body is at yaw -90, except poses drawn facing the viewer
 const frontYaw = (an) => (an.plane === "frontal" ? 90 : -90);
 const VIEWS = { front: 0, q: 45, side: 90, back: 180 };
@@ -7054,6 +7056,8 @@ const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the h
 const KNEEL_REST = { ankle: 7, toe: 1.5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
+let GOBLET = [3.4, 2.6]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
+let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
 const KNEE_FIX = 7, KNEE_GAIN = 1.7; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
 // How far each foot's skin reaches behind the ankle (heel) and in front of it (toes), along the foot, in the rest pose (model units).
@@ -7380,6 +7384,104 @@ function proPose(B) {
   for (const a of B.arms) a[1] = [rot(a[1][0]), rot(a[1][1]), a[1][2]];
   B.nfOf = (a, b) => { const d = b.map((v, i) => v - a[i]), n = Math.hypot(d[0], d[1]) || 1; return [-d[1] / n || 1e-6, d[0] / n, 0]; };
   B._tilted = true; PRO.reach = {}; proPose0(B);
+}
+// Barbells on the chrome figures. The bar is set where it can really be: on the front of the thighs or shins (deadlifts, rows),
+// on the upper back behind the neck (back squat), over the chest (bench) or in front of the face and collarbones (press) —
+// touching the skin but never passing through it. Then each arm reaches for its spot on the bar (two-bone IK from the model's
+// own shoulder, the elbow keeping its side), the wrist stays straight, and the hand turns so the bar lies across the palm with the
+// fingers round it, palms facing the body (pulls, squat) or forward/towards the feet (press, bench).
+function proBodyPts(M) {
+  if (!M.bodyIdx) {
+    const names = M.bones.map((b) => b.name.replace("mixamorig:", "")), arm = /(Arm|ForeArm|ForeArmTwist|Hand.*)$/;
+    M.bodyIdx = []; M.meshes.forEach((m, mi) => { const SI = m.geometry.attributes.skinIndex, SW = m.geometry.attributes.skinWeight; if (!SI) return;
+      for (let i = 0; i < SI.count; i += 5) { let w = 0; for (let k = 0; k < 4; k++) if (arm.test(names[SI.array[i * 4 + k]] || "")) w += SW.array[i * 4 + k]; if (w < .3) M.bodyIdx.push(mi, i); } });
+  }
+  const out = [], v = new THREE.Vector3();
+  for (let j = 0; j < M.bodyIdx.length; j += 2) { const m = M.meshes[M.bodyIdx[j]], i = M.bodyIdx[j + 1]; v.fromBufferAttribute(m.geometry.attributes.position, i); m.boneTransform(i, v); out.push(v.clone().applyMatrix4(m.matrixWorld)); }
+  return out;
+}
+// Where a chrome hand holds something: the point inside the fist (as for a bar) and the knuckle line (a dumbbell's handle runs along it)
+function proHandGrip(L) {
+  const T = THREE, M = PRO, R = M.rest; if (!M.curl || !M.by[L + "Hand"]) return null; M.group.updateMatrixWorld(true); boneTwist(M, L + "Hand");
+  const wq = new T.Quaternion(); M.by[L + "Hand"].getWorldQuaternion(wq); const toW = (v) => v.clone().applyQuaternion(M.bindW[M.by[L + "Hand"].name].clone().invert()).applyQuaternion(wq);
+  const kn = new T.Vector3(...M.curl[L + "HandMiddle1"]), dR = R[L + "HandMiddle1"].clone().sub(R[L + "Hand"]).normalize(), pR = new T.Vector3().crossVectors(kn, dR).normalize();
+  const h = new T.Vector3().setFromMatrixPosition(M.by[L + "Hand"].matrixWorld), m = new T.Vector3().setFromMatrixPosition(M.by[L + "HandMiddle1"].matrixWorld);
+  return { p: h.lerp(m, BAR_FIT.knuckle).add(toW(pR).multiplyScalar(BAR_FIT.grip)), kn: toW(kn).normalize(), palm: toW(pR).normalize() };
+}
+// Goblet squat (chrome): one dumbbell held upright against the chest, the hands on either side of its top end, palms in
+function proGoblet(B) {
+  const T = THREE, M = PRO, R = M.rest, S = M.S, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), wq = (n) => { const q = new T.Quaternion(); M.by[n].getWorldQuaternion(q); return q; };
+  M.group.updateMatrixWorld(true);
+  const lat = V3(B.lat).normalize(), up = new T.Vector3(0, 1, 0), d = V3(B.fwd).setY(0).normalize(), e = lat.clone();
+  const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5), c = sh.clone().lerp(wp("Spine1"), .55);
+  // in front of the chest: the dumbbell's heads (radius 4.4) just clear the skin between its ends
+  let need = -1e9; for (const q of proBodyPts(M)) { const r = q.clone().sub(c); if (Math.abs(r.dot(up)) > 8 || Math.abs(r.dot(e)) > 4.4) continue; need = Math.max(need, r.dot(d)); }
+  if (need > -1e8) c.add(d.clone().multiplyScalar(need + 5.4));
+  const top = c.clone().add(up.clone().multiplyScalar(6.5));
+  for (const L of ["Left", "Right"]) {
+    const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(lat)) || 1, inward = lat.clone().multiplyScalar(-side), tgt = top.clone().add(lat.clone().multiplyScalar(side * GOBLET[0])).sub(up.clone().multiplyScalar(GOBLET[1]));
+    const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
+    let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize();
+    for (let it = 0; it < 4; it++) {
+      const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).sub(inward.clone().multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
+      const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
+      let pole = up.clone().negate().add(lat.clone().multiplyScalar(side * .3)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // (elbows down under the hands, a little out)
+      E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
+    }
+    const rotTo = (n, child, to) => { const b = M.by[n], p0 = wp(n), cur = wp(child).sub(p0).normalize(), nw = to.clone().sub(p0).normalize();
+      const pw = new T.Quaternion(); b.parent.getWorldQuaternion(pw); b.quaternion.copy(pw.invert().multiply(new T.Quaternion().setFromUnitVectors(cur, nw).multiply(wq(n)))); b.updateMatrixWorld(true); };
+    rotTo(L + "Arm", L + "ForeArm", E); rotTo(L + "ForeArm", L + "Hand", W); rotTo(L + "Hand", L + "HandMiddle1", W.clone().add(fd.clone().multiplyScalar(hl)));
+    // palm onto the side of the dumbbell's top end
+    const g = proHandGrip(L), p0 = g.palm.clone().sub(fd.clone().multiplyScalar(g.palm.dot(fd))).normalize(), p1 = inward.clone().sub(fd.clone().multiplyScalar(inward.dot(fd))).normalize();
+    const ang = Math.atan2(p0.clone().cross(p1).dot(fd), p0.dot(p1)), b = M.by[L + "Hand"], pw = new T.Quaternion(); b.parent.getWorldQuaternion(pw);
+    b.quaternion.copy(pw.invert().multiply(new T.Quaternion().setFromAxisAngle(fd, ang).multiply(wq(L + "Hand")))); b.updateMatrixWorld(true);
+  }
+  M.group.updateMatrixWorld(true);
+  PRO.bar = { c, a: up, goblet: true };
+}
+function proBarGrip(B) {
+  PRO.bar = null; if (!B.barMode || !PRO.chrome || !PRO.curl) return;
+  if (B.barMode === "goblet") return proGoblet(B);
+  const T = THREE, M = PRO, R = M.rest, S = M.S, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), wq = (n) => { const q = new T.Quaternion(); M.by[n].getWorldQuaternion(q); return q; };
+  M.group.updateMatrixWorld(true); boneTwist(M, "LeftHand");
+  const a = V3(B.lat).normalize(), fwd = V3(B.fwd).normalize(), upB = V3(B.up).normalize(), lying = Math.abs(fwd.y) > .7;
+  const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5);
+  // where the hand holds: knuckle axis and palm direction in the world, from the model's rest hand
+  const restV = (L, v) => v.clone().applyQuaternion(M.bindW[M.by[L + "Hand"].name].clone().invert()).applyQuaternion(wq(L + "Hand"));
+  const kn0 = (L) => new T.Vector3(...M.curl[L + "HandMiddle1"]), dR = (L) => R[L + "HandMiddle1"].clone().sub(R[L + "Hand"]).normalize(), pR = (L) => new T.Vector3().crossVectors(kn0(L), dR(L)).normalize();
+  const gripOf = (L) => { const h = wp(L + "Hand"), m = wp(L + "HandMiddle1"); return h.clone().lerp(m, 1 + BAR_FIT.knuckle - 1).add(restV(L, pR(L)).multiplyScalar(BAR_FIT.grip)); };
+  // the bar's starting line: through the hands, or on the shoulders for a back squat
+  let c = B.barMode === "sh" ? sh.clone().add(upB.clone().multiplyScalar(B.barUp ?? 2)) : gripOf("Left").add(gripOf("Right")).multiplyScalar(.5);
+  const d = B.barMode === "sh" ? fwd.clone().negate().setY(0).normalize() : lying ? fwd.clone() : fwd.clone().setY(0).normalize(), e = new T.Vector3().crossVectors(a, d).normalize();
+  const hw = B.barHalf || (B.barMode === "sh" ? 28 : lying ? 30 : 19); // (pulls: hands just outside the legs, arms hanging straight)
+  // push the bar along d until the body at its height (within the hands) is all behind it; hug: pull it back onto the body too
+  const pts = proBodyPts(M); let need = -1e9;
+  for (const q of pts) { const r = q.clone().sub(c); if (Math.abs(r.dot(a)) > hw - 5 || Math.abs(r.dot(e)) > BAR_FIT.band) continue; need = Math.max(need, r.dot(d)); }
+  if (need > -1e8) { const s = need + BAR_FIT.r; if (s > 0 || (B.barHug && s > -12)) c.add(d.clone().multiplyScalar(s)); }
+  // the palm faces: the body for pulls and the squat, forward for the press, the feet for the bench
+  const palmTo = B.barPalm === "fwd" ? fwd.clone() : B.barPalm === "feet" ? upB.clone().negate() : d.clone().negate();
+  for (const L of ["Left", "Right"]) {
+    const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(a)) || (L === "Left" ? 1 : -1), tgt = c.clone().add(a.clone().multiplyScalar(side * hw));
+    const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
+    let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize();
+    for (let it = 0; it < 4; it++) {
+      const pn = palmTo.clone().sub(fd.clone().multiplyScalar(palmTo.dot(fd))).sub(a.clone().multiplyScalar(palmTo.dot(a))); if (pn.lengthSq() < 1e-6) pn.copy(e); pn.normalize();
+      const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).sub(pn.multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
+      const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
+      let pole = E.clone().sub(Sm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))); if (pole.lengthSq() < 1e-6) pole = d.clone().negate().projectOnPlane(hd); pole.normalize();
+      E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
+    }
+    const rotTo = (n, child, to) => { const b = M.by[n], p0 = wp(n), cur = wp(child).sub(p0).normalize(), nw = to.clone().sub(p0).normalize();
+      const pw = new T.Quaternion(); b.parent.getWorldQuaternion(pw); b.quaternion.copy(pw.invert().multiply(new T.Quaternion().setFromUnitVectors(cur, nw).multiply(wq(n)))); b.updateMatrixWorld(true); };
+    rotTo(L + "Arm", L + "ForeArm", E); rotTo(L + "ForeArm", L + "Hand", W); rotTo(L + "Hand", L + "HandMiddle1", W.clone().add(fd.clone().multiplyScalar(hl)));
+    // turn the hand about the forearm: knuckles along the bar, the palm on the chosen side
+    const kw = restV(L, kn0(L)), k0 = kw.clone().sub(fd.clone().multiplyScalar(kw.dot(fd))).normalize(), k1 = a.clone().sub(fd.clone().multiplyScalar(a.dot(fd))).normalize();
+    let ang = Math.atan2(k0.clone().cross(k1).dot(fd), k0.dot(k1));
+    const pAfter = restV(L, pR(L)).applyAxisAngle(fd, ang); if (pAfter.dot(palmTo) < 0) ang += Math.PI;
+    const b = M.by[L + "Hand"], pw = new T.Quaternion(); b.parent.getWorldQuaternion(pw); b.quaternion.copy(pw.invert().multiply(new T.Quaternion().setFromAxisAngle(fd, ang).multiply(wq(L + "Hand")))); b.updateMatrixWorld(true);
+  }
+  M.group.updateMatrixWorld(true);
+  PRO.bar = { c: gripOf("Left").add(gripOf("Right")).multiplyScalar(.5), a };
 }
 function proPose0(B) {
   const T = THREE, S = PRO.S, R = PRO.rest, by = PRO.by;
@@ -7830,6 +7932,7 @@ function proPose0(B) {
   // With one bone per segment, all of a twist landing on one joint wrings the skin there thin, like a sweet wrapper
   // (the shoulder or elbow looked pinched). Each step turns a bone about its own length and puts its child back where it
   // was, so the pose, hands and grip don't move — only how the turn is shared between joints changes.
+  proBarGrip(B);
   if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
   proArmMorphs(PRO);
   // hand on the hip: the upper arm keeps none of its own twist (the elbow stays where it is), so the shoulder isn't wrung thin
@@ -8210,7 +8313,7 @@ function glProps(props, B, an, p) {
     rod(L(bx, by - 8, -63), L(bx, by - 8, 63), 2, E); };
   const disc = (c, axis, len, r) => rod(c.clone().add(axis.clone().multiplyScalar(-len / 2)), c.clone().add(axis.clone().multiplyScalar(len / 2)), r);
   const dumbbell = (c, axis) => { rod(c.clone().add(axis.clone().multiplyScalar(-6)), c.clone().add(axis.clone().multiplyScalar(6)), 1.1); disc(c.clone().add(axis.clone().multiplyScalar(-6.5)), axis, 3.2, 4.4); disc(c.clone().add(axis.clone().multiplyScalar(6.5)), axis, 3.2, 4.4); };
-  const barbell = (c) => { rod(c.clone().add(latv.clone().multiplyScalar(-44)), c.clone().add(latv.clone().multiplyScalar(44)), 1.1); for (const s of [-1, 1]) { disc(c.clone().add(latv.clone().multiplyScalar(s * 34)), latv, 4.5, 11); disc(c.clone().add(latv.clone().multiplyScalar(s * 30.5)), latv, 2, 2.4); } };
+  const barbell = (c, ax = latv) => { rod(c.clone().add(ax.clone().multiplyScalar(-44)), c.clone().add(ax.clone().multiplyScalar(44)), 1.1); for (const s of [-1, 1]) { disc(c.clone().add(ax.clone().multiplyScalar(s * 34)), ax, 4.5, 11); disc(c.clone().add(ax.clone().multiplyScalar(s * 30.5)), ax, 2, 2.4); } };
   const wN = V3(B.arms[0][1][2]), wF = V3(B.arms[1][1][2]), two = p.u2 == null, together = wN.distanceTo(wF) < 10, mid = wN.clone().add(wF).multiplyScalar(.5);
   for (const pp of props || []) {
     const [k, v] = Object.entries(pp)[0];
@@ -8325,8 +8428,12 @@ function glProps(props, B, an, p) {
       for (const y of [top - 36, top - 24]) rod(L(bx, y, -hw + 2.5), L(bx, y, hw - 2.5), 1.6, E); // back rails
       rod(L(v[0] + 2.5, 128, -hw + 2.5), L(v[0] + 2.5, 128, hw - 2.5), .9, E); rod(L(v[0] + d - 2.5, 128, -hw + 2.5), L(v[0] + d - 2.5, 128, hw - 2.5), .9, E); // stretchers
     } else if (k === "chair") { const d = v[3] || 30, hw = v[4] || 15; /* v[3]: seat depth, v[4]: half width */ box(v[0], v[1] - 3, v[0] + d, v[1], hw); if (v[2]) box(v[0] + d, v[1] - 34, v[0] + d + 4, v[1], hw); else box(v[0] - 4, v[1] - 34, v[0], v[1], hw); for (const [dx, o] of [[1, 2 - hw], [d - 1, 2 - hw], [1, hw - 2], [d - 1, hw - 2]]) rod(L(v[0] + dx, v[1], o), L(v[0] + dx, 140, o), 1.2, M.cable); }
-    if (k === "db") { const axOf = (a) => (a[1][3] ? V3(a[1][3]).normalize() : latv); if (v === "far") dumbbell(wF, axOf(B.arms[1])); else if (together && two) dumbbell(mid.clone().sub(up.clone().multiplyScalar(6)), up); else { dumbbell(wN, axOf(B.arms[0])); if (two) dumbbell(wF, axOf(B.arms[1])); } }
-    if (k === "plate") barbell(v === "sh" ? V3(B.sh).add(V3(B.fwd).multiplyScalar(-4.5)).add(up.clone().multiplyScalar(1)) : mid);
+    if (k === "db" && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.curl) { // (chrome: each dumbbell in the model's own fist, its handle along the knuckles)
+      const hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), sideOf = (w) => (hp("LeftHand").distanceTo(w) < hp("RightHand").distanceTo(w) ? "Left" : "Right");
+      const gN = proHandGrip(sideOf(wN)), gF = proHandGrip(sideOf(wF));
+      if (PRO.bar && PRO.bar.goblet) dumbbell(PRO.bar.c, PRO.bar.a); else if (v === "far") dumbbell(gF.p, gF.kn); else if (together && two) dumbbell(gN.p.clone().add(gF.p).multiplyScalar(.5).sub(up.clone().multiplyScalar(6)), up); else { dumbbell(gN.p, gN.kn); if (two) dumbbell(gF.p, gF.kn); }
+    } else if (k === "db") { const axOf = (a) => (a[1][3] ? V3(a[1][3]).normalize() : latv); if (v === "far") dumbbell(wF, axOf(B.arms[1])); else if (together && two) dumbbell(mid.clone().sub(up.clone().multiplyScalar(6)), up); else { dumbbell(wN, axOf(B.arms[0])); if (two) dumbbell(wF, axOf(B.arms[1])); } }
+    if (k === "plate" && isMeshStyle() && PRO.bar && PRO.group && PRO.group.visible) barbell(PRO.bar.c, PRO.bar.a); else if (k === "plate") barbell(v === "sh" ? V3(B.sh).add(V3(B.fwd).multiplyScalar(-4.5)).add(up.clone().multiplyScalar(1)) : mid);
     if (k === "cable" && an && an.rope && two) { // rope attachment: the cable ends in a clip, two rope strands run through the fists and end in stopper knots
       const anc = L(v[0], v[1]), J = mid.clone().add(anc.clone().sub(mid).normalize().multiplyScalar(Math.min(12, anc.distanceTo(mid) * .5)));
       GL.ropeMat = GL.ropeMat || new T.MeshStandardMaterial({ color: 0x24272d, roughness: .85, metalness: 0 });
@@ -8546,7 +8653,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : null; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
