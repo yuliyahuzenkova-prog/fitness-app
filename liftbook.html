@@ -6746,6 +6746,7 @@ ANIMS.doorway.glChrome = { A: ANIMS.doorway.A, B: ANIMS.doorway.B, set: { openHa
 ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.press_bar.B, rk: 0 }, set: { barPole: 1, palmFwd: true } }; // (chrome: the hands keep one width on the bar, just outside the shoulders, the whole press)
 for (const id of ["deadlift", "rdl_bar", "bench_bar"]) if (ANIMS[id]) ANIMS[id].barHug = true;
 for (const id of ["squat_goblet", "squat_goblet_box"]) if (ANIMS[id]) ANIMS[id].goblet = true;
+if (ANIMS.squat_bar) ANIMS.squat_bar.barHalf = 23; // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
 if (ANIMS.press_bar) ANIMS.press_bar.barPalm = "fwd"; if (ANIMS.bench_bar) ANIMS.bench_bar.barPalm = "feet"; // (press: palms forward; bench: palms towards the feet)
 for (const id of ["rdl"]) if (ANIMS[id]) Object.assign(ANIMS[id], { dbFront: true, barHug: true, barHalf: 12 }); // (chrome: both dumbbells in front of the thighs, handles across, palms to the legs, sliding down the front of the legs) // (chrome: one dumbbell upright at the chest in both hands) // (chrome: the bar stays on the body — the front of the legs, the chest at the bottom of a bench press)
 // The front of the body is at yaw -90, except poses drawn facing the viewer
@@ -7061,6 +7062,7 @@ const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked)
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
+let KNEE_TRACK = [.85, 6]; // chrome, feet on the floor: how strongly the bent knee is turned to point over the toes, and how many degrees further out
 const KNEE_FIX = 7, KNEE_GAIN = 1.7; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
 // How far each foot's skin reaches behind the ankle (heel) and in front of it (toes), along the foot, in the rest pose (model units).
 function proFootExt(PRO) {
@@ -7648,6 +7650,12 @@ function proPose0(B) {
     // nearly straight legs: a slight bias to the front, so the knee doesn't flip about as the bend starts
     if (!B.roll) pole.add(V3(B.fwd).projectOnPlane(hd).multiplyScalar(PRO.chrome ? KNEE_FWD : 1.5)); // (chrome: firmer, so a near-straight knee never flips back and forth, as in calf raises)
     if (pole.lengthSq() < 1e-4) pole = V3(B.fwd).sub(hd.clone().multiplyScalar(V3(B.fwd).dot(hd)));
+    // chrome, foot flat on the floor: the knee points the way the toes do (a little further out), never caving in past them
+    if (PRO.chrome && KNEE_TRACK && !B.roll && !kneel && !footEx && !B.kneeSide && A.y < -126 && Math.abs(sole.y) < .5 && Hm.y - A.y > 40) { // (standing on the feet only: lying bridges keep their own knees)
+      const th = sole.clone().setY(0); if (th.lengthSq() > 1e-4) { th.normalize();
+        const out = left.clone().multiplyScalar(L === "Left" ? 1 : -1); th.add(out.multiplyScalar(Math.tan(rad(KNEE_TRACK[1])))).normalize();
+        const tp = th.projectOnPlane(hd); const bendK = Math.acos(Math.max(-1, Math.min(1, K.clone().sub(Hm).normalize().dot(A.clone().sub(K).normalize())))), w = KNEE_TRACK[0] * Math.min(1, bendK / rad(25));
+        if (tp.lengthSq() > 1e-4 && pole.lengthSq() > 1e-6 && w > 0) pole = pole.normalize().lerp(tp.normalize(), w); } }
     const knee = Hm.clone().add(hd.clone().multiplyScalar(along)).add(pole.normalize().multiplyScalar(hgt)), ankle = Hm.clone().add(hd.clone().multiplyScalar(dl));
     aim(L + "UpLeg", L + "Leg", knee.clone().sub(Hm), front(h, k), fwdRest);
     { const bend = knee.clone().sub(Hm).normalize().angleTo(ankle.clone().sub(knee).normalize()), kf = Math.min(2.4, KNEE_GAIN * bend / (Math.PI / 2)); // knee corrective morph
