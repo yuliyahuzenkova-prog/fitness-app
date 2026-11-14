@@ -7463,21 +7463,24 @@ function proBarGrip(B) {
   if (B.barMode === "goblet") return proGoblet(B);
   const T = THREE, M = PRO, R = M.rest, S = M.S, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), wq = (n) => { const q = new T.Quaternion(); M.by[n].getWorldQuaternion(q); return q; };
   M.group.updateMatrixWorld(true); boneTwist(M, "LeftHand");
-  const a = V3(B.lat).normalize(), fwd = V3(B.fwd).normalize(), upB = V3(B.up).normalize(), lying = Math.abs(fwd.y) > .7;
+  const a = V3(B.lat).normalize(), fwd = V3(B.fwd).normalize(), upB = V3(B.up).normalize(), lying = fwd.y > .7 /* (on the back, chest to the ceiling: a deep hinge has the chest facing the floor and is not lying) */;
   const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5);
   // where the hand holds: knuckle axis and palm direction in the world, from the model's rest hand
   const restV = (L, v) => v.clone().applyQuaternion(M.bindW[M.by[L + "Hand"].name].clone().invert()).applyQuaternion(wq(L + "Hand"));
   const kn0 = (L) => new T.Vector3(...M.curl[L + "HandMiddle1"]), dR = (L) => R[L + "HandMiddle1"].clone().sub(R[L + "Hand"]).normalize(), pR = (L) => new T.Vector3().crossVectors(kn0(L), dR(L)).normalize();
   const gripOf = (L) => { const h = wp(L + "Hand"), m = wp(L + "HandMiddle1"); return h.clone().lerp(m, 1 + BAR_FIT.knuckle - 1).add(restV(L, pR(L)).multiplyScalar(BAR_FIT.grip)); };
   // the bar's starting line: through the hands, or on the shoulders for a back squat
-  let c = B.barMode === "sh" ? sh.clone().add(upB.clone().multiplyScalar(B.barUp ?? 2)) : gripOf("Left").add(gripOf("Right")).multiplyScalar(.5);
+  // (start from the fists as the forearms point — wrist plus most of a hand's length along the forearm — not from the palm's facing, which can turn over between frames)
+  const fist = (L) => { const W = wp(L + "Hand"), f = W.clone().sub(wp(L + "ForeArm")).normalize(); return W.add(f.multiplyScalar(R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S * .9)); };
+  let c = B.barMode === "sh" ? sh.clone().add(upB.clone().multiplyScalar(B.barUp ?? 2)) : fist("Left").add(fist("Right")).multiplyScalar(.5);
   const d = B.barMode === "sh" ? fwd.clone().negate().setY(0).normalize() : lying ? fwd.clone() : fwd.clone().setY(0).normalize(), e = new T.Vector3().crossVectors(a, d).normalize();
   const hw = B.barHalf || (B.barMode === "sh" ? 28 : lying ? 30 : 19); // (pulls: hands just outside the legs, arms hanging straight)
   // push the bar along d until the body at its height (within the hands) is all behind it; hug: pull it back onto the body too
   const pts = proBodyPts(M); let need = -1e9;
   const span = B.dbPair ? hw + 8 : hw - 5, band = B.dbPair ? 4.4 : BAR_FIT.band, gap = B.dbPair ? 6 : BAR_FIT.r; // (a pair of dumbbells: their heads, radius 4.4, reach past the hands)
-  for (const q of pts) { const r = q.clone().sub(c); if (Math.abs(r.dot(a)) > span || Math.abs(r.dot(e)) > band) continue; need = Math.max(need, r.dot(d)); }
-  if (need > -1e8) { const s = need + gap; if (s > 0 || (B.barHug && s > -12)) c.add(d.clone().multiplyScalar(s)); }
+  for (const q of pts) { const r = q.clone().sub(c), oa = Math.abs(r.dot(a)) - span, oe = Math.abs(r.dot(e)) - band; if (oa > 6 || oe > 14) continue; need = Math.max(need, r.dot(d) - 1.6 * Math.max(0, oa) - .8 * Math.max(0, oe)); } // (soft edges: skin just outside the band counts for less, so the bar never jumps as a body part comes into it)
+  // never through the body; hugging lifts (barHug) also draw the bar back onto it, fading out smoothly with the gap (a hard cut-off made it jump 9 cm in one frame)
+  if (need > -1e8) { const s = need + gap; if (s > 0) c.add(d.clone().multiplyScalar(s)); else if (B.barHug) { const x = Math.min(1, Math.max(0, (s + 22) / 14)), k = x * x * (3 - 2 * x); c.add(d.clone().multiplyScalar(s * k)); } }
   // the palm faces: the body for pulls and the squat, forward for the press, the feet for the bench
   const palmTo = B.barPalm === "fwd" ? fwd.clone() : B.barPalm === "feet" ? upB.clone().negate() : d.clone().negate();
   for (const L of ["Left", "Right"]) {
