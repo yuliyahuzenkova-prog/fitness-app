@@ -6963,7 +6963,7 @@ async function proLoad(model) {
         const at = new T.Vector3(0, 194.5, (PRO.backZ ?? -7.5) - 2.2).applyMatrix4(by.Head.matrixWorld.clone().invert());
         bun.position.copy(at); bun.scale.set(4, 3.8, 3.4); bun.castShadow = true; by.Head.add(bun);
       }
-      if (PRO.chrome) try { proShinShape(PRO); } catch (e) { console.warn("shin shape unavailable", e); }
+      if (PRO.chrome && SHIN_SHAPE) try { proShinShape(PRO); } catch (e) { console.warn("shin shape unavailable", e); }
       if (PRO.chrome) try { proToeWeights(PRO); } catch (e) { console.warn("toe weights unchanged", e); }
       try { proArchMorph(PRO); } catch (e) { console.warn("arch morph unavailable", e); }
       if (PRO.chrome) try { proNeckRegion(PRO); } catch (e) { console.warn("neck region unavailable", e); }
@@ -7023,6 +7023,7 @@ function proWearShader(mat) {
 // "Short foot": no bone lifts the arch, so build a morph that raises the inner sole and draws the ball of the foot back a little
 // Lower legs: the source mesh has a long, thin "neck" above the ankle and a narrow ankle. Fill the calf out a little and
 // thicken the lower shin and ankle (radially, about the shin's own axis), fading out into the knee and the foot.
+const SHIN_SHAPE = false; // (off: reshaping the lower leg left a band of creased, speckled skin just below the knee and a notch behind it; the model's own calf and shin look smoother)
 const SHIN_SMOOTH = { iters: 6, lam: .5, mu: -.53 }; // chrome lower legs: how much the calf and shin surface is smoothed
 function proShinShape(PRO) {
   const names = PRO.bones.map((b) => b.name.replace("mixamorig:", "")), R = PRO.rest, sm = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
