@@ -7077,13 +7077,14 @@ const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
 let PACK = { w: 21, h: 25, d: 11, drop: 3 }; // backpack (cm): width, height and depth of the bag, and how far below the grip its top is (the handle)
 let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the shoulder-to-wrist distance keeps (a straight but not locked arm)
+let SQUAT_SHRUG = -.4, SQUAT_SHOULDER_FILL = .3; // back squat: the collarbones slightly down (negative), as when the shoulder blades are squeezed under the bar
 let SQUAT_ELBOW = [1, -.15, .5]; // back squat: the elbow's direction (down, back, out): down under the bar and a little out, not pulled back (that wrung the shoulders) // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
 let KNEE_TRACK = [.85, 6]; // chrome, feet on the floor: how strongly the bent knee is turned to point over the toes, and how many degrees further out
 const CLAM_GAP = 7.5; // clamshell: how far apart the ankle joints are with the feet together (the inner ankles touching)
-const KNEE_FIX = 7, KNEE_GAIN = 1.7; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
+const KNEE_FIX = 7, KNEE_GAIN = 1.0; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
 // How far each foot's skin reaches behind the ankle (heel) and in front of it (toes), along the foot, in the rest pose (model units).
 function proFootExt(PRO) {
   const names = PRO.bones.map((b) => b.name.replace("mixamorig:", "")), R = PRO.rest, out = {};
@@ -7243,7 +7244,7 @@ function proArchMorph(PRO) {
         let wT = 0, wS = 0; for (let k = 0; k < 4; k++) { const nm = names[SI.array[i * 4 + k]], w = SW.array[i * 4 + k]; if (nm === side + "UpLeg") wT += w; else if (nm === side + "Leg") wS += w; }
         if (wT + wS < .5) continue;
         v.set(P.getX(i), P.getY(i), P.getZ(i)).sub(K); const along = v.dot(ax); v.sub(ax.clone().multiplyScalar(along)); const rl = v.length(); if (rl < .1) continue;
-        const back = Math.max(0, -v.z / rl), inner = Math.max(0, -(Math.sign(K.x) || 1) * v.x / rl), amt = KNEE_FIX * Math.min(1, 4 * wT * wS) * Math.exp(-((along / 11) ** 2)) * (.45 * (1 - inner) + .55 * back * back); // only where the weights blend (that is what pinches); most at the back, some all round (less on the inner side, so knees held together don't merge), so a bent knee stays as full as the thigh and shin
+        const back = Math.max(0, -v.z / rl), inner = Math.max(0, -(Math.sign(K.x) || 1) * v.x / rl), amt = KNEE_FIX * Math.min(1, 4 * wT * wS) * Math.exp(-((along / 11) ** 2)) * (.1 * (1 - inner) + .9 * back * back); // (mostly behind the knee; pushing the sides out as well tore a jagged notch in the knee at a deep squat) // only where the weights blend (that is what pinches); most at the back, some all round (less on the inner side, so knees held together don't merge), so a bent knee stays as full as the thigh and shin
         kd[i * 3] = (v.x / rl) * amt; kd[i * 3 + 1] = (v.y / rl) * amt; kd[i * 3 + 2] = (v.z / rl) * amt;
       }
       let Lk = new Float32Array(W * 3); for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) Lk[wid[i] * 3 + c] += kd[i * 3 + c] / (cnt[wid[i]] || 1);
@@ -7335,7 +7336,8 @@ function boneRoll(M, n, child, deg) {
 }
 // Elbow and shoulder correctives (morphs 4–7): the elbow's by how much more it bends than at rest, the shoulder's by how far the
 // upper arm is raised above its rest angle from the trunk
-function proArmMorphs(M) {
+function proArmMorphs(M, B) {
+  const liftK = B && B.barMode === "sh" ? SQUAT_SHOULDER_FILL : 1; // (bar on the back: the shoulders stay down, so less fill on top of them)
   const ms = M.meshes.filter((m) => m.morphTargetInfluences && m.morphTargetInfluences.length > 7); if (!ms.length) return;
   M.group.updateMatrixWorld(true);
   const wp = (n) => new THREE.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), R = M.rest, ang = (a, b) => Math.acos(Math.max(-1, Math.min(1, a.dot(b))));
@@ -7345,7 +7347,7 @@ function proArmMorphs(M) {
     const s = wp(L + "Arm"), e = wp(L + "ForeArm"), h = wp(L + "Hand"), u = e.clone().sub(s).normalize(), f = h.clone().sub(e).normalize();
     const u0 = R[L + "ForeArm"].clone().sub(R[L + "Arm"]).normalize(), f0 = R[L + "Hand"].clone().sub(R[L + "ForeArm"]).normalize();
     const bend = Math.max(0, ang(u, f) - ang(u0, f0)) / (Math.PI / 2), lift = Math.max(0, ang(u, down) - ang(u0, down0)) / (Math.PI / 2);
-    for (const m of ms) { m.morphTargetInfluences[4 + k] = Math.min(1.6, bend); m.morphTargetInfluences[6 + k] = Math.min(1.6, lift); }
+    for (const m of ms) { m.morphTargetInfluences[4 + k] = Math.min(1.6, bend); m.morphTargetInfluences[6 + k] = Math.min(1.6, lift) * liftK; }
   });
 }
 function armTwistShare(M) {
@@ -7733,7 +7735,7 @@ function proPose0(B) {
     if (PRO.chrome && B.clam) { // (clamshell: the thigh faces away from where the shin goes, so the knee bends as a hinge, not sideways)
       const td = knee.clone().sub(Hm).normalize(), sd = ankle.clone().sub(knee).normalize(), f0 = sd.clone().negate().sub(td.clone().multiplyScalar(-sd.dot(td))); if (f0.lengthSq() > 1e-4) thighFront = f0.normalize(); }
     aim(L + "UpLeg", L + "Leg", knee.clone().sub(Hm), thighFront, fwdRest);
-    { const bend = knee.clone().sub(Hm).normalize().angleTo(ankle.clone().sub(knee).normalize()), kf = Math.min(2.4, KNEE_GAIN * bend / (Math.PI / 2)); // knee corrective morph
+    { const bend = knee.clone().sub(Hm).normalize().angleTo(ankle.clone().sub(knee).normalize()), kf = Math.min(1.1, KNEE_GAIN * bend / (Math.PI / 2)); // knee corrective morph
       for (const m of PRO.meshes) if (m.morphTargetInfluences && m.morphTargetInfluences.length > 3) m.morphTargetInfluences[L === "Left" ? 2 : 3] = kf; }
     const shinFront = () => { const sd = ankle.clone().sub(knee).normalize(), tf = knee.clone().sub(Hm); tf.sub(sd.multiplyScalar(tf.dot(sd))); return tf.lengthSq() > 1e-4 ? tf.normalize() : front(k, a); };
     aim(L + "Leg", L + "Foot", ankle.clone().sub(knee), B.kneeSide ? shinFront() : kneel ? front(k, a).lerp(new T.Vector3(0, -1, 0), kw).normalize() : front(k, a), fwdRest); // kneeling: the shin's front lies on the floor
@@ -7894,10 +7896,10 @@ function proPose0(B) {
     }
     // Raising the arm above the shoulder also lifts the collarbone, so the shoulder doesn't fold in
     {
-      const abdA = Math.acos(Math.max(-1, Math.min(1, -E.clone().sub(Sv).normalize().dot(up)))), elev = Math.max(0, (abdA - rad(45)) / rad(135)), sb = L + "Shoulder";
+      const abdA = Math.acos(Math.max(-1, Math.min(1, -E.clone().sub(Sv).normalize().dot(up)))), elev = B.barMode === "sh" ? SQUAT_SHRUG : Math.max(0, (abdA - rad(45)) / rad(135)), sb = L + "Shoulder"; // (back squat: shoulders set down under the bar, not shrugged to the ears)
       // reaching forward also brings the shoulder blade round (protraction), so the back of the shoulder isn't pinched thin
       const reachF = PRO.chrome ? Math.max(0, E.clone().sub(Sv).normalize().dot(fwd)) * Math.min(1, abdA / rad(60)) : 0;
-      if (by[sb] && (elev > 0 || reachF > 0)) {
+      if (by[sb] && (elev !== 0 || reachF > 0)) {
         const c0 = R[L + "Arm"].clone().sub(R[sb]).normalize().applyQuaternion(q.Spine2), c1 = c0.clone().add(up.clone().multiplyScalar(Math.tan(rad(SHRUG * elev)))).add(fwd.clone().multiplyScalar(Math.tan(rad(PROTRACT * reachF)))).normalize();
         setBone(sb, new T.Quaternion().setFromUnitVectors(c0, c1).multiply(q.Spine2));
       } else if (by[sb]) setBone(sb, q.Spine2.clone());
@@ -8035,7 +8037,7 @@ function proPose0(B) {
   // was, so the pose, hands and grip don't move — only how the turn is shared between joints changes.
   proBarGrip(B); proHtPad(B);
   if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
-  proArmMorphs(PRO);
+  proArmMorphs(PRO, B);
   // hand on the hip: the upper arm keeps none of its own twist (the elbow stays where it is), so the shoulder isn't wrung thin
   if (PRO.chrome && B.handOnHip && PRO.hipHandL) { const L = PRO.hipHandL, tA = boneTwist(PRO, L + "Arm"); boneRoll(PRO, L + "Arm", L + "ForeArm", -tA * HIP_ARM_UNWIND); }
   // side-lying with the hand on the hip: the bottom arm, stretched overhead along the floor, loses its twist too (the shoulder it lies on was wrung thin)
