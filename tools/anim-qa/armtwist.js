@@ -5,8 +5,8 @@ const p=await b.newPage();p.on('pageerror',e=>console.log('ERR',e.message));
 await p.route('http://app.test/',r=>r.fulfill({path:process.env.APPF||require('path').resolve(__dirname,'../../standalone/index.html')}));
 await p.route('https://cdn.jsdelivr.net/**',r=>r.fulfill({path:require('path').resolve(__dirname,'vendor/package/build/three.min.js'),contentType:'application/javascript'}));
 await p.addInitScript((f)=>{localStorage.setItem('liftbook-figure',JSON.stringify(f));localStorage.setItem('liftbook-figure-v','3')},fig);
-await p.goto('http://app.test/');await p.waitForTimeout(400);
-const r=await p.evaluate(async(only)=>{glInit();glStyle();await proLoad();const c=document.createElement('canvas');c.width=100;c.height=100;document.body.appendChild(c);const res=[];
+await p.addInitScript((v)=>{window.__SNIP=v},process.env.SNIP||'');await p.goto('http://app.test/');await p.waitForTimeout(400);
+const r=await p.evaluate(async(only)=>{glInit();glStyle();await proLoad();if(window.__SNIP)eval(window.__SNIP);const c=document.createElement('canvas');c.width=100;c.height=100;document.body.appendChild(c);const res=[];
  const ids=only?only.split(','):Object.keys(ANIMS);
  for(const id of ids){const rows=[];for(const ph of [0,.125,.25,.375,.5,.625,.75,.875]){try{glDraw(c,id,ph,0,[]);}catch(e){continue}if(!PRO.group.visible)continue;
    const o={ph};for(const L of ['Left','Right']){o[L]=[boneTwist(PRO,L+'Arm'),boneTwist(PRO,L+'ForeArm'),boneTwist(PRO,L+'Hand')].map(x=>Math.round(x));}rows.push(o);}

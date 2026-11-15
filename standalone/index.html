@@ -6761,7 +6761,7 @@ ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.p
 for (const id of ["deadlift", "rdl_bar", "bench_bar"]) if (ANIMS[id]) ANIMS[id].barHug = true;
 for (const id of ["squat_goblet", "squat_goblet_box"]) if (ANIMS[id]) ANIMS[id].goblet = true;
 for (const id of ["deadlift", "rdl_bar", "rdl", "rdl_pack"]) if (ANIMS[id]) ANIMS[id].barHang = true; // (chrome: arms hang straight, the bar where they put it)
-if (ANIMS.squat_bar) ANIMS.squat_bar.barHalf = 23; // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
+if (ANIMS.squat_bar) Object.assign(ANIMS.squat_bar, { barHalf: 27, barUp: 3, barHug: true }); // (back squat: a bit wider than the shoulders, bar resting high on the upper back) // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
 if (ANIMS.press_bar) ANIMS.press_bar.barPalm = "fwd"; if (ANIMS.bench_bar) ANIMS.bench_bar.barPalm = "feet"; // (press: palms forward; bench: palms towards the feet)
 for (const id of ["rdl"]) if (ANIMS[id]) Object.assign(ANIMS[id], { dbFront: true, barHug: true, barHalf: 12 });
 // Backpack Romanian deadlift: a loaded backpack held by its top handle in both hands, hanging in front of the thighs. A slightly
@@ -7079,7 +7079,7 @@ const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
 let PACK = { w: 21, h: 25, d: 11, drop: 3 }; // backpack (cm): width, height and depth of the bag, and how far below the grip its top is (the handle)
 let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the shoulder-to-wrist distance keeps (a straight but not locked arm)
-let SQUAT_ELBOW = [1, .45, .45]; // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
+let SQUAT_ELBOW = [1, -.15, .5]; // back squat: the elbow's direction (down, back, out): down under the bar and a little out, not pulled back (that wrung the shoulders) // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
