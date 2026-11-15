@@ -6509,7 +6509,7 @@ const EX_MAP = [
   [/^Sit-to-stand from a high chair/, "sitstand", "sit_to_stand_high"], [/^Sit-to-stand/, "sitstand", "sit_to_stand"], [/^Bodyweight [Ss]quat/, "bwsquat", "squat_bw"], [/^Wall sit, a bit deeper/, "wallsit", "wall_sit_deep"], [/^Wall sit/, "wallsit", "wall_sit"],
   [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
   [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/^Reverse lunge, short step/, "revlunge", "reverse_lunge_short"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/[Ss]tep-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
-  [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
+  [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/^Backpack Romanian deadlift/, "rdl", "rdl_pack"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
   [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/^Hip thrust, back on the couch/, "hipthrust", "hip_thrust_couch"], [/^Hip thrust machine/, "hipthrust", "hip_thrust_machine"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/^Single-leg glute bridge/, "bridge", "glute_bridge_single"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
   [/^Pike push-up, hands on a chair/, "pike", "pike_chair"], [/^Incline pike/, "pike", "pike_pushup"], [/^Incline push-up, hands on a chair/, "inclinepush", "incline_chair"], [/^Incline push-up/, "inclinepush", "incline_pushup"], [/[Pp]ike [Pp]ush-up/, "pike", "pike_pushup"], [/^Push-up/, "pushup", "pushup"],
   [/^(Barbell bench press|Bench Press)$/, "bench", "bench_bar"], [/[Bb]ench [Pp]ress/, "bench", "bench_press"], [/^Seated cable row/, "cablerow", "row_cable"], [/^Chest-supported/, "csrow", "row_chest"],
@@ -6748,10 +6748,13 @@ ANIMS.doorway.glChrome = { A: ANIMS.doorway.A, B: ANIMS.doorway.B, set: { openHa
 ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.press_bar.B, rk: 0 }, set: { barPole: 1, palmFwd: true } }; // (chrome: the hands keep one width on the bar, just outside the shoulders, the whole press)
 for (const id of ["deadlift", "rdl_bar", "bench_bar"]) if (ANIMS[id]) ANIMS[id].barHug = true;
 for (const id of ["squat_goblet", "squat_goblet_box"]) if (ANIMS[id]) ANIMS[id].goblet = true;
-for (const id of ["deadlift", "rdl_bar", "rdl"]) if (ANIMS[id]) ANIMS[id].barHang = true; // (chrome: arms hang straight, the bar where they put it)
+for (const id of ["deadlift", "rdl_bar", "rdl", "rdl_pack"]) if (ANIMS[id]) ANIMS[id].barHang = true; // (chrome: arms hang straight, the bar where they put it)
 if (ANIMS.squat_bar) ANIMS.squat_bar.barHalf = 23; // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
 if (ANIMS.press_bar) ANIMS.press_bar.barPalm = "fwd"; if (ANIMS.bench_bar) ANIMS.bench_bar.barPalm = "feet"; // (press: palms forward; bench: palms towards the feet)
-for (const id of ["rdl"]) if (ANIMS[id]) Object.assign(ANIMS[id], { dbFront: true, barHug: true, barHalf: 12 }); // (chrome: both dumbbells in front of the thighs, handles across, palms to the legs, sliding down the front of the legs) // (chrome: one dumbbell upright at the chest in both hands) // (chrome: the bar stays on the body — the front of the legs, the chest at the bottom of a bench press)
+for (const id of ["rdl"]) if (ANIMS[id]) Object.assign(ANIMS[id], { dbFront: true, barHug: true, barHalf: 12 });
+// Backpack Romanian deadlift: a loaded backpack held by its top handle in both hands, hanging in front of the thighs. A slightly
+// smaller range than with dumbbells (hands to about the knees), so the bag clears the floor at the bottom
+if (ANIMS.rdl) ANIMS.rdl_pack = { ...ANIMS.rdl, dbFront: false, pack: true, barHalf: 4.5, B: lerpPose(ANIMS.rdl.A, ANIMS.rdl.B, .68) }; // (chrome: both dumbbells in front of the thighs, handles across, palms to the legs, sliding down the front of the legs) // (chrome: one dumbbell upright at the chest in both hands) // (chrome: the bar stays on the body — the front of the legs, the chest at the bottom of a bench press)
 // The front of the body is at yaw -90, except poses drawn facing the viewer
 const frontYaw = (an) => (an.plane === "frontal" ? 90 : -90);
 const VIEWS = { front: 0, q: 45, side: 90, back: 180 };
@@ -7062,6 +7065,7 @@ const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the h
 const KNEEL_REST = { ankle: 7, toe: 1.5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
+let PACK = { w: 21, h: 25, d: 11, drop: 3 }; // backpack (cm): width, height and depth of the bag, and how far below the grip its top is (the handle)
 let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the shoulder-to-wrist distance keeps (a straight but not locked arm)
 let SQUAT_ELBOW = [1, .45, .45]; // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
@@ -7483,7 +7487,11 @@ function proBarGrip(B) {
   // push the bar along d until the body at its height (within the hands) is all behind it; hug: pull it back onto the body too
   const pts = proBodyPts(M);
   const span = B.dbPair ? hw + 8 : hw - 5, band = B.dbPair ? 4.4 : BAR_FIT.band, gap = B.dbPair ? 6 : BAR_FIT.r; // (a pair of dumbbells: their heads, radius 4.4, reach past the hands)
-  const clearOf = (c0) => { let need = -1e9; for (const q of pts) { const r = q.clone().sub(c0), oa = Math.abs(r.dot(a)) - span, oe = Math.abs(r.dot(e)) - band; if (oa > 6 || oe > 14) continue; need = Math.max(need, r.dot(d) - 1.6 * Math.max(0, oa) - .8 * Math.max(0, oe)); } return need > -1e8 ? need + gap : -1e9; }; // (soft edges: skin just outside the band counts for less, so the bar never jumps as a body part comes into it)
+  const fh = fwd.clone().setY(0).normalize(), P = PACK;
+  const clearOf = (c0) => { let need = -1e9; if (B.pack) { // (the bag hanging below the hands: its back face clear of the legs, over its whole height)
+      for (const q of pts) { const r = q.clone().sub(c0), dy = -r.y, oa = Math.abs(r.dot(a)) - P.w / 2; if (dy < P.drop - 2 || dy > P.drop + P.h + 2 || oa > 4) continue; need = Math.max(need, r.dot(fh) - Math.max(0, oa)); }
+      return need > -1e8 ? need + 1.2 : -1e9; }
+    for (const q of pts) { const r = q.clone().sub(c0), oa = Math.abs(r.dot(a)) - span, oe = Math.abs(r.dot(e)) - band; if (oa > 6 || oe > 14) continue; need = Math.max(need, r.dot(d) - 1.6 * Math.max(0, oa) - .8 * Math.max(0, oe)); } return need > -1e8 ? need + gap : -1e9; }; // (soft edges: skin just outside the band counts for less, so the bar never jumps as a body part comes into it)
   if (B.barHang && !lying) {
     // hanging lifts (deadlifts, Romanian deadlifts): the arms hang nearly straight from the shoulders the whole rep — the bar sits at
     // that reach under the shoulders, and only moves forward (round the shoulders, at the same reach) when the legs are in the way
@@ -7514,7 +7522,7 @@ function proBarGrip(B) {
     proArmTo(M, L, E, W, poleK.clone().negate(), pn); // (the elbow folds away from the side it points to: the same side every frame)
   }
   M.group.updateMatrixWorld(true);
-  PRO.bar = { c: gripOf("Left").add(gripOf("Right")).multiplyScalar(.5), a, pair: B.dbPair ? [gripOf("Left"), gripOf("Right")] : null };
+  PRO.bar = { c: gripOf("Left").add(gripOf("Right")).multiplyScalar(.5), a, pack: B.pack ? fwd.clone().setY(0).normalize() : null, pair: B.dbPair ? [gripOf("Left"), gripOf("Right")] : null };
 }
 function proPose0(B) {
   const T = THREE, S = PRO.S, R = PRO.rest, by = PRO.by;
@@ -8469,7 +8477,17 @@ function glProps(props, B, an, p) {
       for (const y of [top - 36, top - 24]) rod(L(bx, y, -hw + 2.5), L(bx, y, hw - 2.5), 1.6, E); // back rails
       rod(L(v[0] + 2.5, 128, -hw + 2.5), L(v[0] + 2.5, 128, hw - 2.5), .9, E); rod(L(v[0] + d - 2.5, 128, -hw + 2.5), L(v[0] + d - 2.5, 128, hw - 2.5), .9, E); // stretchers
     } else if (k === "chair") { const d = v[3] || 30, hw = v[4] || 15; /* v[3]: seat depth, v[4]: half width */ box(v[0], v[1] - 3, v[0] + d, v[1], hw); if (v[2]) box(v[0] + d, v[1] - 34, v[0] + d + 4, v[1], hw); else box(v[0] - 4, v[1] - 34, v[0], v[1], hw); for (const [dx, o] of [[1, 2 - hw], [d - 1, 2 - hw], [1, hw - 2], [d - 1, hw - 2]]) rod(L(v[0] + dx, v[1], o), L(v[0] + dx, 140, o), 1.2, M.cable); }
-    if (k === "db" && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.curl) { // (chrome: each dumbbell in the model's own fist, its handle along the knuckles)
+    if (k === "db" && an && an.pack) { // a backpack: a soft bag with a top handle, a front pocket and the shoulder straps on its back
+      const chrome = isMeshStyle() && PRO.bar && PRO.bar.pack && PRO.group && PRO.group.visible, g0 = chrome ? PRO.bar.c : mid.clone(), Xa = chrome ? PRO.bar.a.clone() : latv.clone(), Zf = chrome ? PRO.bar.pack.clone() : V3(B.fwd).setY(0).normalize(), Yu = new T.Vector3(0, 1, 0), P = PACK;
+      if (!GL.packMat) { GL.packMat = Object.assign(M.equip.clone(), { color: new T.Color(0x34507a), roughness: .85, metalness: 0 }); GL.packMat2 = Object.assign(M.equip.clone(), { color: new T.Color(0x23324a), roughness: .9, metalness: 0 }); }
+      const bc = g0.clone().add(Yu.clone().multiplyScalar(-(P.drop + P.h / 2))).add(Zf.clone().multiplyScalar(P.d / 2 - 2));
+      const bag = glMesh("box", g.box, GL.packMat); bag.castShadow = true; glPlace(bag, bc, Xa, Yu, Zf, P.w, P.h, P.d);
+      const top = glMesh("sph", g.sph, GL.packMat); glPlace(top, bc.clone().add(Yu.clone().multiplyScalar(P.h / 2)), Xa, Yu, Zf, P.w / 2, 3, P.d / 2); // (a rounded top)
+      const pk = glMesh("box", g.box, GL.packMat2); glPlace(pk, bc.clone().add(Zf.clone().multiplyScalar(P.d / 2 + 1.5)).add(Yu.clone().multiplyScalar(-P.h * .18)), Xa, Yu, Zf, P.w * .7, P.h * .45, 3); // front pocket
+      for (const sd of [-1, 1]) { rod(g0.clone().add(Xa.clone().multiplyScalar(sd * 4)), bc.clone().add(Yu.clone().multiplyScalar(P.h / 2 + 1.5)).add(Xa.clone().multiplyScalar(sd * 4)), .7, GL.packMat2); // the handle, up into the fists
+        const bk = bc.clone().add(Zf.clone().multiplyScalar(-P.d / 2 - .6)).add(Xa.clone().multiplyScalar(sd * 7)); rod(bk.clone().add(Yu.clone().multiplyScalar(P.h * .42)), bk.clone().add(Yu.clone().multiplyScalar(-P.h * .4)), 1.1, GL.packMat2); } // shoulder straps
+      rod(g0.clone().add(Xa.clone().multiplyScalar(-4.5)), g0.clone().add(Xa.clone().multiplyScalar(4.5)), .8, GL.packMat2);
+    } else if (k === "db" && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.curl) { // (chrome: each dumbbell in the model's own fist, its handle along the knuckles)
       const hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), sideOf = (w) => (hp("LeftHand").distanceTo(w) < hp("RightHand").distanceTo(w) ? "Left" : "Right");
       const gN = proHandGrip(sideOf(wN)), gF = proHandGrip(sideOf(wF));
       if (PRO.bar && PRO.bar.goblet) dumbbell(PRO.bar.c, PRO.bar.a); else if (PRO.bar && PRO.bar.pair) PRO.bar.pair.forEach((g) => dumbbell(g, PRO.bar.a)); else if (v === "far") dumbbell(gF.p, gF.kn); else if (together && two) dumbbell(gN.p.clone().add(gF.p).multiplyScalar(.5).sub(up.clone().multiplyScalar(6)), up); else { dumbbell(gN.p, gN.kn); if (two) dumbbell(gF.p, gF.kn); }
@@ -8595,6 +8613,7 @@ const TECH = {
 // Hip thrust on a couch and on a hip thrust machine: the same lift; hands resting on the chest (no elbows bent back over the edge)
 { const v = (q, prop, arms) => ({ ...q, ...arms, props: q.props.map((pp) => (pp.box ? prop : pp)) }), H = ANIMS.hip_thrust;
   for (const [id, prop] of [["hip_thrust_couch", { couch: [18, 104] }], ["hip_thrust_machine", { htmachine: [18, 104] }]]) { ANIMS[id] = { ...H, A: v(H.A, prop, {}), B: v(H.B, prop, {}) }; TECH[id] = TECH.hip_thrust; } }
+if (ANIMS.rdl_pack) TECH.rdl_pack = TECH.rdl;
 // the machine: hands hold the hip pad's handles at its ends, all rep
 Object.assign(ANIMS.hip_thrust_machine, { hz: 16 }); Object.assign(ANIMS.hip_thrust_machine.A, { u: 20, f: 120 }); Object.assign(ANIMS.hip_thrust_machine.B, { u: 80, f: 140 });
 // Single-leg glute bridge: one foot on the floor, the other leg held straight out, in line with the thigh of the working leg
@@ -8694,7 +8713,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront ? "wrist" : null; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
