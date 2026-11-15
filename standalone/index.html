@@ -6052,7 +6052,7 @@ let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how m
 let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
 let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
 let HT_BOX = 102.6;
-let HT_PAD = [4, 11]; // hip thrust machine: the roller's shift from the hips towards the head, and its height above them // single-leg hip thrust: the bench top (sketch y)
+let HT_PAD = [4, 11, 17]; // hip thrust machine: the roller's shift from the hips towards the head, and its height above them // single-leg hip thrust: the bench top (sketch y)
 let SLB = [128, 60, 96]; // single-leg glute bridge: the lifted leg's angle at the bottom, its foot, and at the top (straight, in line with the working thigh)
 let BOTTOM_ARM_UNWIND = -1; // side-lying: share of the bottom (overhead) arm's twist taken out
 let HIP_ARM_UNWIND = -.45; // hand on hip: share of the upper arm's twist taken out
@@ -7546,6 +7546,31 @@ function proBarGrip(B) {
   M.group.updateMatrixWorld(true);
   PRO.bar = { c: gripOf("Left").add(gripOf("Right")).multiplyScalar(.5), a, pack: B.pack ? fwd.clone().setY(0).normalize() : null, pair: B.dbPair ? [gripOf("Left"), gripOf("Right")] : null };
 }
+// Hip thrust machine (chrome): the padded roller rests on the hip crease, on top of the body's own skin (never sunk into it),
+// and both hands hold it near its ends, palms down on top, fingers over it towards the knees
+function proHtPad(B) {
+  PRO.htPad = null; if (!B.htPad || !PRO.chrome) return;
+  const T = THREE, M = PRO, R = M.rest, S = M.S, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld);
+  M.group.updateMatrixWorld(true);
+  const hp = wp("Hips"), kn = wp("LeftLeg").add(wp("RightLeg")).multiplyScalar(.5), toHead = hp.clone().setZ(0).sub(kn.clone().setZ(0)).normalize(), rr = 5.2, hz = 15; // (the hips and belly only: the arms, whatever pose they start from, don't count)
+  // across the front of the pelvis, just towards the knees from the hip joints, lifted off the skin square to the thighs
+  const tK = toHead.clone().negate(), tn = new T.Vector3(-tK.y, tK.x, 0); if (tn.y < 0) tn.negate(); tn.normalize();
+  const th = kn.clone().sub(hp).setZ(0).normalize(), nn = new T.Vector3(-th.y, th.x, 0); if (nn.y < 0) nn.negate();
+  const c0 = hp.clone().setZ(0).add(th.clone().multiplyScalar(HT_PAD[0] + 3 * Math.min(1, Math.max(0, th.y / .5)))); let sN = 0; // (a little further along the thighs at the bottom, where they slope up: the pad sits in the hip crease, not on the belly)
+  for (const q of proBodyPts(M)) { if (Math.abs(q.z) > hz) continue; const r = q.clone().setZ(0).sub(c0), u = r.dot(th); if (Math.abs(u) >= rr) continue; sN = Math.max(sN, r.dot(nn) + Math.sqrt(rr * rr - u * u) + .4); }
+  const c = c0.add(nn.clone().multiplyScalar(sN));
+  const up = new T.Vector3(0, 1, 0), dn = up.clone().negate(), fwd = kn.clone().setZ(0).sub(hp.clone().setZ(0)).normalize();
+  for (const L of ["Left", "Right"]) { if (!M.by[L + "Hand"]) continue;
+    const Sm = wp(L + "Arm"), side = Math.sign(Sm.z) || (L === "Left" ? 1 : -1), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
+    const toSh = Sm.clone().setZ(0).sub(c.clone().setZ(0)).normalize(), gd = up.clone().add(toSh.multiplyScalar(.7)).normalize(), top = c.clone().add(gd.clone().multiplyScalar(rr + .6)).add(new T.Vector3(0, 0, side * HT_PAD[2])); // (on the pad's upper side nearest the shoulders, so the hands reach it at the top of the lift too)
+    let E = wp(L + "ForeArm"), W, fd = fwd.clone();
+    for (let it = 0; it < 4; it++) { const Wt = top.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).add(gd.clone().multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
+      const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
+      let pole = new T.Vector3(0, -1, side * .9).add(fwd.clone().multiplyScalar(-.3)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); // (elbows out to the sides and down)
+      E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.clone().multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize(); var poleK = pole; }
+    proArmTo(M, L, E, W, poleK.clone().negate(), gd.clone().negate()); } // (the fist over the top of the pad, the palm onto it)
+  M.group.updateMatrixWorld(true); PRO.htPad = { c };
+}
 function proPose0(B) {
   const T = THREE, S = PRO.S, R = PRO.rest, by = PRO.by;
   let up = V3(B.sh).sub(V3(B.hip)).normalize();
@@ -8019,7 +8044,7 @@ function proPose0(B) {
   // With one bone per segment, all of a twist landing on one joint wrings the skin there thin, like a sweet wrapper
   // (the shoulder or elbow looked pinched). Each step turns a bone about its own length and puts its child back where it
   // was, so the pose, hands and grip don't move — only how the turn is shared between joints changes.
-  proBarGrip(B);
+  proBarGrip(B); proHtPad(B);
   if (PRO.chrome && TWIST_SHARE) armTwistShare(PRO);
   proArmMorphs(PRO);
   // hand on the hip: the upper arm keeps none of its own twist (the elbow stays where it is), so the shoulder isn't wrung thin
@@ -8446,7 +8471,7 @@ function glProps(props, B, an, p) {
     if (k === "htmachine") { const X = new T.Vector3(1, 0, 0), Y = new T.Vector3(0, 1, 0), Z = new T.Vector3(0, 0, 1), E = M.equip, x0 = v[0], top = v[1]; // hip thrust machine: a padded back rest, a frame on the floor, and a padded roller over the hips that rises with them
       const pad = glMesh("box", g.box, M.box); pad.castShadow = pad.receiveShadow = true; glPlace(pad, L(x0 + 18, top + 3, 0), X, Y, Z, 36, 6, 44);
       rod(L(x0 + 18, top + 6, 0), L(x0 + 18, 140, 0), 2.6, E); rod(L(x0 - 30, 139, -30), L(x0 + 120, 139, -30), 2.4, E); rod(L(x0 - 30, 139, 30), L(x0 + 120, 139, 30), 2.4, E); rod(L(x0 - 30, 139, -30), L(x0 - 30, 139, 30), 2.4, E);
-      const hp = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.Hips.matrixWorld) : V3(B.hip), kn = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.LeftLeg.matrixWorld).setZ(0) : V3(B.legs[0][1][1]).setZ(0), rt = hp.clone().add(hp.clone().setZ(0).sub(kn).normalize().multiplyScalar(HT_PAD[0])).add(new T.Vector3(0, HT_PAD[1], 0)); /* (on the hip crease, just above the pelvis) */ rod(rt.clone().add(new T.Vector3(0, 0, -24)), rt.clone().add(new T.Vector3(0, 0, 24)), 5.2, M.box); // the hip pad
+      const hp = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.Hips.matrixWorld) : V3(B.hip), kn = PRO.group && PRO.group.visible && PRO.by ? new T.Vector3().setFromMatrixPosition(PRO.by.LeftLeg.matrixWorld).setZ(0) : V3(B.legs[0][1][1]).setZ(0), rt = PRO.htPad ? PRO.htPad.c.clone() : hp.clone().add(hp.clone().setZ(0).sub(kn).normalize().multiplyScalar(HT_PAD[0])).add(new T.Vector3(0, HT_PAD[1], 0)); /* (on the hip crease, just above the pelvis; chrome: resting on the skin) */ rod(rt.clone().add(new T.Vector3(0, 0, -24)), rt.clone().add(new T.Vector3(0, 0, 24)), 5.2, M.box); // the hip pad
       for (const sz of [-1, 1]) { const end = rt.clone().add(new T.Vector3(0, 0, sz * 27)); rod(end, new T.Vector3(L(x0 + 30, 139, 0).x, -139, sz * 30), 1.8, E); } } // its arms down to the frame (they pivot as the hips rise)
     if (k === "latmachine") { // lat pulldown machine: the seat on a post and floor frame, a knee pad roller over the thighs, a column with the weight stack in front, and the top beam out to the pulley over the head
       const E = M.equip, C = M.cable;
@@ -8755,7 +8780,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.htPad = !!(p.props || []).find((q) => q.htmachine); B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
