@@ -6500,7 +6500,7 @@ const ANIMS = {
   clamshell: { roll: true, clam: true, A: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 0 }, B: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 42 } },
   side_leg: { roll: true, A: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: SIDE_LEG_REST }, B: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: 38 } },
   // Half-kneeling: only the arm on the kneeling-leg side reaches up (it adds to the stretch); the other hand rests on the front thigh
-  hip_flexor: { kneelHold: true, A: pose({ at: [132, 140], a: 90, b: 0, a2: -10, b2: -90, fd2: -90, t: 0, u: 20, f: 70, u2: 4, f2: 6 }), B: pose({ at: [132, 140], a: 75, b: -22, a2: -28, b2: -95, fd2: -90, t: -6, u: 26, f: 72, u2: 140, f2: 150 }) }, // (the arm reaches up and a little forward, not pressed against the ear)
+  hip_flexor: { kneelHold: true, noKneel: true, A: pose({ at: [132, 140], a: 90, b: 0, a2: -10, b2: -90, fd2: 180, t: 0, u: 20, f: 70, u2: 4, f2: 6 }), B: pose({ at: [132, 140], a: 95, b: -22, a2: -30, b2: -90, fd2: 180, t: -6, u: 26, f: 72, u2: 140, f2: 150 }) }, // (leaning in: the hips go forward and a little down over the bent front knee, the back knee stays on the floor; the back foot rests on its instep, toes back) // (the arm reaches up and a little forward, not pressed against the ear)
   chin_tuck: { A: pose({ hx: 3, h: 0, u: 0, f: 0 }), B: pose({ hx: -3, h: 5, u: 0, f: 0 }), view: "58 -4 84 63", glView: "58 -4 84 63" }, // a small, level glide of the head back (eyes stay level), shown close up
   // Face pull: start with straight arms at shoulder height; pull the rope to the forehead, hands either side of the face at eye level,
   // elbows out to the sides and a little above the shoulders. M keeps the hands on a near-straight line to the face (no loop over the head).
@@ -7697,7 +7697,7 @@ function proPose0(B) {
     // chrome, foot flat on the floor: the knee points the way the toes do (a little further out), never caving in past them
     if (PRO.chrome && KNEE_TRACK && !B.roll && !kneel && !footEx && !B.kneeSide) { // (standing on the feet only: lying bridges keep their own knees)
       const sm = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); }; // (every condition fades in, so the knee never jumps as one is met)
-      const gate = sm((-120 - A.y) / 8) * sm((.6 - Math.abs(sole.y)) / .2) * sm((Hm.y - A.y - 21) / 5); // (hips more than ~26 cm above the ankles: squats down to the bottom; bridges, lying, stay under 20)
+      const gate = sm((-120 - A.y) / 8) * sm((.6 - Math.abs(sole.y)) / .2) * sm((Hm.y - A.y - 21) / 5) * sm((K.y + 126) / 6); // (not a knee down on the floor: kneeling, the foot behind lies on its instep) // (hips more than ~26 cm above the ankles: squats down to the bottom; bridges, lying, stay under 20)
       const th = sole.clone().setY(0); if (gate > 0 && th.lengthSq() > 1e-4) { th.normalize();
         const out = left.clone().multiplyScalar(L === "Left" ? 1 : -1); th.add(out.multiplyScalar(Math.tan(rad(KNEE_TRACK[1])))).normalize();
         const tp = th.projectOnPlane(hd); const bendK = Math.acos(Math.max(-1, Math.min(1, K.clone().sub(Hm).normalize().dot(A.clone().sub(K).normalize())))), w = KNEE_TRACK[0] * gate * sm(bendK / rad(30));
