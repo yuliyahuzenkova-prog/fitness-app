@@ -7071,6 +7071,7 @@ const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the h
 const KNEEL_REST = { ankle: 7, toe: 1.5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
+let SQUAT_ELBOW = [1, .45, .45]; // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
@@ -7504,7 +7505,7 @@ function proBarGrip(B) {
       const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).sub(pn.multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       // the elbow's side: mostly its natural one for the lift (a near-straight arm gives no reliable direction of its own, and it flipped mid-rep)
-      const pref = B.barMode === "sh" ? new T.Vector3(0, -1, 0).add(d.clone().multiplyScalar(.3)) : lying ? upB.clone().negate().add(a.clone().multiplyScalar(side * .8)) : B.barPalm === "fwd" ? new T.Vector3(0, -1, 0).add(a.clone().multiplyScalar(side * .3)) : d.clone().negate().add(a.clone().multiplyScalar(side * .25));
+      const pref = B.barMode === "sh" ? new T.Vector3(0, -1, 0).multiplyScalar(SQUAT_ELBOW[0]).add(d.clone().multiplyScalar(SQUAT_ELBOW[1])).add(a.clone().multiplyScalar(side * SQUAT_ELBOW[2])) : lying ? upB.clone().negate().add(a.clone().multiplyScalar(side * .8)) : B.barPalm === "fwd" ? new T.Vector3(0, -1, 0).add(a.clone().multiplyScalar(side * .3)) : d.clone().negate().add(a.clone().multiplyScalar(side * .25));
       let pole = E.clone().sub(Sm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))); pole = (pole.lengthSq() > 1e-6 ? pole.normalize().multiplyScalar(.4) : pole).add(pref.normalize()); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))); if (pole.lengthSq() < 1e-6) pole = d.clone().negate().projectOnPlane(hd); pole.normalize(); poleK = pole.clone();
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
     }
