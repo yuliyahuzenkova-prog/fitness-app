@@ -6172,6 +6172,15 @@ function lift(j, an, p) {
   // The front of a limb: in the side view it's the side facing forward when the limb hangs down
   let nfOf = (a, b) => { if (frontal) return fwd; const d = v3.norm(v3.sub(b, a)); return v3.norm([-d[1] || 1e-6, d[0], 0]); };
   // Top leg lifted sideways (side-lying exercises): around the hip–foot line for clamshells, around the front–back axis otherwise
+  // Clamshell: the top leg rests on the bottom one — knee on knee, foot on foot — rather than floating a hip-width above it:
+  // swing it down about the hip until its ankle is CLAM_GAP from the bottom ankle (the knee follows, a little further apart)
+  if (an && an.clam) {
+    const pv = legF[0], dz = legN[2][2] - legF[2][2], need = Math.abs(dz) - CLAM_GAP;
+    if (need > 0) { const ha = v3.sub(legF[2], pv), La = v3.len(ha), ax = v3.norm(v3.cross(v3.norm(ha), [0, 0, Math.sign(dz)])), th = -Math.asin(Math.min(.9, need / La));
+      const rot = (q) => { const v = v3.sub(q, pv), c = Math.cos(th), sn = Math.sin(th); return v3.add(pv, v3.add(v3.add(v3.mul(v, c), v3.mul(v3.cross(ax, v), sn)), v3.mul(ax, v3.dot(ax, v) * (1 - c)))); };
+      let r2 = rot(legF[2]); if (Math.abs(legN[2][2] - r2[2]) > Math.abs(dz)) { /* (wrong way round) */ const t0 = th; for (let i = 1; i < 4; i++) legF[i] = ((q) => { const v = v3.sub(q, pv), c = Math.cos(-t0), sn = Math.sin(-t0); return v3.add(pv, v3.add(v3.add(v3.mul(v, c), v3.mul(v3.cross(ax, v), sn)), v3.mul(ax, v3.dot(ax, v) * (1 - c)))); })(legF[i]); }
+      else for (let i = 1; i < 4; i++) legF[i] = rot(legF[i]); }
+  }
   if (p && p.abd2) {
     const pv = legF[0], A = an.clam ? v3.norm(v3.sub(legF[2], pv)) : [1, 0, 0];
     const rot = (q, th) => { const v = v3.sub(q, pv), c = Math.cos(th), sn = Math.sin(th); return v3.add(pv, v3.add(v3.add(v3.mul(v, c), v3.mul(v3.cross(A, v), sn)), v3.mul(A, v3.dot(A, v) * (1 - c)))); };
@@ -7084,6 +7093,7 @@ let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out fro
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
 let KNEE_TRACK = [.85, 6]; // chrome, feet on the floor: how strongly the bent knee is turned to point over the toes, and how many degrees further out
+const CLAM_GAP = 7.5; // clamshell: how far apart the ankle joints are with the feet together (the inner ankles touching)
 const KNEE_FIX = 7, KNEE_GAIN = 1.7; // (gain: the morph's strength per right angle of bend) // cm the back of the knee is pushed out at a right-angle bend
 // How far each foot's skin reaches behind the ankle (heel) and in front of it (toes), along the foot, in the rest pose (model units).
 function proFootExt(PRO) {
@@ -7688,6 +7698,8 @@ function proPose0(B) {
     // Two-bone IK with the model's own leg lengths, bending the knee towards the pose's knee, so the foot lands on the floor
     const Hm = new T.Vector3().setFromMatrixPosition(by[L + "UpLeg"].matrixWorld);
     const l1 = R[L + "Leg"].distanceTo(R[L + "UpLeg"]) * S, l2 = R[L + "Foot"].distanceTo(R[L + "Leg"]) * S;
+    // clamshell (chrome): the top foot stays on the bottom one the whole rep — the leg turns about it as the knee opens
+    if (PRO.chrome && B.clam) { if (!PRO.clamBot || PRO.clamBot.L === L) PRO.clamBot = { L, A: target.clone(), H: Hm.clone() }; else { const hipDir = Hm.clone().sub(PRO.clamBot.H).normalize(); target = PRO.clamBot.A.clone().add(hipDir.multiplyScalar(CLAM_GAP)); } }
     const ht = target.clone().sub(Hm), dl = Math.min(ht.length(), (l1 + l2) * .9995), hd = ht.normalize();
     const along = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hgt = Math.sqrt(Math.max(0, l1 * l1 - along * along));
     let pole = K.clone().sub(Hm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
@@ -7703,7 +7715,10 @@ function proPose0(B) {
         const tp = th.projectOnPlane(hd); const bendK = Math.acos(Math.max(-1, Math.min(1, K.clone().sub(Hm).normalize().dot(A.clone().sub(K).normalize())))), w = KNEE_TRACK[0] * gate * sm(bendK / rad(30));
         if (tp.lengthSq() > 1e-4 && pole.lengthSq() > 1e-6 && w > 0) pole = pole.normalize().lerp(tp.normalize(), w); } }
     const knee = Hm.clone().add(hd.clone().multiplyScalar(along)).add(pole.normalize().multiplyScalar(hgt)), ankle = Hm.clone().add(hd.clone().multiplyScalar(dl));
-    aim(L + "UpLeg", L + "Leg", knee.clone().sub(Hm), front(h, k), fwdRest);
+    let thighFront = front(h, k);
+    if (PRO.chrome && B.clam) { // (clamshell: the thigh faces away from where the shin goes, so the knee bends as a hinge, not sideways)
+      const td = knee.clone().sub(Hm).normalize(), sd = ankle.clone().sub(knee).normalize(), f0 = sd.clone().negate().sub(td.clone().multiplyScalar(-sd.dot(td))); if (f0.lengthSq() > 1e-4) thighFront = f0.normalize(); }
+    aim(L + "UpLeg", L + "Leg", knee.clone().sub(Hm), thighFront, fwdRest);
     { const bend = knee.clone().sub(Hm).normalize().angleTo(ankle.clone().sub(knee).normalize()), kf = Math.min(2.4, KNEE_GAIN * bend / (Math.PI / 2)); // knee corrective morph
       for (const m of PRO.meshes) if (m.morphTargetInfluences && m.morphTargetInfluences.length > 3) m.morphTargetInfluences[L === "Left" ? 2 : 3] = kf; }
     const shinFront = () => { const sd = ankle.clone().sub(knee).normalize(), tf = knee.clone().sub(Hm); tf.sub(sd.multiplyScalar(tf.dot(sd))); return tf.lengthSq() > 1e-4 ? tf.normalize() : front(k, a); };
@@ -8737,7 +8752,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
