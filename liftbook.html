@@ -7985,7 +7985,10 @@ function proPose0(B) {
     } else if (PRO.curl && pw > 0 && headDir.lengthSq() > 4) {
       // Hand planted on the floor: palm flat, fingers pointing ahead
       const ax = new T.Vector3(...PRO.curl[L + "HandMiddle1"]), dR = R[L + "HandMiddle1"].clone().sub(R[L + "Hand"]).normalize(), pR = new T.Vector3().crossVectors(ax, dR).normalize();
-      const f = headDir.normalize(), dn = new T.Vector3(0, -1, 0);
+      let f = headDir.normalize(); const dn = new T.Vector3(0, -1, 0);
+      // chrome, the forearm lying on the floor pointing away from the head (arms along the body, as in a bridge): the fingers carry on
+      // along the forearm and the forearm rolls palm-down, rather than the hand turning round to point at the head (a half-turn wrist)
+      { const fh = Wv.clone().sub(E); if (PRO.chrome && Math.abs(fh.clone().normalize().y) < .45 && fh.setY(0).lengthSq() > 1 && fh.normalize().dot(f) < -.3) { f = fh; aim(L + "ForeArm", L + "Hand", Wv.clone().sub(E), dn, pR); } }
       const Mr = new T.Matrix4().makeBasis(dR, pR, new T.Vector3().crossVectors(dR, pR)), Mt = new T.Matrix4().makeBasis(f, dn, new T.Vector3().crossVectors(f, dn));
       const qFlat = new T.Quaternion().setFromRotationMatrix(Mt.multiply(Mr.transpose())), qRel = q[L + "ForeArm"].clone().multiply(new T.Quaternion().setFromAxisAngle(ax, -rad(PRO.wristExt ?? 18)));
       setBone(L + "Hand", qRel.slerp(qFlat, pw));
