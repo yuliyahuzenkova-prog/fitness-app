@@ -6397,6 +6397,8 @@ const ANIMS = {
   squat_bar: { A: pose({ u: -45, f: 150, props: [{ plate: "sh" }, { squatrack: [72, 128, 42] }] }), B: pose({ a: 82, b: -25, t: 46, u: -45, f: 150, props: [{ plate: "sh" }, { squatrack: [72, 128, 42] }] }) },
   squat_box: { A: pose({ u: 10, f: 10, props: [{ box: [52, 113, 30, 27] }] }), B: pose({ a: 82, b: -25, t: 42, u: 90, f: 90, props: [{ box: [52, 113, 30, 27] }] }) },
   // to a high box: the box top above knee height (its top right under the buttocks at the bottom, so they rest on it, not in it), so the thighs stay well above level and the knees bend only ~85°
+  // slow squat to a chair: the same squat, sitting back to a real chair (seat, four legs, backrest behind)
+  squat_chair: { A: pose({ u: 10, f: 10, props: [{ chair: [46, 116, 0, 36, 21] }] }), B: pose({ a: 82, b: -25, t: 42, u: 90, f: 90, props: [{ chair: [46, 116, 0, 36, 21] }] }) },
   squat_box_high: { A: pose({ u: 10, f: 10, props: [{ box: [52, 102, 30, 38] }] }), B: pose({ a: 55, b: -18, t: 32, u: 90, f: 90, props: [{ box: [52, 102, 30, 38] }] }) },
   // High chair (seat ~60 cm, e.g. a bar stool or a chair on a cushion): the thighs slope down from the seat, an easier stand
   sit_to_stand_high: { A: pose({ at: [100, 140], a: 65, b: -5, t: 18, u: 55, f: 110, props: [{ chair: [44, 104.5, 0, 36, 21] }] }), B: pose({ at: [100, 140], t: 0, u: 20, f: 120, props: [{ chair: [44, 104.5, 0, 36, 21] }] }) },
@@ -6531,7 +6533,7 @@ const ANIMS = {
 // Which guide and animation each exercise uses (first match wins)
 const EX_MAP = [
   [/^Goblet squat to a box/, "goblet", "squat_goblet_box"], [/^Goblet squat/, "goblet", "squat_goblet"],
-  [/^(Barbell back squat|Squat)$/, "backsquat", "squat_bar"], [/^Box squat to a high box/, "boxsquat", "squat_box_high"], [/^(Box squat|Slow squat to a chair)/, "boxsquat", "squat_box"],
+  [/^(Barbell back squat|Squat)$/, "backsquat", "squat_bar"], [/^Box squat to a high box/, "boxsquat", "squat_box_high"], [/^Slow squat to a chair/, "boxsquat", "squat_chair"], [/^Box squat/, "boxsquat", "squat_box"],
   [/^Sit-to-stand from a high chair/, "sitstand", "sit_to_stand_high"], [/^Sit-to-stand/, "sitstand", "sit_to_stand"], [/^Bodyweight [Ss]quat/, "bwsquat", "squat_bw"], [/^Wall sit, a bit deeper/, "wallsit", "wall_sit_deep"], [/^Wall sit/, "wallsit", "wall_sit"],
   [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
   [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/^Reverse lunge, short step/, "revlunge", "reverse_lunge_short"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/[Ss]tep-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
@@ -6721,7 +6723,7 @@ function drawFigure(an, p, cam, cls, small) {
 }
 // Default camera angle per exercise (degrees; 0 = side view, -90 = front, 90 = back), hand and foot spacing, and poses drawn facing the viewer
 const ANIM_3D = {
-  squat_bw: { yaw: -40, fz: 4 }, squat_goblet: { yaw: -40, fz: 5, hz: 3 }, squat_goblet_box: { yaw: -40, fz: 5, hz: 3 }, squat_bar: { yaw: -40, fz: 5, hz: 20 }, squat_box: { yaw: -40, fz: 4 }, squat_box_high: { yaw: -40, fz: 4 },
+  squat_bw: { yaw: -40, fz: 4 }, squat_goblet: { yaw: -40, fz: 5, hz: 3 }, squat_goblet_box: { yaw: -40, fz: 5, hz: 3 }, squat_bar: { yaw: -40, fz: 5, hz: 20 }, squat_box: { yaw: -40, fz: 4 }, squat_box_high: { yaw: -40, fz: 4 }, squat_chair: { yaw: -40, fz: 4 },
   sit_to_stand: { yaw: -40 }, sit_to_stand_high: { yaw: -40, armsCrossed: true }, wall_sit: { yaw: -30 }, wall_sit_deep: { yaw: -30 }, leg_press: { yaw: -30 }, split_squat: { yaw: -40 }, bulgarian: { yaw: -40 }, reverse_lunge: { yaw: -40 }, reverse_lunge_short: { yaw: -40 }, step_up: { yaw: -40 },
   rdl: { yaw: -30 }, deadlift: { yaw: -30, hz: 15 }, sl_rdl: { yaw: -30 }, glute_bridge: { yaw: -25, plantAll: true, plantPole: [10, .3, 0, -1, 1], plantSlide: .97 }, glute_bridge_single: { yaw: -25, plantAll: true, plantPole: [10, .3, 0, -1, 1] } /* (arms lie flat on the floor beside the body, palms down) */, hip_thrust: { yaw: -25 }, hip_thrust_single: { yaw: -25 }, hip_thrust_couch: { yaw: -25 }, hip_thrust_machine: { yaw: -25 }, pull_through: { yaw: 35, hz: 3, fz: 6, closeGrip: true, rope: true } /* (stand tall: the rope comes through between the legs to the hands in front of the hips; feet a little wider so it passes) */,
   pushup: { yaw: -25, hz: 15, handFix: 1, plantPole: [200, 1.5, 1, 0, 1], reachK: 1.2 }, /* (reachK: at the top the arms are straight, not bent 35°) */ incline_pushup: { yaw: -25, hz: 15, handFix: 1, handsOn: true }, /* (plantPole: elbows back towards the hips and out about 40°, as the guide says, not glued to the sides or straight out) */ pike_pushup: { yaw: -25, hz: 14, handFix: -1 }, bench_press: { yaw: -30, flare: .5 }, bench_bar: { yaw: -30, hz: 25, hzk: 1 }, row_cable: { yaw: -30, hz: 4, hzk: .9, palmIn: true, closeGrip: true },
@@ -8690,7 +8692,7 @@ function glProps(props, B, an, p) {
 const BACK = ["hip", "sh", "Keep your back straight"], LINE = ["ankle", "sh", "Body in one straight line"];
 const TECH = {
   squat_bw: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_goblet: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_goblet_box: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" },
-  squat_bar: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_box: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_box_high: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, sit_to_stand: { lab: ["Stand up", "Sit down slowly"], path: "hip" },
+  squat_bar: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_box: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_box_high: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, squat_chair: { lab: ["Sit down slowly", "Stand up"], form: BACK, path: "hip" }, sit_to_stand: { lab: ["Stand up", "Sit down slowly"], path: "hip" },
   wall_sit: { lab: ["Hold", "Hold"], form: BACK }, wall_sit_deep: { lab: ["Hold", "Hold"], form: BACK }, leg_press: { lab: ["Push away", "Lower slowly"], path: "knee" }, split_squat: { lab: ["Lower slowly", "Push back up"], path: "hip" }, bulgarian: { lab: ["Lower slowly", "Push back up"], path: "hip" },
   reverse_lunge: { lab: ["Step back and lower slowly", "Push back up"], path: "hip" }, step_up: { lab: ["Step up", "Step down slowly"], path: "hip" },
   rdl: { lab: ["Hips back, lower slowly", "Stand tall"], form: BACK, path: "wrist" }, deadlift: { lab: ["Lift", "Lower slowly"], form: BACK, path: "wrist" }, sl_rdl: { lab: ["Hinge down slowly", "Stand tall"], form: BACK, path: "wrist2" },
