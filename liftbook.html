@@ -6254,8 +6254,11 @@ function lift(j, an, p) {
     // Arms as you'd really lie: the bottom arm stretched along the floor past the head (a pillow for it, palm up),
     // the top hand on the floor in front of the chest for balance. Here x = where the chest faces, y = down, z = towards the head.
     const sB = B.arms[0][1][0], sT = B.arms[1][1][0], fl = 137.5;
-    const eB = [sB[0] + 3, fl, sB[2] + SEG.upper * .97], wB = [eB[0] + 5, fl, eB[2] + SEG.fore * .95];
-    const wT = [sT[0] + 20, fl, sT[2] - 12], mid = v3.mix(sT, wT, .5), dT = v3.len(v3.sub(wT, sT));
+    let eB = [sB[0] + 3, fl, sB[2] + SEG.upper * .97], wB = [eB[0] + 5, fl, eB[2] + SEG.fore * .95];
+    if (an && an.pillowArm) { // (the head rests on the bottom arm: elbow out on the floor in front of the head, the hand folded back under it)
+      const P = PILLOW_ARM, d = v3.norm([P[0], 0, 1]); eB = v3.add([sB[0], fl, sB[2]], v3.mul(d, SEG.upper * .97)); eB[1] = fl;
+      const hd = B.head, tgt = [hd[0] + P[1], fl, hd[2] + P[2]], fd = v3.norm(v3.sub(tgt, eB)); wB = v3.add(eB, v3.mul(fd, SEG.fore * .95)); wB[1] = fl; }
+    const wT = an && an.pillowArm ? [sT[0] + TOP_HAND[0], fl, sT[2] + TOP_HAND[1]] : [sT[0] + 20, fl, sT[2] - 12], mid = v3.mix(sT, wT, .5), dT = v3.len(v3.sub(wT, sT));
     const out = Math.sqrt(Math.max(0, SEG.upper ** 2 - (Math.min(dT, SEG.upper + SEG.fore - .5) / 2) ** 2)), pole = v3.norm([-.1, -.35, -1]); // elbow bends back towards the hips
     const eT = v3.add(mid, v3.mul(pole, out));
     B.arms = [[B.arms[0][0], [sB, eB, wB]], [B.arms[1][0], [sT, eT, wT]]];
@@ -6713,7 +6716,7 @@ const ANIM_3D = {
   lat_pulldown: { yaw: 145, palmFwd: true, wideBar: 31 }, pullup: { yaw: 145, palmFwd: true, ankle: 42 }, pull_neg: { yaw: 145, palmFwd: true, ankle: 42, stepBox: true }, pull_band: { yaw: 145, palmFwd: true, ankle: 42 }, dead_hang: { yaw: 145, hz: 28, hzk: .9, palmFwd: true, ankle: 42 }, /* (ankle: feet hang relaxed, ~20° pointed, not on tiptoe) */ band_pulldown: { yaw: 145, hz: 20, palmMid: true }, band_pulldown1: { yaw: 145, hz: 18, single: true, palmMid: true } /* (neutral grip on the band's handle: palms facing in, the forearm turning half at the elbow and half at the wrist) */,
   prone_y: { yaw: 35, hz: 20 }, prone_ytw: { yaw: 60, pitch: 34, armHinge: true }, /* (seen from higher up, so the letter the arms make on the floor reads) */ superman: { yaw: 35 }, dead_bug: { yaw: -30, alt: true, period: 8400 }, dead_bug_straight: { yaw: -30, alt: true, period: 8400 }, bird_dog: { footDown: true, yaw: 30, handFix: -1, handFix2: false, alt: true, period: 8400 }, cat_cow: { yaw: 25, handFix: -1 },
   plank: { yaw: -25, thumbsUp: true }, plank_knee: { yaw: -25, thumbsUp: true }, /* forearm planks: forearms resting on their outer edge, thumbs up, no twist */ side_plank: { yaw: 90, plane: "frontal", stackLegs: true, handOnHip: true }, side_plank_knee: { yaw: 60, plane: "frontal", noKneel: true, handOnHip: true }, shoulder_taps: { yaw: -25, handFix: -1, handFix2: false, alt: true, period: 6400 }, pallof: { yaw: -45, hz: 1.5, palmIn: true, closeGrip: true }, carry: { yaw: -35 }, walk: { yaw: -35 }, bike: { yaw: -30 }, rower: { yaw: -35, period: 3200, glView: "14 12 208 156" },
-  calf_raise: { yaw: 145 }, tib_raise: { yaw: -35 }, clamshell: { yaw: -55 }, side_leg: { yaw: -65, handOnHip: true, openHand: true } /* (top hand resting on the hip, the bottom arm relaxed along the floor) */, hip_flexor: { yaw: -35 },
+  calf_raise: { yaw: 145 }, tib_raise: { yaw: -35 }, clamshell: { yaw: -55, pillowArm: true }, side_leg: { yaw: -65, handOnHip: true, openHand: true } /* (top hand resting on the hip, the bottom arm relaxed along the floor) */, hip_flexor: { yaw: -35 },
   chin_tuck: { yaw: 0 }, foot_arch: { yaw: -128, fz: 8, hz: 12, hzk: .8 }, foot_toes: { yaw: -40, hz: 20, hzk: .8 }, face_pull: { yaw: 35, hz: 14, rope: true, flare: .9 }, doorway: { yaw: 145 }, /* (seen from behind: the forearms rest on the near side of the doorframe while the chest leans through) */
 };
 // Chrome arms, per exercise: over which elbow bend (degrees) the upper arm turns to face the bend (default BEND_HAND).
@@ -7070,6 +7073,8 @@ function proShinShape(PRO) {
   }
 }
 const TAP_SURF = [6.5, 3, 2];
+let TOP_HAND = [27, -4]; // side-lying with the head on the bottom arm: where the top hand rests on the floor, from its shoulder (in front, towards the head)
+let PILLOW_ARM = [.5, 14, -2]; // side-lying, head on the bottom arm: the upper arm's forward lean (per unit towards the head), and where the hand goes from the head (forward, towards the top of the head)
 const HAND_ON_HIP = { up: 4, fwd: 0, lift: 1.6 }; // side planks (chrome): where the top palm rests, from the hip joint (model units towards the head and front), and how far it sits off the skin (cm)
 const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the hand lands from the sketch's near shoulder (towards the head, towards the floor, sideways) // shoulder taps: where the hand lands from the opposite shoulder joint (model units: towards the floor, towards the head, outwards)
 const KNEEL_REST = { ankle: 7, toe: 1.5 }, INSTEP = { ankle: 4.9, toe: -1.5, edge: 4, lift: 2, hipTop: 84, hipSpan: 16 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
