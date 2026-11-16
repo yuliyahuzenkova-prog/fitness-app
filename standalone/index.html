@@ -7088,8 +7088,9 @@ const KNEEL_REST = { ankle: 7, toe: 1.5 }, INSTEP = { ankle: 4.9, toe: -1.5, edg
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
 let PACK = { w: 21, h: 25, d: 11, drop: 3 }; // backpack (cm): width, height and depth of the bag, and how far below the grip its top is (the handle)
+let BAR_LEN = [70, 50, 56]; // barbell (cm from the middle): the bar's end, the collar (the thicker sleeve starts here) and the plates
 let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the shoulder-to-wrist distance keeps (a straight but not locked arm)
-let SQUAT_SHRUG = -.4, SQUAT_SHOULDER_FILL = .3; // back squat: the collarbones slightly down (negative), as when the shoulder blades are squeezed under the bar
+let SQUAT_SHRUG = -.4, SQUAT_SHOULDER_FILL = 1, SQUAT_UNWIND = 40; // back squat: the collarbones slightly down (negative), as when the shoulder blades are squeezed under the bar
 let SQUAT_ELBOW = [1, -.15, .5]; // back squat: the elbow's direction (down, back, out): down under the bar and a little out, not pulled back (that wrung the shoulders) // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
 let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: 1 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
@@ -7545,6 +7546,7 @@ function proBarGrip(B) {
     // palm square to the bar and the forearm, on the chosen side
     let pn = fd.clone().cross(a).normalize(); if (pn.dot(palmTo) < 0) pn.negate();
     proArmTo(M, L, E, W, poleK.clone().negate(), pn); // (the elbow folds away from the side it points to: the same side every frame)
+    if (B.barMode === "sh" && SQUAT_UNWIND) { const t = boneTwist(M, L + "Arm"); if (Math.abs(t) > 90) boneRoll(M, L + "Arm", L + "ForeArm", Math.sign(t) * Math.min(SQUAT_UNWIND, Math.abs(t) - 90)); } // (back squat: the hands behind the head wring the upper arm round ~160°; give some of that back so the shoulder keeps its shape)
   }
   M.group.updateMatrixWorld(true);
   PRO.bar = { c: gripOf("Left").add(gripOf("Right")).multiplyScalar(.5), a, pack: B.pack ? fwd.clone().setY(0).normalize() : null, pair: B.dbPair ? [gripOf("Left"), gripOf("Right")] : null };
@@ -8428,7 +8430,7 @@ function glProps(props, B, an, p) {
     rod(L(bx, by - 8, -63), L(bx, by - 8, 63), 2, E); };
   const disc = (c, axis, len, r) => rod(c.clone().add(axis.clone().multiplyScalar(-len / 2)), c.clone().add(axis.clone().multiplyScalar(len / 2)), r);
   const dumbbell = (c, axis) => { rod(c.clone().add(axis.clone().multiplyScalar(-6)), c.clone().add(axis.clone().multiplyScalar(6)), 1.1); disc(c.clone().add(axis.clone().multiplyScalar(-6.5)), axis, 3.2, 4.4); disc(c.clone().add(axis.clone().multiplyScalar(6.5)), axis, 3.2, 4.4); };
-  const barbell = (c, ax = latv) => { rod(c.clone().add(ax.clone().multiplyScalar(-44)), c.clone().add(ax.clone().multiplyScalar(44)), 1.1); for (const s of [-1, 1]) { disc(c.clone().add(ax.clone().multiplyScalar(s * 34)), ax, 4.5, 11); disc(c.clone().add(ax.clone().multiplyScalar(s * 30.5)), ax, 2, 2.4); } };
+  const barbell = (c, ax = latv) => { const W = BAR_LEN; rod(c.clone().add(ax.clone().multiplyScalar(-W[0])), c.clone().add(ax.clone().multiplyScalar(W[0])), 1.1); for (const s of [-1, 1]) { disc(c.clone().add(ax.clone().multiplyScalar(s * W[2])), ax, 4.5, 11); disc(c.clone().add(ax.clone().multiplyScalar(s * W[1])), ax, 2, 2.4); rod(c.clone().add(ax.clone().multiplyScalar(s * W[1])), c.clone().add(ax.clone().multiplyScalar(s * W[0])), 1.9); } }; // (a full-length bar: the plates well outside the hands, so they never hide the grip)
   const wN = V3(B.arms[0][1][2]), wF = V3(B.arms[1][1][2]), two = p.u2 == null, together = wN.distanceTo(wF) < 10, mid = wN.clone().add(wF).multiplyScalar(.5);
   for (const pp of props || []) {
     const [k, v] = Object.entries(pp)[0];
