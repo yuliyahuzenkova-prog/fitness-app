@@ -7087,7 +7087,8 @@ let BAR_LEN = [70, 50, 56]; // barbell (cm from the middle): the bar's end, the 
 let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the shoulder-to-wrist distance keeps (a straight but not locked arm)
 let SQUAT_SHRUG = -.4, SQUAT_SHOULDER_FILL = 1, SQUAT_UNWIND = 55; // back squat: the collarbones slightly down (negative), as when the shoulder blades are squeezed under the bar
 let SQUAT_ELBOW = [1, -.15, .5]; // back squat: the elbow's direction (down, back, out): down under the bar and a little out, not pulled back (that wrung the shoulders) // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
-let GOBLET = [2.2, 2.4]; // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
+let GOBLET_CUP = { f: { 1: 14, 2: 26, 3: 18 }, t: { 1: 8, 2: 12, 3: 12 } }; // goblet: finger and thumb bends (degrees per joint) for hands cupping the top plate
+let GOBLET = [2.5, 5.8, 1.6, .45]; // goblet hold: each palm's centre this far out from the dumbbell's axis and down from the middle of its top plate (just under it), how much the palm faces up rather than in, and how far along the hand the palm centre is // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: .75 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
 let ARM_FIX = { elbow: 3.8, elbowW: 8, shoulder: 5, shoulderW: 10 }; // cm of fullness the elbow and shoulder correctives add (at a right-angle bend, or the arm raised 90° above its rest), and how far along the arm they reach
 let KNEE_TRACK = [.85, 6]; // chrome, feet on the floor: how strongly the bent knee is turned to point over the toes, and how many degrees further out
@@ -7474,16 +7475,16 @@ function proGoblet(B) {
   if (need > -1e8) c.add(d.clone().multiplyScalar(need + 5.4));
   const top = c.clone().add(up.clone().multiplyScalar(6.5));
   for (const L of ["Left", "Right"]) {
-    const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(lat)) || 1, inward = lat.clone().multiplyScalar(-side), tgt = top.clone().add(lat.clone().multiplyScalar(side * GOBLET[0])).sub(up.clone().multiplyScalar(GOBLET[1]));
+    const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(lat)) || 1, inward = lat.clone().multiplyScalar(-side), cup = up.clone().multiplyScalar(GOBLET[2]).add(inward.clone()).normalize() /* (the palm faces up under the top plate, a little inwards: the two hands make a cup) */, tgt = top.clone().add(lat.clone().multiplyScalar(side * GOBLET[0])).sub(up.clone().multiplyScalar(GOBLET[1]));
     const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
     let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize(), poleK = up.clone().negate();
     for (let it = 0; it < 4; it++) {
-      const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).sub(inward.clone().multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
+      const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * GOBLET[3])).sub(cup.clone().multiplyScalar(1.6)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       let pole = up.clone().negate().add(lat.clone().multiplyScalar(side * .3)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); poleK = pole.clone(); // (elbows down under the hands, a little out)
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
     }
-    proArmTo(M, L, E, W, poleK.clone().negate(), inward); // (the elbow folds away from where it points)
+    proArmTo(M, L, E, W, poleK.clone().negate(), cup); // (the elbow folds away from where it points)
   }
   M.group.updateMatrixWorld(true);
   PRO.bar = { c, a: up, goblet: true };
@@ -8057,7 +8058,8 @@ function proPose0(B) {
     const nearL = V3(B.arms[0][1][0]).sub(V3(B.sh)).dot(left) >= 0 ? "Left" : "Right";
     const gOf = (L) => (GL.grip && (L === nearL ? GL.grip.near : GL.grip.far) ? 1 : 0);
     // Hanging from a bar the fingers make a hook over it (the bar sits in the hollow), instead of a closed fist
-    const ang = (g) => B.openHand ? { 1: -8, 2: -6, 3: -4 } : (B.hang || B.hook) && g ? BAR_HOOK.f : ({ 1: 10 + g * 52, 2: 12 + g * 68, 3: 8 + g * 42 }), thumb = (g) => B.openHand ? { 1: 0, 2: 2, 3: 2 } : (B.hang || B.hook) && g ? BAR_HOOK.t : ({ 1: 4 + g * 18, 2: 6 + g * 26, 3: 6 + g * 30 });
+    const cupH = PRO.bar && PRO.bar.goblet; // (goblet: open hands curled softly round the plate, like holding a bowl)
+    const ang = (g) => cupH ? GOBLET_CUP.f : B.openHand ? { 1: -8, 2: -6, 3: -4 } : (B.hang || B.hook) && g ? BAR_HOOK.f : ({ 1: 10 + g * 52, 2: 12 + g * 68, 3: 8 + g * 42 }), thumb = (g) => cupH ? GOBLET_CUP.t : B.openHand ? { 1: 0, 2: 2, 3: 2 } : (B.hang || B.hook) && g ? BAR_HOOK.t : ({ 1: 4 + g * 18, 2: 6 + g * 26, 3: 6 + g * 30 });
     for (const [name, ax] of Object.entries(PRO.curl)) { const b = by[name]; if (!b) continue; const k = +name.slice(-1), fw = +((PRO.planted && PRO.planted[name.startsWith("Left") ? "Left" : "Right"]) || 0);
       const flatA = name.includes("Thumb") ? 0 : { 1: FLAT_FINGERS[0], 2: FLAT_FINGERS[1], 3: FLAT_FINGERS[2] }[k] /* (a relaxed hand on a surface: flat with a soft bend; bent back further, it looked strained) */, restA = (name.includes("Thumb") ? thumb : ang)(gOf(name.startsWith("Left") ? "Left" : "Right"))[k];
       b.quaternion.setFromAxisAngle(new T.Vector3(...ax), rad(restA + (flatA - restA) * fw)); }
