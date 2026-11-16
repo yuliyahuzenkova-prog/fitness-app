@@ -7088,6 +7088,7 @@ let BAR_HANG = 1.02; // hanging lifts: the share of the arm's full length the sh
 let BRIDGE_EASE = [0, 16]; // bridges: the shoulders settle onto the floor as the hips rise from this many cm above them, over this many cm
 let SQUAT_SHRUG = -.4, SQUAT_SHOULDER_FILL = 1, SQUAT_UNWIND = 55; // back squat: the collarbones slightly down (negative), as when the shoulder blades are squeezed under the bar
 let SQUAT_ELBOW = [1, -.15, .5]; // back squat: the elbow's direction (down, back, out): down under the bar and a little out, not pulled back (that wrung the shoulders) // back squat: the elbow's direction, down and back (behind the body), so the arms don't stand up beside the head
+let GOBLET_HOLD = { grip: "Right", upright: 1, elbowDown: .5, height: .5, gap: 10.5, gripOut: 1, palmAlong: .45, palmOff: 1.6, cover: 3.2 }; // goblet: which hand grips the handle, how high (share from the shoulders to mid-spine), the gap in front of the chest, where the fist sits, where a palm's centre is (along the hand, off the bones) and how far the covering palm sits off the fist's back
 let GOBLET_CUP = { f: { 1: 14, 2: 26, 3: 18 }, t: { 1: 8, 2: 12, 3: 12 } }; // goblet: finger and thumb bends (degrees per joint) for hands cupping the top plate
 let GOBLET = [2.5, 5.8, 1.6, .45]; // goblet hold: each palm's centre this far out from the dumbbell's axis and down from the middle of its top plate (just under it), how much the palm faces up rather than in, and how far along the hand the palm centre is // goblet hold: each fist's grip point this far out from the dumbbell's axis and down from the middle of its top end (cm): the fingers curl under its rim
 let BAR_FIT = { r: 2.2, band: 3, grip: 2.6, knuckle: .75 }; // chrome barbells: the gap kept between the bar's centre and the skin (cm), how far above and below the bar the body is checked, and where the bar sits in the fist (cm in from the palm, and how far along the hand towards the knuckles)
@@ -7470,28 +7471,40 @@ function proArmTo(M, L, E, W, foldTo, palmN) {
 }
 // Goblet squat (chrome): one dumbbell held upright against the chest, the hands on either side of its top end, palms in
 function proGoblet(B) {
-  const T = THREE, M = PRO, R = M.rest, S = M.S, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld), wq = (n) => { const q = new T.Quaternion(); M.by[n].getWorldQuaternion(q); return q; };
+  // Goblet hold (chrome): the dumbbell stands upright in front of the chest; one hand (GOBLET_HOLD.grip) closes its fist round the
+  // handle, the other lays its palm over the back of that fist, fingers wrapped round it
+  const T = THREE, M = PRO, R = M.rest, S = M.S, G = GOBLET_HOLD, wp = (n) => new T.Vector3().setFromMatrixPosition(M.by[n].matrixWorld);
   M.group.updateMatrixWorld(true);
-  const lat = V3(B.lat).normalize(), up = new T.Vector3(0, 1, 0), d = V3(B.fwd).setY(0).normalize(), e = lat.clone();
-  const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5), c = sh.clone().lerp(wp("Spine1"), .55);
-  // in front of the chest: the dumbbell's heads (radius 4.4) just clear the skin between its ends
-  let need = -1e9; for (const q of proBodyPts(M)) { const r = q.clone().sub(c); if (Math.abs(r.dot(up)) > 8 || Math.abs(r.dot(e)) > 4.4) continue; need = Math.max(need, r.dot(d)); }
-  if (need > -1e8) c.add(d.clone().multiplyScalar(need + 5.4));
-  const top = c.clone().add(up.clone().multiplyScalar(6.5));
-  for (const L of ["Left", "Right"]) {
-    const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(lat)) || 1, inward = lat.clone().multiplyScalar(-side), cup = up.clone().multiplyScalar(GOBLET[2]).add(inward.clone()).normalize() /* (the palm faces up under the top plate, a little inwards: the two hands make a cup) */, tgt = top.clone().add(lat.clone().multiplyScalar(side * GOBLET[0])).sub(up.clone().multiplyScalar(GOBLET[1]));
-    const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
-    let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize(), poleK = up.clone().negate();
-    for (let it = 0; it < 4; it++) {
-      const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * GOBLET[3])).sub(cup.clone().multiplyScalar(1.6)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
+  const lat = V3(B.lat).normalize(), up = new T.Vector3(0, 1, 0), d = V3(B.fwd).setY(0).normalize();
+  const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5), c = sh.clone().lerp(wp("Spine1"), G.height);
+  // in front of the chest: the dumbbell's heads (radius 4.4) and the covering hand clear the skin
+  let need = -1e9; for (const q of proBodyPts(M)) { const r = q.clone().sub(c); if (Math.abs(r.dot(up)) > 9 || Math.abs(r.dot(lat)) > 6) continue; need = Math.max(need, r.dot(d)); }
+  if (need > -1e8) c.add(d.clone().multiplyScalar(need + G.gap));
+  const reachArm = (L, tgtPalm, palmN, poleDir) => { // place an arm so its palm centre lands on tgtPalm with the palm facing palmN
+    const Sm = wp(L + "Arm"), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
+    let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize(), poleK = poleDir.clone();
+    for (let it = 0; it < 5; it++) {
+      const Wt = tgtPalm.clone().sub(fd.clone().multiplyScalar(hl * G.palmAlong)).sub(palmN.clone().multiplyScalar(G.palmOff)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
-      let pole = up.clone().negate().add(lat.clone().multiplyScalar(side * .3)); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); poleK = pole.clone(); // (elbows down under the hands, a little out)
+      const pole = poleDir.clone(); pole.sub(hd.clone().multiplyScalar(pole.dot(hd))).normalize(); poleK = pole.clone();
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
     }
-    proArmTo(M, L, E, W, poleK.clone().negate(), cup); // (the elbow folds away from where it points)
-  }
+    return { E, W, fd, poleK };
+  };
+  const gL = G.grip, cL = gL === "Left" ? "Right" : "Left", sideOf = (L) => Math.sign(wp(L + "Arm").sub(c).dot(lat)) || (L === "Left" ? 1 : -1), sg = sideOf(gL), sc = sideOf(cL);
+  // the gripping hand: its forearm comes in level from its own side, the knuckles stand upright round the handle, the palm facing the far side
+  const pA = d.clone().negate(); // (forearm across the chest, the palm towards the chest: the knuckles stand upright and the fist closes round the upright handle)
+  let A = reachArm(gL, c.clone().add(lat.clone().multiplyScalar(sg * G.gripOut)), pA, lat.clone().multiplyScalar(sg).add(up.clone().multiplyScalar(-G.elbowDown)));
+  proArmTo(M, gL, A.E, A.W, A.poleK.clone().negate(), pA);
   M.group.updateMatrixWorld(true);
-  PRO.bar = { c, a: up, goblet: true };
+  const gA = proHandGrip(gL); // where that fist really is, and its knuckle line (the handle runs along it)
+  // the covering hand: its palm over the back of the fist (the back faces the gripping hand's own side), fingers round it
+  const back = gA.palm.clone().negate(), hc = wp(gL + "Hand").lerp(wp(gL + "HandMiddle1"), .55).add(back.clone().multiplyScalar(G.cover));
+  const C = reachArm(cL, hc, gA.palm.clone(), lat.clone().multiplyScalar(sc).add(up.clone().multiplyScalar(-G.elbowDown)));
+  proArmTo(M, cL, C.E, C.W, C.poleK.clone().negate(), gA.palm.clone());
+  M.group.updateMatrixWorld(true);
+  const g2 = proHandGrip(gL), ax = g2.kn.clone(); if (ax.dot(up) < 0) ax.negate(); ax.lerp(up, G.upright).normalize(); // (the dumbbell stands upright through the fist, not tipped with the knuckle line)
+  PRO.bar = { c: g2.p.clone(), a: ax, goblet: true, gripL: gL };
 }
 function proBarGrip(B) {
   PRO.bar = null; if (!B.barMode || !PRO.chrome || !PRO.curl) return;
@@ -8062,10 +8075,10 @@ function proPose0(B) {
     const nearL = V3(B.arms[0][1][0]).sub(V3(B.sh)).dot(left) >= 0 ? "Left" : "Right";
     const gOf = (L) => (GL.grip && (L === nearL ? GL.grip.near : GL.grip.far) ? 1 : 0);
     // Hanging from a bar the fingers make a hook over it (the bar sits in the hollow), instead of a closed fist
-    const cupH = PRO.bar && PRO.bar.goblet; // (goblet: open hands curled softly round the plate, like holding a bowl)
-    const ang = (g) => cupH ? GOBLET_CUP.f : B.openHand ? { 1: -8, 2: -6, 3: -4 } : (B.hang || B.hook) && g ? BAR_HOOK.f : ({ 1: 10 + g * 52, 2: 12 + g * 68, 3: 8 + g * 42 }), thumb = (g) => cupH ? GOBLET_CUP.t : B.openHand ? { 1: 0, 2: 2, 3: 2 } : (B.hang || B.hook) && g ? BAR_HOOK.t : ({ 1: 4 + g * 18, 2: 6 + g * 26, 3: 6 + g * 30 });
+    const cupH = PRO.bar && PRO.bar.goblet ? PRO.bar.gripL : null; // (goblet: open hands curled softly round the plate, like holding a bowl)
+    const ang = (g, sd) => cupH && sd !== cupH ? GOBLET_CUP.f : cupH ? { 1: 62, 2: 80, 3: 50 } : B.openHand ? { 1: -8, 2: -6, 3: -4 } : (B.hang || B.hook) && g ? BAR_HOOK.f : ({ 1: 10 + g * 52, 2: 12 + g * 68, 3: 8 + g * 42 }), thumb = (g, sd) => cupH && sd !== cupH ? GOBLET_CUP.t : cupH ? { 1: 22, 2: 32, 3: 36 } : B.openHand ? { 1: 0, 2: 2, 3: 2 } : (B.hang || B.hook) && g ? BAR_HOOK.t : ({ 1: 4 + g * 18, 2: 6 + g * 26, 3: 6 + g * 30 });
     for (const [name, ax] of Object.entries(PRO.curl)) { const b = by[name]; if (!b) continue; const k = +name.slice(-1), fw = +((PRO.planted && PRO.planted[name.startsWith("Left") ? "Left" : "Right"]) || 0);
-      const flatA = name.includes("Thumb") ? 0 : { 1: FLAT_FINGERS[0], 2: FLAT_FINGERS[1], 3: FLAT_FINGERS[2] }[k] /* (a relaxed hand on a surface: flat with a soft bend; bent back further, it looked strained) */, restA = (name.includes("Thumb") ? thumb : ang)(gOf(name.startsWith("Left") ? "Left" : "Right"))[k];
+      const flatA = name.includes("Thumb") ? 0 : { 1: FLAT_FINGERS[0], 2: FLAT_FINGERS[1], 3: FLAT_FINGERS[2] }[k] /* (a relaxed hand on a surface: flat with a soft bend; bent back further, it looked strained) */, restA = (name.includes("Thumb") ? thumb : ang)(gOf(name.startsWith("Left") ? "Left" : "Right"), name.startsWith("Left") ? "Left" : "Right")[k];
       b.quaternion.setFromAxisAngle(new T.Vector3(...ax), rad(restA + (flatA - restA) * fw)); }
     // A hand resting on a surface: the fingers lie close together (the model's rest pose has them spread, which looked tense).
     // Each knuckle turns, in the palm's plane, most of the way towards the middle finger's line.
