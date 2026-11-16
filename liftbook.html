@@ -6765,7 +6765,7 @@ ANIMS.press_bar.glChrome = { A: { ...ANIMS.press_bar.A, rk: 1 }, B: { ...ANIMS.p
 for (const id of ["deadlift", "rdl_bar", "bench_bar"]) if (ANIMS[id]) ANIMS[id].barHug = true;
 for (const id of ["squat_goblet", "squat_goblet_box"]) if (ANIMS[id]) ANIMS[id].goblet = true;
 for (const id of ["deadlift", "rdl_bar", "rdl", "rdl_pack"]) if (ANIMS[id]) ANIMS[id].barHang = true; // (chrome: arms hang straight, the bar where they put it)
-if (ANIMS.squat_bar) Object.assign(ANIMS.squat_bar, { barHalf: 27, barUp: 3, barHug: true }); // (back squat: a bit wider than the shoulders, bar resting high on the upper back) // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
+if (ANIMS.squat_bar) Object.assign(ANIMS.squat_bar, { barHalf: 40, barUp: 3, barHug: true }); /* (hands well outside the shoulders, as on a real back squat: the elbows bend ~100°, pointing down under the bar, not folded tight) */ // (back squat: a bit wider than the shoulders, bar resting high on the upper back) // (back squat: hands just outside the shoulders, elbows down behind them, not flared up and out)
 if (ANIMS.press_bar) ANIMS.press_bar.barPalm = "fwd"; if (ANIMS.bench_bar) ANIMS.bench_bar.barPalm = "feet"; // (press: palms forward; bench: palms towards the feet)
 for (const id of ["rdl"]) if (ANIMS[id]) Object.assign(ANIMS[id], { dbFront: true, barHug: true, barHalf: 12 });
 // Backpack Romanian deadlift: a loaded backpack held by its top handle in both hands, hanging in front of the thighs. A slightly
