@@ -6269,12 +6269,14 @@ function lift(j, an, p) {
     let eB = [sB[0] + 3, fl, sB[2] + SEG.upper * .97], wB = [eB[0] + 5, fl, eB[2] + SEG.fore * .95];
     if (an && an.pillowArm) { // (the head rests on the bottom arm: elbow out on the floor in front of the head, the hand folded back under it)
       const P = PILLOW_ARM, d = v3.norm([P[0], 0, 1]); eB = v3.add([sB[0], fl, sB[2]], v3.mul(d, SEG.upper * .97)); eB[1] = fl;
-      const hd = B.head, tgt = [hd[0] + P[1], fl, hd[2] + P[2]], fd = v3.norm(v3.sub(tgt, eB)); wB = v3.add(eB, v3.mul(fd, SEG.fore * .95)); wB[1] = fl; }
+      const hd = B.head, tgt = [hd[0] + P[1], fl, hd[2] + P[2]], fd = P[3] != null ? v3.norm([P[3], 0, 1]) : v3.norm(v3.sub(tgt, eB)); wB = v3.add(eB, v3.mul(fd, SEG.fore * .95)); wB[1] = fl; } // (P[3]: the forearm's own direction instead, forward lean per unit towards the head)
     const wT = an && an.pillowArm ? [sT[0] + TOP_HAND[0], fl, sT[2] + TOP_HAND[1]] : [sT[0] + 20, fl, sT[2] - 12], mid = v3.mix(sT, wT, .5), dT = v3.len(v3.sub(wT, sT));
     const out = Math.sqrt(Math.max(0, SEG.upper ** 2 - (Math.min(dT, SEG.upper + SEG.fore - .5) / 2) ** 2)), pole = v3.norm([-.1, -.35, -1]); // elbow bends back towards the hips
     const eT = v3.add(mid, v3.mul(pole, out));
     B.arms = [[B.arms[0][0], [sB, eB, wB]], [B.arms[1][0], [sT, eT, wT]]];
-    B.nfFix = new Map([[sB, [0, -1, 0]], [eB, [0, -1, 0]], [sT, v3.norm(v3.sub(wT, eT))]]);
+    const perpTo = (v, ax) => { const n = v3.norm(ax); return v3.norm(v3.sub(v, v3.mul(n, v3.dot(v, n)))); };
+    const bentB = an && an.pillowArm ? [perpTo(v3.sub(wB, eB), v3.sub(eB, sB)), perpTo(v3.sub(sB, eB), v3.sub(wB, eB))] : null; // (a bent bottom arm: the biceps faces where the forearm goes, the forearm's inner side the upper arm — a true hinge)
+    B.nfFix = new Map([[sB, bentB ? bentB[0] : [0, -1, 0]], [eB, bentB ? bentB[1] : [0, -1, 0]], [sT, v3.norm(v3.sub(wT, eT))]]);
   }
   return B;
 }
@@ -6512,7 +6514,7 @@ const ANIMS = {
   tib_raise: { A: pose({ at: [122, 140], a: 18, b: 18, t: -18, u: 0, f: 0, fd: 0, props: [{ wall: 78 }] }), B: pose({ at: [122, 140], a: 18, b: 18, t: -18, u: 0, f: 0, fd: 35, props: [{ wall: 78 }] }) },
   foot_arch: { foot: true, A: { arch: 0 }, B: { arch: 14 }, feet: "arch", glView: "48 84 108 81", gl: { A: pose({ at: [96, 134], a: 90, b: -8, a2: 90, b2: -6, fd2: 0, t: 14, u: FOOT_HANDS[0], f: FOOT_HANDS[1], u2: -5, f2: 25, props: [{ chair: [44, 114] }] }), B: pose({ at: [96, 134], a: 90, b: -8, a2: 90, b2: -6, fd2: 0, t: 14, u: FOOT_HANDS[0], f: FOOT_HANDS[1], u2: -5, f2: 25, props: [{ chair: [44, 114] }] }) } },
   foot_toes: { foot: true, A: { curl: 0, towel: 1 }, B: { curl: 35, towel: 1 }, feet: "towel", glView: "62 96 84 63", gl: { A: pose({ at: [96, 134], a: 90, b: -8, t: 14, u: FOOT_HANDS[0], f: FOOT_HANDS[1], props: [{ chair: [44, 114] }] }), B: pose({ at: [96, 134], a: 90, b: -8, t: 14, u: FOOT_HANDS[0], f: FOOT_HANDS[1], props: [{ chair: [44, 114] }] }) } },
-  clamshell: { roll: true, clam: true, A: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 0 }, B: { anchor: "hip", at: [100, 80], a: 45, b: -45, a2: 45, b2: -45, fd: -45, fd2: -45, u: 172, f: 172, u2: 55, f2: 95, abd2: 42 } },
+  clamshell: { roll: true, clam: true, A: { anchor: "hip", at: [100, 80], a: 45, b: -30, a2: 45, b2: -30, fd: -30, fd2: -30, u: 172, f: 172, u2: 55, f2: 95, abd2: 0 }, B: { anchor: "hip", at: [100, 80], a: 45, b: -30, a2: 45, b2: -30, fd: -30, fd2: -30, u: 172, f: 172, u2: 55, f2: 95, abd2: 42 } },
   side_leg: { roll: true, A: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: SIDE_LEG_REST }, B: { anchor: "hip", at: [100, 80], a: 12, b: -12, fd: -12, a2: 0, b2: 0, u: 172, f: 172, u2: 55, f2: 95, abd2: 38 } },
   // Half-kneeling: only the arm on the kneeling-leg side reaches up (it adds to the stretch); the other hand rests on the front thigh
   hip_flexor: { kneelHold: true, noKneel: true, A: pose({ at: [132, 140], a: 90, b: 0, a2: -10, b2: -90, fd2: 180, t: 0, u: 20, f: 70, u2: 4, f2: 6 }), B: pose({ at: [132, 140], a: 95, b: -22, a2: -30, b2: -90, fd2: 180, t: -6, u: 26, f: 72, u2: 140, f2: 150 }) }, // (leaning in: the hips go forward and a little down over the bent front knee, the back knee stays on the floor; the back foot rests on its instep, toes back) // (the arm reaches up and a little forward, not pressed against the ear)
@@ -7086,7 +7088,7 @@ function proShinShape(PRO) {
 }
 const TAP_SURF = [6.5, 3, 2];
 let TOP_HAND = [27, -4]; // side-lying with the head on the bottom arm: where the top hand rests on the floor, from its shoulder (in front, towards the head)
-let PILLOW_ARM = [.5, 14, -2]; // side-lying, head on the bottom arm: the upper arm's forward lean (per unit towards the head), and where the hand goes from the head (forward, towards the top of the head)
+let PILLOW_ARM = [1, 0, 0, .3]; // side-lying, head on the bottom arm: the upper arm's forward lean (per unit towards the head), and where the hand goes from the head (forward, towards the top of the head)
 const HAND_ON_HIP = { up: 4, fwd: 0, lift: 1.6 }; // side planks (chrome): where the top palm rests, from the hip joint (model units towards the head and front), and how far it sits off the skin (cm)
 const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the hand lands from the sketch's near shoulder (towards the head, towards the floor, sideways) // shoulder taps: where the hand lands from the opposite shoulder joint (model units: towards the floor, towards the head, outwards)
 const KNEEL_REST = { ankle: 7, toe: 1.5 }, INSTEP = { ankle: 4.9, toe: -1.5, edge: 4, lift: 2, hipTop: 84, hipSpan: 16 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
