@@ -7481,7 +7481,7 @@ function proGoblet(B) {
   const lat = V3(B.lat).normalize(), up = new T.Vector3(0, 1, 0), d = V3(B.fwd).setY(0).normalize();
   const sh = wp("LeftArm").add(wp("RightArm")).multiplyScalar(.5), c = sh.clone().lerp(wp("Spine1"), G.height);
   // in front of the chest: the dumbbell's heads (radius 4.4) and the covering hand clear the skin
-  let need = -1e9; for (const q of proBodyPts(M)) { const r = q.clone().sub(c), ry = r.dot(up); if (ry < -9 || ry > GOBLET_DB.shift + GOBLET_DB.half + GOBLET_DB.thick || Math.abs(r.dot(lat)) > GOBLET_DB.r) continue; need = Math.max(need, r.dot(d)); }
+  let need = -1e9; for (const q of proBodyPts(M)) { const r = q.clone().sub(c), ry = r.dot(up), oy = Math.max(-9 - ry, ry - (GOBLET_DB.shift + GOBLET_DB.half + GOBLET_DB.thick), 0), ox = Math.max(0, Math.abs(r.dot(lat)) - GOBLET_DB.r); if (oy > 8 || ox > 8) continue; need = Math.max(need, r.dot(d) - 1.2 * oy - 1.2 * ox); } // (soft edges: a body part coming into the dumbbell's band nudges it out gradually, no jump)
   if (need > -1e8) c.add(d.clone().multiplyScalar(need + G.gap));
   const reachArm = (L, tgtPalm, palmN, poleDir) => { // place an arm so its palm centre lands on tgtPalm with the palm facing palmN
     const Sm = wp(L + "Arm"), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
