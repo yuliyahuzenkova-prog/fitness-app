@@ -14,3 +14,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1932:"Jak zapisywać serie",1933:"Ćwiczenia",1934:"Serie",1935:"Następnie"
 });
+// Today (v342): weekly check-in row
+I18N_FILL("es", {
+1936:"Peso, medidas y cómo fue tu semana · 1 min"
+});
+I18N_FILL("de", {
+1936:"Gewicht, Maße und wie deine Woche war · 1 Min."
+});
+I18N_FILL("fr", {
+1936:"Poids, mensurations et ta semaine · 1 min"
+});
+I18N_FILL("pt", {
+1936:"Peso, medidas e como foi sua semana · 1 min"
+});
+I18N_FILL("pl", {
+1936:"Waga, wymiary i jak minął tydzień · 1 min"
+});

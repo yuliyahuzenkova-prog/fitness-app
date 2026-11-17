@@ -202,3 +202,6 @@ Object.assign(UK, {
   "Sets": "Підходи",
   "Up next": "Далі",
 });
+Object.assign(UK, {
+  "Weight, measurements and how your week felt · 1 min": "Вага, заміри і як минув тиждень · 1 хв",
+});
