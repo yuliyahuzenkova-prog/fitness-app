@@ -30,3 +30,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1936:"Waga, wymiary i jak minął tydzień · 1 min"
 });
+// Me (v343): shorter backup text
+I18N_FILL("es", {
+1937:"Guarda todo en un archivo para pasarlo a otro teléfono o navegador, o entre la versión de Claude y el sitio web."
+});
+I18N_FILL("de", {
+1937:"Speichere alles in einer Datei, um es auf ein anderes Handy oder in einen anderen Browser zu übertragen oder zwischen der Claude-Version und der Website."
+});
+I18N_FILL("fr", {
+1937:"Enregistre tout dans un fichier pour le transférer sur un autre téléphone ou navigateur, ou entre la version Claude et le site web."
+});
+I18N_FILL("pt", {
+1937:"Salve tudo em um arquivo para levar para outro celular ou navegador, ou entre a versão do Claude e o site."
+});
+I18N_FILL("pl", {
+1937:"Zapisz wszystko w jednym pliku, aby przenieść dane na inny telefon lub do innej przeglądarki albo między wersją w Claude a stroną."
+});
