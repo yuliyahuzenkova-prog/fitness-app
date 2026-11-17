@@ -41,8 +41,6 @@ h3 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; line-height: 1.3
 .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--accent-fill); color: var(--accent-ink); display: grid; place-items: center; }
 .logo .ico { width: 18px; height: 18px; stroke-width: 2.2; }
 .langseg button { min-width: 40px; padding: 6px 10px; font-size: 13px; }
-.weekcard.inactive .big, .weekcard.inactive .ring text { color: var(--muted); fill: var(--muted); } /* (no fading: faded text dropped below readable contrast) */
-.weekcard.inactive .week span { background: var(--fill); }
 .langsel { font: 600 13px var(--body); padding: 6px 28px 6px 10px; border-radius: 999px; background-color: var(--fill); border: 0; color: var(--ink); }
 .ltitle-wrap { display: grid; gap: 2px; padding-top: 4px; }
 .ltitle { font: 800 40px/1.05 var(--display); letter-spacing: -.03em; }
@@ -604,6 +602,29 @@ canvas.hero3d { width: 100%; max-width: min(340px, 44vh); justify-self: center; 
 .hlegend b { font-weight: 600; white-space: nowrap; } .hlegend span { color: var(--hero-hint); }
 .hlegend.glow i { background: #ff4a2a; box-shadow: 0 0 8px #ff4a2a; } .hlegend.ready i { background: linear-gradient(135deg, #f4f6f8, #8f96a1); } .hlegend.matte i { background: #6e737c; }
 .herocard .hint { color: var(--hero-hint); }
+/* Welcome stage (first visit): the figure, then the one thing to do */
+.herocard.welcome { gap: 12px; padding-bottom: 12px; }
+.herocard.welcome canvas.hero3d { max-width: min(230px, 30vh); margin: -4px 0 -10px; }
+.herocard.welcome h3 { font-size: 22px; color: var(--hero-ink); }
+.herocard.welcome .btn.ghost { color: var(--hero-label); } /* (accent text is too dark on the stage in the light theme) */
+/* Compact stage (after setup): figure beside its status, today's workout right below */
+.herocard.compact { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; column-gap: 10px; padding: 12px 16px 12px 4px; }
+.herocard.compact canvas.hero3d { width: 126%; max-width: none; margin: -22px -13%; } /* (the figure fills only the middle of its canvas) */
+.herocard.compact .hside { position: relative; z-index: 1; }
+.hside { display: grid; gap: 10px; align-content: center; min-width: 0; }
+.hside .herohead { display: grid; gap: 2px; justify-content: start; }
+.hside .hreleaf { font-size: 15px; } .hside .hreleaf b { font: 800 30px/1 var(--display); letter-spacing: -.02em; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.hside .hlegend { grid-template-columns: 12px minmax(0, 1fr); }
+.hside .hlegend span { grid-column: 2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hside .hint { font-size: 13px; }
+.hside .hshare { position: static; justify-self: start; }
+/* A secondary card that is one tap: icon, title and a line of text, chevron */
+.rowcard { all: unset; box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr) 18px; gap: 12px; align-items: center; background: var(--surface); border-radius: 20px; padding: 14px 16px; box-shadow: var(--shadow); cursor: pointer; color: var(--ink); }
+:root[data-theme="dark"] .rowcard { background: linear-gradient(180deg, var(--studio-card-top), var(--studio-card-bottom)); box-shadow: var(--shadow-edge); }
+.rowcard:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rowicon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--fill); color: var(--ink); }
+.rowtext { display: grid; gap: 2px; min-width: 0; } .rowtext b { font: 600 16px/1.3 var(--display); } .rowtext span { font-size: 14px; color: var(--muted); line-height: 1.35; }
+.rowcard > .ico:last-child { width: 18px; height: 18px; color: var(--muted); transform: rotate(-90deg); }
 .whybtn { justify-self: start; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent-text); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 7px 13px; min-height: 34px; /* (easy to tap) */ cursor: pointer; white-space: nowrap; vertical-align: middle; }
 .whybtn[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); }
 .whybox { font-weight: 400; color: var(--ink); background: var(--fill); border-radius: 12px; padding: 10px 12px; margin: 6px 0; font-size: 14px; display: grid; gap: 6px; }
@@ -756,6 +777,7 @@ const ICONS = {
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 7.6v.01"/>',
   share: '<path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M6.5 11H6a1.5 1.5 0 0 0-1.5 1.5v6A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 18 11h-.5"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  camera: '<path d="M4.5 8.5A1.5 1.5 0 0 1 6 7h2l1.5-2h5L16 7h2a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 18 19H6a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.3"/>',
   trophy: '<path d="M8 20.5h8M12 16.5v4M7 3.5h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
   lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
   alert: '<path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.01"/>',
@@ -1064,20 +1086,38 @@ function bodyState() {
   const matte = S.workouts.length ? HERO_MUSCLES.filter((m) => !(m in last) || last[m] > 24 * 9) : [];
   return { glow, last, matte, relief, any: S.workouts.length > 0 };
 }
-function heroCardHtml() {
+// mode "welcome": first visit, the figure is the stage for the one thing to do (set up the profile);
+// mode "compact": figure beside its status, so today's workout sits right under it; otherwise the full stage
+function heroCardHtml(mode) {
   if (!glInit()) return "";
   const st = bodyState(), uk = LANG !== "en", T = (m) => tr(m);
   const rec = HERO_MUSCLES.filter((m) => (st.glow[m] || 0) > .05).sort((a, b) => st.glow[b] - st.glow[a]);
   const ready = st.any ? HERO_MUSCLES.filter((m) => !rec.includes(m) && !st.matte.includes(m)) : [];
   const lvl = Math.round(st.relief * 100);
   const chip = (cls, label, list) => list.length ? `<div class="hlegend ${cls}"><i></i><b>${label}</b><span>${list.map(T).join(", ")}</span></div>` : "";
-  return `<section class="card herocard" data-notr>
-    <div class="herohead"><span class="label">${scanL("Your body right now", "Твоє тіло зараз")}</span><span class="hreleaf">${scanL("Relief", "Рельєф")} <b>${lvl}%</b></span></div>
-    <button type="button" class="hshare" data-act="heroshare" aria-label="${scanL("Share as an image", "Поділитися картинкою")}">${icon("share")}<span>${scanL("Share", "Поділитися")}</span></button>
+  if (mode === "welcome") return `<section class="card herocard welcome" data-notr>
+    <span class="label">${tr("Start here")}</span>
     <canvas class="hero3d" width="600" height="720" role="img" aria-label="${scanL("3D figure showing recovering muscles", "3D-фігура з м'язами, що відновлюються")}"></canvas>
-    <div class="hbar" aria-hidden="true"><i style="width:${Math.max(4, lvl)}%"></i></div>
-    ${st.any ? `${chip("glow", scanL("Recovering", "Відновлюються"), rec)}${chip("ready", scanL("Ready to train", "Готові до роботи"), ready)}${chip("matte", scanL("Not trained lately", "Давно не тренувались"), st.matte)}`
-      : `<p class="hint">${scanL("After your first workout, the muscles you trained will glow here. The more you train, the more defined the figure gets.", "Після першого тренування тут засвітяться м'язи, які ти навантажили. Що більше тренуєшся, то рельєфнішою стає фігура.")}</p>`}
+    <h3>${tr("Tell us about you")}</h3>
+    <p class="hint">${tr("Answer a few questions about your goal, experience, equipment, schedule and injuries, and get a personal plan right away. It takes about 3 minutes.")}</p>
+    <button class="btn primary big" data-act="gome">${tr("Set up my profile")}</button>
+    <button class="btn ghost small" data-act="gobackup" style="justify-self:center">${tr("I have a backup to restore")}</button>
+  </section>`;
+  const head = `<div class="herohead"><span class="label">${scanL("Your body right now", "Твоє тіло зараз")}</span><span class="hreleaf">${scanL("Relief", "Рельєф")} <b>${lvl}%</b></span></div>`;
+  const share = `<button type="button" class="hshare" data-act="heroshare" aria-label="${scanL("Share as an image", "Поділитися картинкою")}">${icon("share")}<span>${scanL("Share", "Поділитися")}</span></button>`;
+  const canvas = `<canvas class="hero3d" width="600" height="720" role="img" aria-label="${scanL("3D figure showing recovering muscles", "3D-фігура з м'язами, що відновлюються")}"></canvas>`;
+  const bar = `<div class="hbar" aria-hidden="true"><i style="width:${Math.max(4, lvl)}%"></i></div>`;
+  const legend = st.any ? `${chip("glow", scanL("Recovering", "Відновлюються"), rec)}${chip("ready", scanL("Ready to train", "Готові до роботи"), ready)}${chip("matte", scanL("Not trained lately", "Давно не тренувались"), st.matte)}`
+      : `<p class="hint">${scanL("After your first workout, the muscles you trained will glow here. The more you train, the more defined the figure gets.", "Після першого тренування тут засвітяться м'язи, які ти навантажили. Що більше тренуєшся, то рельєфнішою стає фігура.")}</p>`;
+  if (mode === "compact") return `<section class="card herocard compact" data-notr>${canvas}
+    <div class="hside">${head}${bar}${legend}${share}</div>
+  </section>`;
+  return `<section class="card herocard" data-notr>
+    ${head}
+    ${share}
+    ${canvas}
+    ${bar}
+    ${legend}
   </section>`;
 }
 function proPaintBody(st) {
@@ -1364,7 +1404,9 @@ function viewLibrary() {
   <input type="search" class="libsearch" id="libq" value="${esc(S.libQ || "")}" placeholder="${scanL("Search exercises", "Пошук вправ")}" data-notr>
   ${LIB_GROUPS.map(([g, en, ukT]) => { const r = rows(g); return r ? `<section class="card libgroup" data-notr><h3>${scanL(en, ukT)}</h3><div class="liblist">${r}</div></section>` : ""; }).join("") || `<p class="empty">${scanL("Nothing found.", "Нічого не знайдено.")}</p>`}`;
 }
-function scanCardHtml(quiet) { // quiet: shown under the profile card, so only one primary button is on screen
+function scanCardHtml(quiet) { // quiet: shown under the welcome stage, so only one primary button is on screen
+  if (quiet && !(S.intake.scans || []).length) return `<button type="button" class="card rowcard" data-act="scanopen" data-notr>
+    <span class="rowicon">${icon("camera")}</span><span class="rowtext"><b>${scanL("Posture check", "Оцінка постави")}</b><span>${scanL("Two photos and a few taps show what to work on: head, shoulders, knees and arches.", "Два фото й кілька дотиків покажуть, над чим попрацювати: голова, плечі, коліна, склепіння стопи.")}</span></span>${icon("chev")}</button>`;
   const last = (S.intake.scans || [])[0], uk = LANG === "uk";
   return `<section class="card scancard" data-notr><div class="row spread"><h3>${scanL("Posture check", "Оцінка постави")}</h3>${last ? `<span class="hint">${dateLabel(last.date, { month: "short", day: "numeric" })}</span>` : ""}</div>
     <p class="muted">${last ? (last.found.length ? `${scanL("Last time", "Минулого разу")}: ${last.found.map((id) => pickL(SCAN_FIND[id])[0]).join(", ")}.` : scanL("Last time nothing stood out.", "Минулого разу нічого помітного.")) : scanL("Two photos and a few taps show what to work on: head, shoulders, knees and arches.", "Два фото й кілька дотиків покажуть, над чим попрацювати: голова, плечі, коліна, склепіння стопи.")}</p>
@@ -1418,19 +1460,16 @@ function viewToday() {
       <button class="btn primary" data-act="goplan" style="justify-self:start">See my plan</button></section>`;
   }
   const ciDue = S.intake.done && !ciKeys().includes(thisWeekKey()) && (S.workouts.length > 0 || ciKeys().length > 0); // (asking how the week went makes sense once there is a week to look back on)
-  const onboarding = S.intake.done ? "" : `<section class="card">
+  const onboarding = S.intake.done ? "" : glInit() ? heroCardHtml("welcome") + scanCardHtml(true) : `<section class="card">
     <span class="label">Start here</span><h3>Tell us about you</h3>
     <p class="muted">Answer a few questions about your goal, experience, equipment, schedule and injuries, and get a personal plan right away. It takes about 3 minutes.</p>
     <button class="btn primary big" data-act="gome">Set up my profile</button>
     <button class="btn ghost small" data-act="gobackup" style="justify-self:center">I have a backup to restore</button>
-  </section>${glInit() ? scanCardHtml(true) : ""}`;
-  return `${onboarding}${heroCardHtml()}${planCard}${coachCardHtml()}
+  </section>`;
+  return `${onboarding}${S.intake.done ? heroCardHtml("compact") : ""}${planCard}${coachCardHtml()}
   ${(() => {
     const goal = S.intake.done ? buildPlan(S.intake).strength : 3, frac = Math.min(1, thisWeek / goal), C = 2 * Math.PI * 30;
-    if (!ready) return `<section class="card weekcard inactive" aria-disabled="true">
-      <svg class="ring" viewBox="0 0 76 76" aria-hidden="true"><circle class="trk" cx="38" cy="38" r="30"/><text x="38" y="44" text-anchor="middle">–</text></svg>
-      <div style="min-width:0"><span class="label">This week</span><p class="big">Your week starts after setup</p><div class="week">${days}</div></div>
-    </section>`;
+    if (!ready) return ""; // (before setup the week has nothing in it; the welcome stage says what to do)
     // the ring is split into one segment per planned workout, each filling in as it's done
     const gap = goal > 1 ? 9 : 0, seg = C / goal - gap, segs = Array.from({ length: goal }, (_, i) => `<circle class="${i < thisWeek ? "val" : "trk"} seg" cx="38" cy="38" r="30" stroke-dasharray="${seg.toFixed(1)} ${(C - seg).toFixed(1)}" stroke-dashoffset="${(-(C / goal) * i - gap / 2).toFixed(1)}"/>`).join("");
     const uk = LANG === "uk", acc = ["понеділок", "вівторок", "середу", "четвер", "пʼятницю", "суботу", "неділю"];
