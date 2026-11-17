@@ -5,10 +5,12 @@
 «Розпакуй архів, прочитай HANDOFF.md і продовжуй роботу над застосунком Relief».
 
 ## Де що лежить
-- Опублікований застосунок (артефакт): https://claude.ai/artifact/PEGciLQxAMRbWY1SPQmpCH — остання версія v337.
+- Опублікований застосунок (артефакт): https://claude.ai/artifact/PEGciLQxAMRbWY1SPQmpCH — остання версія v338.
   Новий чат може прочитати його через Artifact `read` з цим URL і далі оновлювати той самий URL (publish з `url`).
 - Сайт: better-fit-you.netlify.app — туди вручну завантажується `standalone/index.html`.
 - `liftbook.html` — весь застосунок в одному файлі (HTML + JS, three.js 3D-фігури, переклади).
+- `design/tokens.json` — **єдине джерело кольорів, тіней, радіусів, відступів і шрифтів**. Блок між `/* <tokens:start> */` і `/* <tokens:end> */` у `liftbook.html` генерується з нього скриптом `python3 build-tokens.py` — руками його не правити.
+- Дизайн-система (артефакт): https://claude.ai/artifact/4gzQUUcsuRY55mqNtqkphh — брендбук, токени, 18 компонентів, розділ «Напрям і аудит». Її `project/tokens.json` = `design/tokens.json`: змінив одне — онови інше.
 - `standalone/index.html` — збирається з `liftbook.html` для Netlify.
 - `i18n/` — переклади (uk*.js — українська, keys.js — список англ. рядків, tr-00..tr-13.js — es/de/fr/pt/pl, tr-rx.js — правила).
 - `tools/anim-qa/` — скрипти перевірки анімацій (Playwright), `vendor/` — локальна копія three.js для них.
@@ -17,7 +19,7 @@
 ## Робочий процес після кожної зміни
 1. Зробити резервну копію `liftbook.html` у `backups/`.
 2. Змінити `liftbook.html`.
-3. Якщо змінювались тексти: `python3 build-i18n.py`. Потім завжди: `python3 build-standalone.py`.
+3. Якщо змінювались кольори/токени: правити `design/tokens.json`, потім `python3 build-tokens.py`. Якщо змінювались тексти: `python3 build-i18n.py`. Потім завжди: `python3 build-standalone.py`.
 4. Перевірка синтаксису: витягти найбільший `<script>` у файл і `node --check`.
 5. Рендер-перевірка (Playwright, Chromium вже встановлений у хмарі). Приклади з `tools/anim-qa`:
    - `node zoomHi.js <animId> <фази через кому> <yaw через кому> <viewbox|-> out.png chromeF` (APPF=інший html, PITCH=нахил камери у zoomP.js)
@@ -105,3 +107,4 @@ Bird dog (плавні стопи), тяги під столом (хват, п'�
 - v335: присід зі штангою — хват ширший (`barHalf` 40, кисті ~25 см назовні від плечей, як на фото користувачки): згин ліктя ~100° замість 131°, лікті вниз під грифом.
 - v336: goblet — гантеля у двох руках: обидва кулаки обхоплюють вертикальну ручку один над одним (`GOBLET_HOLD.stack` 9 см), передпліччя поперек грудей з обох боків, долоні до грудей; ручка довша (`GOBLET_DB.half` 10, `shift` 0); пальці обох рук — кулак (`PRO.bar.gripL = "both"`).
 - v337: goblet — гантеля менша (`GOBLET_DB` r 5, thick 4, half 6), кулаки ближче й трохи накладаються (`GOBLET_HOLD.stack` 4.5).
+- v338: дизайн-система й перші правки з аудиту. (1) Токени винесені в `design/tokens.json` + `build-tokens.py` (значення ті самі, що були; додано `good-text`, `good-ink`, `pr-text`, `hero-hint`, а також відступи `space-*`, радіуси `radius-*`, розміри `tap-*`/`page-max` як CSS-змінні). Кольори сцени фігури й студії (`hero-*`, `studio-*`, `shadow-edge`, `shadow-glow`) тепер теж змінні, а не літерали. (2) Підписи вкладок = заголовки екранів: «Log» → «History», «Stats» → «Progress» (переклади вже були). (3) Поки не заповнено профіль, кнопка «Start the posture check» — вторинна (`scanCardHtml(true)`): на екрані одна головна кнопка. (4) Контраст: неактивна картка тижня без `opacity .55` (підписи `muted`); золотий текст — `pr-text`, зелений текст — `good-text`, галочка виконаного підходу — `good-ink` (у Studio темна на зеленому, 7:1).
