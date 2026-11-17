@@ -196,3 +196,9 @@ Object.assign(UK, {
   "Less": "Менше", "Usual": "Звично", "More": "Більше",
   "Counts your working sets (warm-ups don't count), weighted by effort when you rate it.": "Рахуються робочі підходи (розминка не враховується), з поправкою на зусилля, якщо ти його оцінюєш.",
 });
+Object.assign(UK, {
+  "How to log sets": "Як записувати підходи",
+  "Exercises": "Вправи",
+  "Sets": "Підходи",
+  "Up next": "Далі",
+});
