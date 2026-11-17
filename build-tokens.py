@@ -6,14 +6,23 @@ here = os.path.dirname(os.path.abspath(__file__))
 t = json.load(open(os.path.join(here, "design", "tokens.json"), encoding="utf-8"))
 NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 
+ALIAS = re.compile(r"^\{([A-Za-z0-9][A-Za-z0-9_-]*)\}$")  # "{other-token}" = the same colour as another token
+
+def css_value(v, known):
+    m = ALIAS.match(v)
+    if not m: return v
+    assert m.group(1) in known, "alias of a missing token: " + v
+    return f"var(--{m.group(1)})"
+
 def per_theme(tokens):
     """(name, light value, dark value) for every token; a plain value is the same in both themes."""
+    known = {x["name"] for x in tokens}
     out = []
     for x in tokens:
         assert NAME.match(x["name"]), "token name not usable in CSS: " + x["name"]
         v = x["value"]
-        if isinstance(v, str): out.append((x["name"], v, v))
-        else: out.append((x["name"], v.get("light", v["dark"]), v.get("dark", v["light"])))
+        l, d = (v, v) if isinstance(v, str) else (v.get("light", v["dark"]), v.get("dark", v["light"]))
+        out.append((x["name"], css_value(l, known), css_value(d, known)))
     return out
 
 colors = per_theme(t["color"]["tokens"]) + per_theme(t.get("shadow", {}).get("tokens", []))
