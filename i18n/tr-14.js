@@ -179,3 +179,37 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2002:"Zwiń"
 });
+
+// Skipping an exercise and why (v355)
+I18N_FILL("es", {
+2003:"No tuve tiempo",2004:"No me gusta",2005:"Dolor o molestia",2006:"Máquina ocupada o sin material",2007:"Sin motivo",2008:"¿Cambiarlo en tu plan?",2009:"¿Hacer otra cosa hoy?",2010:"¿Probar algo más suave hoy?",2011:"Para cualquier ejercicio que duela. Si el dolor sigue o vuelve, consulta a un fisioterapeuta o médico.",2012:"Elige uno y tu plan lo usará a partir de ahora.",2013:"Solo por hoy. Tu plan no cambia.",2014:"Solo saltarlo",2015:"¿Por qué lo saltas?",2016:"¿Qué pasó? (opcional)",2017:"Saltar este ejercicio",2018:"Sin motivo",2019:"ejercicio sin hacer",2020:"ejercicios sin hacer",2021:"¿Por qué? Así el plan se ajusta mejor a ti. Puedes omitirlo.",2022:"Igual para todos",2023:"Volver al entrenamiento",2024:"Saltado",2025:"La última vez lo saltaste por ser demasiado difícil, así que empieza más ligero.",2026:"La última vez lo saltaste por ser demasiado difícil. Haz menos repeticiones o la versión más fácil de las instrucciones."
+});
+I18N_FILL("de", {
+2003:"Keine Zeit",2004:"Mag ich nicht",2005:"Schmerz oder Unbehagen",2006:"Gerät besetzt oder nicht da",2007:"Ohne Grund",2008:"Im Plan austauschen?",2009:"Heute etwas anderes machen?",2010:"Heute etwas Sanfteres probieren?",2011:"Brich jede Übung ab, die wehtut. Bleibt der Schmerz oder kommt er wieder, geh zu Physiotherapie oder Arzt.",2012:"Wähl eine aus, dann nutzt dein Plan sie ab jetzt.",2013:"Nur für heute. Dein Plan bleibt gleich.",2014:"Einfach auslassen",2015:"Warum auslassen?",2016:"Was war los? (optional)",2017:"Diese Übung auslassen",2018:"Kein Grund",2019:"Übung nicht gemacht",2020:"Übungen nicht gemacht",2021:"Warum? So passt sich der Plan besser an. Du kannst das überspringen.",2022:"Für alle gleich",2023:"Zurück zum Training",2024:"Ausgelassen",2025:"Letztes Mal hast du sie ausgelassen, weil sie zu schwer war. Starte leichter.",2026:"Letztes Mal hast du sie ausgelassen, weil sie zu schwer war. Mach weniger Wiederholungen oder die leichtere Variante aus der Anleitung."
+});
+I18N_FILL("fr", {
+2003:"Pas eu le temps",2004:"Je n'aime pas",2005:"Douleur ou gêne",2006:"Appareil pris ou pas de matériel",2007:"Sans raison",2008:"La remplacer dans ton plan ?",2009:"Faire autre chose aujourd'hui ?",2010:"Essayer plus doux aujourd'hui ?",2011:"Arrête tout exercice qui fait mal. Si la douleur reste ou revient, consulte un kiné ou un médecin.",2012:"Choisis-en un et ton plan l'utilisera désormais.",2013:"Juste pour aujourd'hui. Ton plan ne change pas.",2014:"Juste la passer",2015:"Pourquoi la passer ?",2016:"Que s'est-il passé ? (facultatif)",2017:"Passer cet exercice",2018:"Sans raison",2019:"exercice non fait",2020:"exercices non faits",2021:"Pourquoi ? Ça aide le plan à s'adapter. Tu peux passer.",2022:"Pareil pour tous",2023:"Retour à la séance",2024:"Passé",2025:"La dernière fois tu l'as passée car c'était trop dur, alors commence plus léger.",2026:"La dernière fois tu l'as passée car c'était trop dur. Fais moins de répétitions ou la version plus facile des instructions."
+});
+I18N_FILL("pt", {
+2003:"Sem tempo",2004:"Não gosto",2005:"Dor ou desconforto",2006:"Máquina ocupada ou sem equipamento",2007:"Sem motivo",2008:"Trocar no teu plano?",2009:"Fazer outra coisa hoje?",2010:"Experimentar algo mais suave hoje?",2011:"Para qualquer exercício que doa. Se a dor continuar ou voltar, consulta um fisioterapeuta ou médico.",2012:"Escolhe um e o plano passa a usá-lo.",2013:"Só por hoje. O plano não muda.",2014:"Só saltar",2015:"Porque saltas?",2016:"O que aconteceu? (opcional)",2017:"Saltar este exercício",2018:"Sem motivo",2019:"exercício por fazer",2020:"exercícios por fazer",2021:"Porquê? Ajuda o plano a adaptar-se. Podes saltar.",2022:"Igual para todos",2023:"Voltar ao treino",2024:"Saltado",2025:"Da última vez saltaste por ser demasiado difícil, por isso começa mais leve.",2026:"Da última vez saltaste por ser demasiado difícil. Faz menos repetições ou a versão mais fácil das instruções."
+});
+I18N_FILL("pl", {
+2003:"Brak czasu",2004:"Nie lubię",2005:"Ból lub dyskomfort",2006:"Maszyna zajęta lub brak sprzętu",2007:"Bez powodu",2008:"Zamienić w planie?",2009:"Zrobić dziś coś innego?",2010:"Spróbować dziś czegoś łagodniejszego?",2011:"Przerwij każde ćwiczenie, które boli. Jeśli ból nie mija lub wraca, idź do fizjoterapeuty lub lekarza.",2012:"Wybierz jedno, a plan będzie go odtąd używać.",2013:"Tylko na dziś. Plan się nie zmienia.",2014:"Po prostu pomiń",2015:"Dlaczego pomijasz?",2016:"Co się stało? (opcjonalnie)",2017:"Pomiń to ćwiczenie",2018:"Bez powodu",2019:"ćwiczenie niezrobione",2020:"ćwiczeń niezrobionych",2021:"Dlaczego? To pomaga dopasować plan. Możesz pominąć.",2022:"To samo dla wszystkich",2023:"Wróć do treningu",2024:"Pominięte",2025:"Ostatnio pominięto je, bo było za ciężko, więc zacznij lżej.",2026:"Ostatnio pominięto je, bo było za ciężko. Zrób mniej powtórzeń albo łatwiejszą wersję z instrukcji."
+});
+
+// Short reasons for the Finish list (v355)
+I18N_FILL("es", {
+2027:"Dolor",2028:"Máquina ocupada"
+});
+I18N_FILL("de", {
+2027:"Schmerz",2028:"Gerät besetzt"
+});
+I18N_FILL("fr", {
+2027:"Douleur",2028:"Appareil pris"
+});
+I18N_FILL("pt", {
+2027:"Dor",2028:"Máquina ocupada"
+});
+I18N_FILL("pl", {
+2027:"Ból",2028:"Maszyna zajęta"
+});
