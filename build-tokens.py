@@ -26,7 +26,7 @@ def per_theme(tokens):
     return out
 
 colors = per_theme(t["color"]["tokens"]) + per_theme(t.get("shadow", {}).get("tokens", []))
-plain = [(x["name"], x["value"]) for f in ("spacing", "radius", "size") for x in t.get(f, {}).get("tokens", [])]
+plain = [(x["name"], x["value"]) for f in ("spacing", "radius", "size", "fontsize") for x in t.get(f, {}).get("tokens", [])]
 fams = t["type"]["families"]  # keys become --display, --body (the names the app's CSS uses)
 
 light = "; ".join(f"--{n}: {l}" for n, l, d in colors)
