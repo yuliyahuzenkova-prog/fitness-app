@@ -293,5 +293,6 @@ Object.assign(UK, {
   "Answer a few questions about your goal, experience, equipment, schedule and injuries, and get a personal plan right away. It takes about a minute.": "Дай відповідь на кілька запитань про мету, досвід, інвентар, розклад і травми та одразу отримай персональний план. Це займе близько хвилини.",
   "No answers yet.": "Ще немає відповідей.",
   "Show all": "Показати всі",
-  "Show less": "Згорнути"
+  "Show less": "Згорнути",
+  "Profile": "Профіль"
 });

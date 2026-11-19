@@ -298,3 +298,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2038:"Pokaż wszystko",2039:"Pokaż mniej"
 });
+
+// Me: one Profile card (v364)
+I18N_FILL("es", {
+2040:"Perfil"
+});
+I18N_FILL("de", {
+2040:"Profil"
+});
+I18N_FILL("fr", {
+2040:"Profil"
+});
+I18N_FILL("pt", {
+2040:"Perfil"
+});
+I18N_FILL("pl", {
+2040:"Profil"
+});

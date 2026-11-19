@@ -153,7 +153,7 @@ UK_RX.push(
   [/^Lighter than the (\d+) (kg|lb) bar\. Use dumbbells or a lighter bar\.$/, (m) => `Легше за гриф ${m[1]} ${UNIT_UK[m[2]]}. Використай гантелі або легший гриф.`],
   [/^Just the empty (\d+) (kg|lb) bar\.$/, (m) => `Лише порожній гриф ${m[1]} ${UNIT_UK[m[2]]}.`],
   [/^(\d+) ft (\d+) in$/, (m) => `${m[1]} фут ${m[2]} дюйм`],
-  [/^([−+-]?[\d.,–]+) (kg|lb|cm|in|s|h|bpm|kcal|reps|min|years|workouts)$/, (m) => `${m[1]} ${UNIT_UK[m[2]]}`],
+  [/^([−+-]?[\d.,–]+) (kg|lb|cm|in|s|h|bpm|kcal|reps|min|years|workouts)$/, (m) => `${m[1]} ${m[2] === "years" && /^\d+$/.test(m[1]) ? ukPl(+m[1], "рік", "роки", "років") : UNIT_UK[m[2]]}`],
   [/^([\d.,]+ (?:kg|lb)) × (\d+)$/, (m) => `${unitify(m[1])} × ${m[2]}`],
   [/^(\d+) × (.+)$/, (m) => `${m[1]} × ${unitify(m[2])}`],
   [/^([−+]\d+) s$/, (m) => `${m[1]} с`],
