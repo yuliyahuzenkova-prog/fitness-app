@@ -1,0 +1,35 @@
+<!-- @dsCard height=288 -->
+<div class="rcover">
+<style>
+.rcover { position: relative; width: 960px; height: 288px; background: var(--bg); overflow: hidden; }
+.rcover svg { position: absolute; left: 0; top: 0; }
+.rcover .stage { fill: var(--hero-mid); rx: var(--radius-card); }
+.rcover .stage-core { fill: var(--hero-hi); }
+.rcover .trk { fill: none; stroke: var(--hero-lo); stroke-width: 8; }
+.rcover .arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; }
+.rcover .act { fill: var(--accent-fill); rx: var(--radius-xl); }
+.rcover .gold { fill: var(--pr); }
+.rcover .chrome { fill: var(--hero-label); rx: var(--radius-xl); }
+.rcover h1 { position: absolute; left: 40px; bottom: 64px; margin: 0; font: 800 120px/.92 var(--font-display); letter-spacing: -0.03em; color: var(--ink); }
+.rcover p { position: absolute; left: 42px; bottom: 34px; margin: 0; max-width: 420px; font: 400 14px/1.3 var(--font-body); color: var(--muted); }
+</style>
+<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true">
+<!-- blocks: hero-mid stage 280×240 (radius-card), accent-fill 120×112 (radius-xl), pr pill 120×48, hero-label chrome 120×48 (radius-xl)
+     arrangement: one tall studio slab with three satellites stacked to its right, all right of x=480
+     pattern: concentric progress arcs from the WeekRing (stroke 8, round caps) — Relief measures change on a body, the ring is its unit of progress
+     steps/radii: gaps space-4 (16), satellites space-4 from edges; radius-card 20, radius-xl 14, pill = half of 48 -->
+<rect class="stage" x="512" y="24" width="280" height="240" rx="20"/>
+<circle class="stage-core" cx="652" cy="144" r="96"/>
+<circle class="trk" cx="652" cy="144" r="84"/>
+<circle class="trk" cx="652" cy="144" r="60"/>
+<circle class="trk" cx="652" cy="144" r="36"/>
+<path class="arc" d="M652 60 A84 84 0 1 1 568 144"/>
+<path class="arc" d="M652 84 A60 60 0 0 1 712 144"/>
+<path class="arc" d="M652 108 A36 36 0 1 1 616 144"/>
+<rect class="act" x="808" y="24" width="128" height="112" rx="14"/>
+<rect class="gold" x="808" y="152" width="128" height="48" rx="24"/>
+<rect class="chrome" x="808" y="216" width="128" height="48" rx="14"/>
+</svg>
+<h1>Relief</h1>
+<p>Сила, постава і прогрес у студії з хромованою фігурою.</p>
+</div>
