@@ -247,5 +247,12 @@ Object.assign(UK, {
   "each side": "на кожен бік",
   "per leg": "на ногу",
   "per arm": "на руку",
-  "per side": "на бік"
+  "per side": "на бік",
+  "Level": "Рівень",
+  "Resistance on the bike's screen": "Опір на екрані тренажера",
+  "+ Add a part": "+ Додати відрізок",
+  "Change the parts to what you really do: seconds and rpm from the bike's screen.": "Зміни відрізки на те, що робиш насправді: секунди й rpm з екрана тренажера.",
+  "Last time's ride is filled in. Try a few rpm more at the same level.": "Минула їзда вже вписана. Спробуй на кілька rpm більше на тому самому рівні.",
+  "Last time's intervals are filled in. Try the fast parts 5 rpm faster, or one level higher.": "Минулі інтервали вже вписані. Спробуй швидкі відрізки на 5 rpm швидше або на рівень вище.",
+  "level": "рівень"
 });
