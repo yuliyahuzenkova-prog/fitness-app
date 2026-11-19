@@ -162,3 +162,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1972:"Poziom",1973:"Opór na ekranie rowerka",1974:"+ Dodaj odcinek",1975:"Zmień odcinki na to, co naprawdę robisz: sekundy i rpm z ekranu.",1976:"Ostatnia jazda jest już wpisana. Spróbuj kilka rpm więcej na tym samym poziomie.",1977:"Ostatnie interwały są już wpisane. Spróbuj szybkie odcinki o 5 rpm szybciej albo poziom wyżej.",1978:"poziom",1979:"Interwały na rowerku pionowym",1980:"Interwały na rowerku poziomym",1981:"Rowerek pionowy, równe tempo",1982:"Rowerek poziomy, równe tempo",1983:"Lekkie i szybkie odcinki na zmianę. Zapisuj każdy: sekundy i rpm z ekranu.",1984:"Plecy na oparciu, pedały z przodu. Lekkie i szybkie odcinki na zmianę; zapisuj sekundy i rpm.",1985:"Jedno równe tempo, przy którym da się rozmawiać. Zapisuj rpm co 5 minut.",1986:"Plecy na oparciu, jedno równe tempo, przy którym da się rozmawiać. Zapisuj rpm co 5 minut.",1987:"Serce, płuca i nogi. Łagodne dla pleców i stawów.",1988:"Siodełko na wysokości biodra: gdy pedał jest na dole, kolano zostaje lekko ugięte. Stopy w paskach, dłonie lekko na kierownicy.",1989:"Przesuń siedzisko tak, by kolano było lekko ugięte, gdy pedał jest najdalej. Plecy na oparciu, dłonie na bocznych uchwytach.",1990:"Rozgrzej się 2 minuty lekko, ok. 60 rpm.",1991:"Interwały: szybkie odcinki 85–100 rpm, lekkie 55–65 rpm. Równa jazda: jedno tempo.",1992:"Interwały: szybkie odcinki 80–95 rpm, lekkie 55–65 rpm. Równa jazda: jedno tempo.",1993:"Jeśli szybkie odcinki są łatwe, podnieś poziom (opór), zamiast tylko kręcić szybciej.",1994:"Po każdym odcinku zapisz jego sekundy i rpm z ekranu.",1995:"Na szybkich odcinkach oddychaj mocno, ale kontrolowanie, na lekkich zwolnij.",1996:"Za nisko siodełko: bolą kolana.",1997:"Podskakiwanie na siodełku: poziom za niski na takie rpm.",1998:"Siedzisko za blisko: kolana idą wysoko.",1999:"Zsuwanie się lub odchylanie od oparcia.",2000:"Niższy poziom albo krótsze szybkie odcinki (20 sekund).",2001:"Wyższy poziom albo dłuższe szybkie odcinki (40 sekund)."
 });
+
+// Fold a finished exercise back up (v354)
+I18N_FILL("es", {
+2002:"Contraer"
+});
+I18N_FILL("de", {
+2002:"Einklappen"
+});
+I18N_FILL("fr", {
+2002:"Replier"
+});
+I18N_FILL("pt", {
+2002:"Recolher"
+});
+I18N_FILL("pl", {
+2002:"Zwiń"
+});
