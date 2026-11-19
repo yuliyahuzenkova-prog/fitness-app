@@ -259,6 +259,7 @@ Object.assign(UK, {
   "Undo": "Повернути",
   "Pain": "Біль",
   "Machine busy": "Тренажер зайнятий",
+  "Details": "Докладніше",
   "No time": "Не було часу",
   "Don't like it": "Не подобається",
   "Pain or discomfort": "Біль чи дискомфорт",

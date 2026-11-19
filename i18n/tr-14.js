@@ -213,3 +213,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2027:"Ból",2028:"Maszyna zajęta"
 });
+
+// Progressive disclosure: Details (v358)
+I18N_FILL("es", {
+2029:"Más info"
+});
+I18N_FILL("de", {
+2029:"Details"
+});
+I18N_FILL("fr", {
+2029:"Détails"
+});
+I18N_FILL("pt", {
+2029:"Detalhes"
+});
+I18N_FILL("pl", {
+2029:"Szczegóły"
+});
