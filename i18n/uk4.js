@@ -221,4 +221,22 @@ Object.assign(UK, {
 });
 Object.assign(UK, {
   "Tap a muscle on the figure to see it": "Торкнися м'яза на фігурі, щоб побачити його",
+  "Then and now": "Тоді й зараз",
+  "1 month ago": "Місяць тому",
+  "3 months ago": "3 місяці тому",
+  "6 months ago": "Пів року тому",
+  "A year ago": "Рік тому",
+  "At the start": "На старті",
+  "1 mo": "1 міс",
+  "3 mo": "3 міс",
+  "6 mo": "6 міс",
+  "1 yr": "1 рік",
+  "From the start": "Від старту",
+  "Photos": "Фото",
+  "Stronger": "Сильніше",
+  "workouts logged": "тренувань записано",
+  "Relief on each figure comes from the workouts you logged in the 4 months before that day.": "Рельєф кожної фігури — це тренування, які ти записали за 4 місяці до того дня.",
+  "Your comparison appears after two weeks of training.": "Порівняння з'явиться після двох тижнів тренувань.",
+  "Your photos stay on this device.": "Твої фото лишаються лише на цьому пристрої.",
+  "Workouts since then": "Тренувань відтоді"
 });

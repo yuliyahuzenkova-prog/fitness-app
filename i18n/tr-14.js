@@ -94,3 +94,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1944:"Dotknij mięśnia na sylwetce, aby go zobaczyć"
 });
+
+// Progress: then and now (v350)
+I18N_FILL("es", {
+1945:"Antes y ahora",1946:"Hace 1 mes",1947:"Hace 3 meses",1948:"Hace 6 meses",1949:"Hace un año",1950:"Al empezar",1951:"1 mes",1952:"3 meses",1953:"6 meses",1954:"1 año",1955:"Desde el inicio",1956:"Fotos",1957:"Más fuerte",1958:"entrenamientos registrados",1959:"El relieve de cada figura sale de los entrenamientos que registraste en los 4 meses anteriores a ese día.",1960:"La comparación aparece tras dos semanas de entrenamiento.",1961:"Tus fotos se quedan en este dispositivo.",1962:"Entrenamientos desde entonces"
+});
+I18N_FILL("de", {
+1945:"Damals und heute",1946:"Vor 1 Monat",1947:"Vor 3 Monaten",1948:"Vor 6 Monaten",1949:"Vor einem Jahr",1950:"Zu Beginn",1951:"1 Mon.",1952:"3 Mon.",1953:"6 Mon.",1954:"1 Jahr",1955:"Seit Beginn",1956:"Fotos",1957:"Stärker",1958:"Trainings eingetragen",1959:"Die Definition jeder Figur ergibt sich aus den Trainings, die du in den 4 Monaten vor diesem Tag eingetragen hast.",1960:"Der Vergleich erscheint nach zwei Wochen Training.",1961:"Deine Fotos bleiben auf diesem Gerät.",1962:"Trainings seitdem"
+});
+I18N_FILL("fr", {
+1945:"Avant et maintenant",1946:"Il y a 1 mois",1947:"Il y a 3 mois",1948:"Il y a 6 mois",1949:"Il y a un an",1950:"Au départ",1951:"1 mois",1952:"3 mois",1953:"6 mois",1954:"1 an",1955:"Depuis le début",1956:"Photos",1957:"Plus fort",1958:"séances enregistrées",1959:"Le relief de chaque silhouette vient des séances enregistrées dans les 4 mois avant ce jour.",1960:"La comparaison apparaît après deux semaines d'entraînement.",1961:"Tes photos restent sur cet appareil.",1962:"Séances depuis"
+});
+I18N_FILL("pt", {
+1945:"Antes e agora",1946:"Há 1 mês",1947:"Há 3 meses",1948:"Há 6 meses",1949:"Há um ano",1950:"No início",1951:"1 mês",1952:"3 meses",1953:"6 meses",1954:"1 ano",1955:"Desde o início",1956:"Fotos",1957:"Mais forte",1958:"treinos registados",1959:"O relevo de cada figura vem dos treinos que registaste nos 4 meses antes desse dia.",1960:"A comparação aparece após duas semanas de treino.",1961:"As tuas fotos ficam neste dispositivo.",1962:"Treinos desde então"
+});
+I18N_FILL("pl", {
+1945:"Wtedy i teraz",1946:"Miesiąc temu",1947:"3 miesiące temu",1948:"Pół roku temu",1949:"Rok temu",1950:"Na starcie",1951:"1 mies.",1952:"3 mies.",1953:"6 mies.",1954:"1 rok",1955:"Od startu",1956:"Zdjęcia",1957:"Silniej",1958:"zapisanych treningów",1959:"Rzeźba każdej sylwetki wynika z treningów zapisanych w ciągu 4 miesięcy przed tym dniem.",1960:"Porównanie pojawi się po dwóch tygodniach treningów.",1961:"Twoje zdjęcia zostają na tym urządzeniu.",1962:"Treningi od tamtej pory"
+});
