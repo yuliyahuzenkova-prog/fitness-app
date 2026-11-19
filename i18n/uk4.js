@@ -219,3 +219,6 @@ Object.assign(UK, {
   "Glowing = still recovering": "Жар — ще відновлюється",
   "All exercises in the library": "Усі вправи в бібліотеці",
 });
+Object.assign(UK, {
+  "Tap a muscle on the figure to see it": "Торкнися м'яза на фігурі, щоб побачити його",
+});

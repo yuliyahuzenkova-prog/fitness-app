@@ -78,3 +78,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1940:"Regeneracja",1941:"Ostatni trening",1942:"Żar = jeszcze się regeneruje",1943:"Wszystkie ćwiczenia w bibliotece"
 });
+// Body tab: tap the figure (v349)
+I18N_FILL("es", {
+1944:"Toca un músculo en la figura para verlo"
+});
+I18N_FILL("de", {
+1944:"Tippe auf einen Muskel an der Figur, um ihn zu sehen"
+});
+I18N_FILL("fr", {
+1944:"Touche un muscle sur la figure pour le voir"
+});
+I18N_FILL("pt", {
+1944:"Toque num músculo da figura para vê-lo"
+});
+I18N_FILL("pl", {
+1944:"Dotknij mięśnia na sylwetce, aby go zobaczyć"
+});
