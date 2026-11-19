@@ -46,3 +46,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1937:"Zapisz wszystko w jednym pliku, aby przenieść dane na inny telefon lub do innej przeglądarki albo między wersją w Claude a stroną."
 });
+// Today scene (v347)
+I18N_FILL("es", {
+1938:"Ver todo el entrenamiento",1939:"Ocultar el entrenamiento"
+});
+I18N_FILL("de", {
+1938:"Ganzes Training ansehen",1939:"Training ausblenden"
+});
+I18N_FILL("fr", {
+1938:"Voir toute la séance",1939:"Masquer la séance"
+});
+I18N_FILL("pt", {
+1938:"Ver o treino completo",1939:"Ocultar o treino"
+});
+I18N_FILL("pl", {
+1938:"Zobacz cały trening",1939:"Ukryj trening"
+});

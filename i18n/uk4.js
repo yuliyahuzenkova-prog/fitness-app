@@ -208,3 +208,7 @@ Object.assign(UK, {
 Object.assign(UK, {
   "Save everything to one file to move it to another phone or browser, or between the Claude version and the website.": "Збережи все в один файл, щоб перенести на інший телефон чи в інший браузер або між версією в Claude і сайтом.",
 });
+Object.assign(UK, {
+  "See the whole workout": "Усе тренування",
+  "Hide the workout": "Сховати тренування",
+});
