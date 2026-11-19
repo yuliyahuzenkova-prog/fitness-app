@@ -241,5 +241,11 @@ Object.assign(UK, {
   "Workouts since then": "Тренувань відтоді",
   "Theme": "Тема",
   "Dark": "Темна",
-  "Light": "Світла"
+  "Light": "Світла",
+  "each leg": "на кожну ногу",
+  "each arm": "на кожну руку",
+  "each side": "на кожен бік",
+  "per leg": "на ногу",
+  "per arm": "на руку",
+  "per side": "на бік"
 });

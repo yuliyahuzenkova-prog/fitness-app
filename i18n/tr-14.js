@@ -128,3 +128,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1963:"Motyw",1964:"Ciemny",1965:"Jasny"
 });
+
+// One-sided exercises: each leg / arm / side (v352)
+I18N_FILL("es", {
+1966:"cada pierna",1967:"cada brazo",1968:"cada lado",1969:"por pierna",1970:"por brazo",1971:"por lado"
+});
+I18N_FILL("de", {
+1966:"je Bein",1967:"je Arm",1968:"je Seite",1969:"pro Bein",1970:"pro Arm",1971:"pro Seite"
+});
+I18N_FILL("fr", {
+1966:"chaque jambe",1967:"chaque bras",1968:"chaque côté",1969:"par jambe",1970:"par bras",1971:"par côté"
+});
+I18N_FILL("pt", {
+1966:"cada perna",1967:"cada braço",1968:"cada lado",1969:"por perna",1970:"por braço",1971:"por lado"
+});
+I18N_FILL("pl", {
+1966:"na każdą nogę",1967:"na każdą rękę",1968:"na każdą stronę",1969:"na nogę",1970:"na rękę",1971:"na stronę"
+});
