@@ -111,3 +111,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1945:"Wtedy i teraz",1946:"Miesiąc temu",1947:"3 miesiące temu",1948:"Pół roku temu",1949:"Rok temu",1950:"Na starcie",1951:"1 mies.",1952:"3 mies.",1953:"6 mies.",1954:"1 rok",1955:"Od startu",1956:"Zdjęcia",1957:"Silniej",1958:"zapisanych treningów",1959:"Rzeźba każdej sylwetki wynika z treningów zapisanych w ciągu 4 miesięcy przed tym dniem.",1960:"Porównanie pojawi się po dwóch tygodniach treningów.",1961:"Twoje zdjęcia zostają na tym urządzeniu.",1962:"Treningi od tamtej pory"
 });
+
+// Settings: theme (v351)
+I18N_FILL("es", {
+1963:"Tema",1964:"Oscuro",1965:"Claro"
+});
+I18N_FILL("de", {
+1963:"Design",1964:"Dunkel",1965:"Hell"
+});
+I18N_FILL("fr", {
+1963:"Thème",1964:"Sombre",1965:"Clair"
+});
+I18N_FILL("pt", {
+1963:"Tema",1964:"Escuro",1965:"Claro"
+});
+I18N_FILL("pl", {
+1963:"Motyw",1964:"Ciemny",1965:"Jasny"
+});

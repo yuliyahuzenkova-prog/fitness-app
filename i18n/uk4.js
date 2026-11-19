@@ -238,5 +238,8 @@ Object.assign(UK, {
   "Relief on each figure comes from the workouts you logged in the 4 months before that day.": "Рельєф кожної фігури — це тренування, які ти записали за 4 місяці до того дня.",
   "Your comparison appears after two weeks of training.": "Порівняння з'явиться після двох тижнів тренувань.",
   "Your photos stay on this device.": "Твої фото лишаються лише на цьому пристрої.",
-  "Workouts since then": "Тренувань відтоді"
+  "Workouts since then": "Тренувань відтоді",
+  "Theme": "Тема",
+  "Dark": "Темна",
+  "Light": "Світла"
 });
