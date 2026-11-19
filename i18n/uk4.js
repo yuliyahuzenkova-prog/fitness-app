@@ -289,5 +289,7 @@ Object.assign(UK, {
   "You skipped it last time because it was too hard, so start lighter.": "Минулого разу ти пропустили її, бо було занадто важко, тож почни легше.",
   "You skipped it last time because it was too hard. Do fewer reps, or the easier version in the directions.": "Минулого разу ти пропустили її, бо було занадто важко. Зроби менше повторень або легший варіант з інструкції.",
   "See how your body changed": "Подивись, як змінилося тіло",
-  "New month": "Новий місяць"
+  "New month": "Новий місяць",
+  "Answer a few questions about your goal, experience, equipment, schedule and injuries, and get a personal plan right away. It takes about a minute.": "Дай відповідь на кілька запитань про мету, досвід, інвентар, розклад і травми та одразу отримай персональний план. Це займе близько хвилини.",
+  "No answers yet.": "Ще немає відповідей."
 });

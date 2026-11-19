@@ -264,3 +264,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2034:"Zobacz, jak zmieniło się Twoje ciało",2035:"Nowy miesiąc"
 });
+
+// Welcome: about a minute; empty profile section (v362)
+I18N_FILL("es", {
+2036:"Responde unas preguntas sobre tu objetivo, experiencia, equipo, horario y lesiones, y obtén un plan personal al momento. Tarda alrededor de un minuto.",2037:"Aún no hay respuestas."
+});
+I18N_FILL("de", {
+2036:"Beantworte ein paar Fragen zu Ziel, Erfahrung, Ausrüstung, Zeitplan und Verletzungen und erhalte sofort einen persönlichen Plan. Das dauert etwa eine Minute.",2037:"Noch keine Antworten."
+});
+I18N_FILL("fr", {
+2036:"Réponds à quelques questions sur ton objectif, ton expérience, ton matériel, ton planning et tes blessures, et obtiens tout de suite un plan personnel. Ça prend environ une minute.",2037:"Pas encore de réponses."
+});
+I18N_FILL("pt", {
+2036:"Responda algumas perguntas sobre seu objetivo, experiência, equipamento, agenda e lesões e receba um plano pessoal na hora. Leva cerca de um minuto.",2037:"Ainda sem respostas."
+});
+I18N_FILL("pl", {
+2036:"Odpowiedz na kilka pytań o cel, doświadczenie, sprzęt, harmonogram i urazy, a od razu dostaniesz osobisty plan. To zajmuje około minuty.",2037:"Brak odpowiedzi."
+});
