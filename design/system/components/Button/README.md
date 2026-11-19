@@ -1,0 +1,10 @@
+Кнопка для дії. Варіанти: головна `primary` (одна на картку), звичайна (заливка `fill`), `ghost` (текст `accent-text`), `danger`, розміри `big` (на всю ширину, 52 px) і `small` (34 px).
+
+**Що дає розробник:** `<button type="button" class="btn …">` з текстом-дієсловом; іконка — inline SVG `.ico` перед текстом.
+
+- Текст каже, що станеться: «Set up my profile», «Start the posture check · 2 min».
+- Головна кнопка — `accent-fill` + `accent-ink`; у Studio під нею жевріння `shadow-glow`.
+- Не став дві `primary big` поспіль на одному екрані: другу роби звичайною або `ghost`.
+- Вимкнена — атрибут `disabled` (прозорість .4).
+- **Три види кнопок, і лише вони:** `.btn` — дія (головна `primary`, звичайна, `ghost`, `danger`; `small` / `big`); `.chipbtn` — вибір і перемикачі (варіанти відповіді, «Чому так?» — `.chipbtn.small.accent`, вибрана — `aria-pressed` / `aria-expanded` → `accent-fill`); `.linkbtn` — текстове посилання. Кругла іконка без тексту — `.iconbtn`. Нового класу кнопки не заводь: бери один із цих і модифікатор.
+- «Why?» / «Details» — та сама `.chipbtn.small.accent` у правому куті заголовка картки (`moreBtn(key, why)`), відкриває `.whybox` під заголовком (`moreBox(key, texts)`); стан — `S.why`, одночасно відкритий один.

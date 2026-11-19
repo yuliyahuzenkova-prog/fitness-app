@@ -1,5 +1,9 @@
 // Short exercise tips: English → Ukrainian
 const UK_CUES = {
+  "Easy and fast parts in turn. Log each part: seconds and rpm from the screen.": "Легкі й швидкі відрізки по черзі. Записуй кожен: секунди й rpm з екрана.",
+  "Back on the backrest, pedals in front. Easy and fast parts in turn; log seconds and rpm.": "Спина на спинці, педалі попереду. Легкі й швидкі відрізки по черзі; записуй секунди й rpm.",
+  "One even pace you could still talk at. Log the rpm every 5 minutes.": "Один рівний темп, за якого ще можна говорити. Записуй rpm кожні 5 хвилин.",
+  "Back on the backrest, one even pace you could still talk at. Log the rpm every 5 minutes.": "Спина на спинці, один рівний темп, за якого ще можна говорити. Записуй rpm кожні 5 хвилин.",
   "Hold a dumbbell at your chest. Sit back to the box, knees follow your toes.": "Тримай гантель біля грудей. Сідай назад на опору, коліна йдуть за пальцями ніг.",
   "Chest up, sit between your heels, push the floor away.": "Груди вгору, сідай між п'ятами, відштовхуй підлогу.",
   "Bar on your upper back. Brace your belly, sit down, stand up tall.": "Гриф на верху спини. Напруж живіт, сідай, вставай рівно.",
