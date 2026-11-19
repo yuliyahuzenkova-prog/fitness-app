@@ -287,5 +287,7 @@ Object.assign(UK, {
   "Back to the workout": "Назад до тренування",
   "Skipped": "Пропущено",
   "You skipped it last time because it was too hard, so start lighter.": "Минулого разу ти пропустили її, бо було занадто важко, тож почни легше.",
-  "You skipped it last time because it was too hard. Do fewer reps, or the easier version in the directions.": "Минулого разу ти пропустили її, бо було занадто важко. Зроби менше повторень або легший варіант з інструкції."
+  "You skipped it last time because it was too hard. Do fewer reps, or the easier version in the directions.": "Минулого разу ти пропустили її, бо було занадто важко. Зроби менше повторень або легший варіант з інструкції.",
+  "See how your body changed": "Подивись, як змінилося тіло",
+  "New month": "Новий місяць"
 });

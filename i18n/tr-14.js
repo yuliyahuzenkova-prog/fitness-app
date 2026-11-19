@@ -247,3 +247,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2030:"Dopasuj plan",2031:"Obszary do pracy, dodatkowe cele, docelowa waga · 1 min",2032:"Coś o Twojej postawie?",2033:"Doda ćwiczenia na postawę i stopy, jeśli pomogą · 1 min"
 });
+
+// Monthly look at Then and now (v361)
+I18N_FILL("es", {
+2034:"Mira cómo cambió tu cuerpo",2035:"Nuevo mes"
+});
+I18N_FILL("de", {
+2034:"Sieh, wie sich dein Körper verändert hat",2035:"Neuer Monat"
+});
+I18N_FILL("fr", {
+2034:"Vois comment ton corps a changé",2035:"Nouveau mois"
+});
+I18N_FILL("pt", {
+2034:"Vê como o teu corpo mudou",2035:"Novo mês"
+});
+I18N_FILL("pl", {
+2034:"Zobacz, jak zmieniło się Twoje ciało",2035:"Nowy miesiąc"
+});
