@@ -212,3 +212,10 @@ Object.assign(UK, {
   "See the whole workout": "Усе тренування",
   "Hide the workout": "Сховати тренування",
 });
+Object.assign(UK, {
+  "Now": "Зараз",
+  "Recovery": "Відновлення",
+  "Last trained": "Останнє тренування",
+  "Glowing = still recovering": "Жар — ще відновлюється",
+  "All exercises in the library": "Усі вправи в бібліотеці",
+});

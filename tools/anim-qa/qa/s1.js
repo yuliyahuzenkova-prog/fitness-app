@@ -3,7 +3,7 @@ const {open}=require('./common');
 (async()=>{const rows=[];
 for(const profile of ['fresh','empty','hist'])for(const lang of ['uk','en'])for(const width of [320,390]){
  const {b,p,errs}=await open({profile,lang,width,gl:width===390});
- for(const tab of ['today','plan','history','progress','me']){
+ for(const tab of ['today','body','plan','history','progress','me']){
   await p.evaluate(t=>{S.tab=t;S.guide=null;render();scrollTo(0,0);},tab);await p.waitForTimeout(250);
   const r=await p.evaluate((lang)=>{const de=document.documentElement,o={};o.overflow=de.scrollWidth-de.clientWidth;
    const wide=[...document.querySelectorAll('#app *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&getComputedStyle(e).position!=='fixed'&&!e.closest('.hscroll,.wheel,.chips,[style*=overflow]')}).slice(0,3).map(e=>e.tagName+'.'+(e.className||'').toString().slice(0,30)+':'+(e.textContent||'').trim().slice(0,30));o.wide=wide;

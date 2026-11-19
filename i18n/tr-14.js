@@ -62,3 +62,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 1938:"Zobacz cały trening",1939:"Ukryj trening"
 });
+// Body tab (v348)
+I18N_FILL("es", {
+1940:"Recuperación",1941:"Último entrenamiento",1942:"Brillo = aún se recupera",1943:"Todos los ejercicios de la biblioteca"
+});
+I18N_FILL("de", {
+1940:"Erholung",1941:"Zuletzt trainiert",1942:"Glühen = erholt sich noch",1943:"Alle Übungen in der Bibliothek"
+});
+I18N_FILL("fr", {
+1940:"Récupération",1941:"Dernier entraînement",1942:"Lueur = récupère encore",1943:"Tous les exercices de la bibliothèque"
+});
+I18N_FILL("pt", {
+1940:"Recuperação",1941:"Último treino",1942:"Brilho = ainda se recupera",1943:"Todos os exercícios da biblioteca"
+});
+I18N_FILL("pl", {
+1940:"Regeneracja",1941:"Ostatni trening",1942:"Żar = jeszcze się regeneruje",1943:"Wszystkie ćwiczenia w bibliotece"
+});
