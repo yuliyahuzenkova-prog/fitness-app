@@ -230,3 +230,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2029:"Szczegóły"
 });
+
+// Later questions on Plan (v359)
+I18N_FILL("es", {
+2030:"Enfoca tu plan",2031:"Zonas a trabajar, metas extra, un peso objetivo · 1 min",2032:"¿Algo sobre tu postura?",2033:"Añade ejercicios de postura y pies si ayudan · 1 min"
+});
+I18N_FILL("de", {
+2030:"Plan ausrichten",2031:"Bereiche für den Fokus, weitere Ziele, Wunschgewicht · 1 Min.",2032:"Etwas zu deiner Haltung?",2033:"Fügt Haltungs- und Fußübungen hinzu, wenn sie helfen · 1 Min."
+});
+I18N_FILL("fr", {
+2030:"Oriente ton plan",2031:"Zones à travailler, objectifs en plus, poids visé · 1 min",2032:"Quelque chose sur ta posture ?",2033:"Ajoute des exercices de posture et de pieds s’ils aident · 1 min"
+});
+I18N_FILL("pt", {
+2030:"Foca o teu plano",2031:"Zonas a trabalhar, objetivos extra, peso desejado · 1 min",2032:"Algo sobre a tua postura?",2033:"Acrescenta exercícios de postura e pés se ajudarem · 1 min"
+});
+I18N_FILL("pl", {
+2030:"Dopasuj plan",2031:"Obszary do pracy, dodatkowe cele, docelowa waga · 1 min",2032:"Coś o Twojej postawie?",2033:"Doda ćwiczenia na postawę i stopy, jeśli pomogą · 1 min"
+});
