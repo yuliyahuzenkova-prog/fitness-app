@@ -281,3 +281,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2036:"Odpowiedz na kilka pytań o cel, doświadczenie, sprzęt, harmonogram i urazy, a od razu dostaniesz osobisty plan. To zajmuje około minuty.",2037:"Brak odpowiedzi."
 });
+
+// Progress: Show all / Show less (v363)
+I18N_FILL("es", {
+2038:"Ver todo",2039:"Ver menos"
+});
+I18N_FILL("de", {
+2038:"Alle anzeigen",2039:"Weniger anzeigen"
+});
+I18N_FILL("fr", {
+2038:"Tout afficher",2039:"Afficher moins"
+});
+I18N_FILL("pt", {
+2038:"Ver tudo",2039:"Ver menos"
+});
+I18N_FILL("pl", {
+2038:"Pokaż wszystko",2039:"Pokaż mniej"
+});
