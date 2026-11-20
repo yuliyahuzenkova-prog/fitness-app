@@ -315,3 +315,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2040:"Profil"
 });
+
+// Native app: share and privacy (v365)
+I18N_FILL("es", {
+2041:"No se pudo compartir la imagen. Inténtalo de nuevo.",2042:"En la app, todo se guarda en el almacenamiento de la app en este dispositivo.",2043:"Nada, salvo que tú lo envíes. Todo lo que Relief necesita, incluidos los gráficos 3D, está integrado en la app, así que funciona sin conexión a internet.",2044:"Puedes cambiar tus respuestas cuando quieras en Yo, guardar una copia de seguridad o borrarlo todo con «Eliminar todos mis datos». Eliminar la app también lo borra."
+});
+I18N_FILL("de", {
+2041:"Das Bild konnte nicht geteilt werden. Versuch es noch einmal.",2042:"In der App wird alles im Speicher der App auf diesem Gerät gespeichert.",2043:"Nichts, außer du sendest es selbst. Alles, was Relief braucht, auch die 3D-Grafik, ist in die App eingebaut. Sie funktioniert also ohne Internetverbindung.",2044:"Du kannst deine Antworten jederzeit unter Ich ändern, ein Backup speichern oder mit „Alle meine Daten löschen“ alles löschen. Wenn du die App löschst, wird ebenfalls alles entfernt."
+});
+I18N_FILL("fr", {
+2041:"Impossible de partager l’image. Réessaie.",2042:"Dans l’app, tout est conservé dans le stockage de l’app sur cet appareil.",2043:"Rien, sauf si tu l’envoies toi-même. Tout ce dont Relief a besoin, y compris les graphismes 3D, est intégré à l’app : elle fonctionne sans connexion internet.",2044:"Tu peux modifier tes réponses à tout moment dans Moi, enregistrer une sauvegarde ou tout supprimer avec « Supprimer toutes mes données ». Supprimer l’app efface aussi tout."
+});
+I18N_FILL("pt", {
+2041:"Não foi possível compartilhar a imagem. Tente de novo.",2042:"No app, tudo fica guardado no armazenamento do app neste dispositivo.",2043:"Nada, a menos que você mesmo envie. Tudo o que o Relief precisa, incluindo os gráficos 3D, já vem no app, então ele funciona sem internet.",2044:"Você pode mudar suas respostas a qualquer momento em Eu, salvar um backup ou apagar tudo com “Apagar todos os meus dados”. Excluir o app também apaga tudo."
+});
+I18N_FILL("pl", {
+2041:"Nie udało się udostępnić obrazu. Spróbuj ponownie.",2042:"W aplikacji wszystko jest przechowywane w jej pamięci na tym urządzeniu.",2043:"Nic, chyba że coś wyślesz samodzielnie. Wszystko, czego Relief potrzebuje, łącznie z grafiką 3D, jest wbudowane w aplikację, więc działa bez internetu.",2044:"Możesz w każdej chwili zmienić odpowiedzi w zakładce Ja, zapisać kopię zapasową lub usunąć wszystko przyciskiem „Usuń wszystkie moje dane”. Usunięcie aplikacji też wszystko usuwa."
+});

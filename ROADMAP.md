@@ -1,9 +1,9 @@
 # Liftbook roadmap
 
-## Parked until we build the native phone app
+## Native app: after the first release (v1 ships without these — owner decision, v365)
 
 ### Automatic health and wearable sync
-Remind the owner about this when we start building Liftbook as a native app (iOS / Android).
+The native app now exists (app/, Capacitor). Raise this with the owner once v1 is in the stores.
 
 A web page can't read these sources, so for now Liftbook imports files instead
 (Apple Health export.xml, Garmin/Whoop CSV, or numbers typed in on the Stats tab).

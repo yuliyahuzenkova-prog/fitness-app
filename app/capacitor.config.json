@@ -1,0 +1,25 @@
+{
+  "appId": "com.betterfityou.relief",
+  "appName": "Relief",
+  "webDir": "www",
+  "backgroundColor": "#111317",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#111317"
+  },
+  "android": {
+    "backgroundColor": "#111317"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "launchAutoHide": true,
+      "backgroundColor": "#111317",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "overlaysWebView": true
+    }
+  }
+}

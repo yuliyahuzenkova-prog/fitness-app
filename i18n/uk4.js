@@ -294,5 +294,9 @@ Object.assign(UK, {
   "No answers yet.": "Ще немає відповідей.",
   "Show all": "Показати всі",
   "Show less": "Згорнути",
-  "Profile": "Профіль"
+  "Profile": "Профіль",
+  "Couldn't share the image. Try again.": "Не вдалося поділитися зображенням. Спробуй ще раз.",
+  "In the app, everything is kept in the app's storage on this device.": "У застосунку все зберігається в його сховищі на цьому пристрої.",
+  "Nothing, unless you send it yourself. Everything Relief needs, including the 3D graphics, is built into the app, so it works without an internet connection.": "Нічого, крім файлів, які ти надсилаєш. Усе потрібне Relief, зокрема 3D-графіка, вбудоване в застосунок, тож він працює без інтернету.",
+  "You can change your answers at any time in Me, save a backup, or delete everything with “Delete all my data”. Deleting the app also removes it.": "Ти можеш будь-коли змінити відповіді у вкладці «Я», зберегти резервну копію або видалити все кнопкою «Видалити всі мої дані». Видалення застосунку теж усе стирає."
 });
