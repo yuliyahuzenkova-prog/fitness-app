@@ -16,6 +16,11 @@ www = os.path.join(root, "app", "www")
 os.makedirs(www, exist_ok=True)
 shutil.copyfile(three, os.path.join(www, "three.min.js"))
 out = src.replace(CDN, '<script src="three.min.js"></script>')
+# a native app doesn't zoom like a web page: a quick double tap used to zoom in and leave full-screen views stuck
+VP = '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
+if out.count(VP) != 1: sys.exit("build-app.py: the viewport tag changed in build-standalone.py")
+out = out.replace(VP, '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">')
+out = out.replace("<style>:root{", "<style>html{touch-action:manipulation;-webkit-text-size-adjust:100%}:root{", 1)
 # the website's "add to home screen" tags mean nothing inside the app
 out = "\n".join(l for l in out.split("\n") if "apple-mobile-web-app" not in l)
 open(os.path.join(www, "index.html"), "w", encoding="utf-8").write(out)
