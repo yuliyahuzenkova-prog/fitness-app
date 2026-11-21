@@ -332,3 +332,20 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2041:"Nie udało się udostępnić obrazu. Spróbuj ponownie.",2042:"W aplikacji wszystko jest przechowywane w jej pamięci na tym urządzeniu.",2043:"Nic, chyba że coś wyślesz samodzielnie. Wszystko, czego Relief potrzebuje, łącznie z grafiką 3D, jest wbudowane w aplikację, więc działa bez internetu.",2044:"Możesz w każdej chwili zmienić odpowiedzi w zakładce Ja, zapisać kopię zapasową lub usunąć wszystko przyciskiem „Usuń wszystkie moje dane”. Usunięcie aplikacji też wszystko usuwa."
 });
+
+// Plan: one Why per phase card (v366)
+I18N_FILL("es", {
+2045:"También en tu plan"
+});
+I18N_FILL("de", {
+2045:"Außerdem im Plan"
+});
+I18N_FILL("fr", {
+2045:"Aussi dans ton plan"
+});
+I18N_FILL("pt", {
+2045:"Também no seu plano"
+});
+I18N_FILL("pl", {
+2045:"Także w planie"
+});
