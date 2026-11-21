@@ -1,0 +1,5 @@
+/* Permission prompts shown by iOS (keep in sync with Info.plist and the languages in liftbook.html) */
+"CFBundleDisplayName" = "Relief";
+"NSCameraUsageDescription" = "Relief використовує камеру для фото прогресу й оцінки постави. Фото залишаються на цьому пристрої.";
+"NSPhotoLibraryUsageDescription" = "Relief дає змогу вибрати фото прогресу й постави з бібліотеки. Фото залишаються на цьому пристрої.";
+"NSPhotoLibraryAddUsageDescription" = "Relief може зберегти створені тобою картинки для поширення у твою бібліотеку фото.";

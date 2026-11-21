@@ -1,0 +1,5 @@
+/* Permission prompts shown by iOS (keep in sync with Info.plist and the languages in liftbook.html) */
+"CFBundleDisplayName" = "Relief";
+"NSCameraUsageDescription" = "Relief uses the camera for progress photos and the posture check. Photos stay on this device.";
+"NSPhotoLibraryUsageDescription" = "Relief lets you pick progress and posture photos from your library. Photos stay on this device.";
+"NSPhotoLibraryAddUsageDescription" = "Relief can save the share images you create to your photo library.";

@@ -51,11 +51,12 @@ npm run android   # те саме для Android Studio
 
 Кожна наступна версія: збільш `versionCode` (і `versionName`) у `android/app/build.gradle`, далі крок 3 і завантаження.
 
-## Що ще потрібно до першої відправки
+## Сторінка в App Store
 
-- `APP_OWNER` і `APP_CONTACT` у `liftbook.html` — ім'я/компанія та email для політики конфіденційності й підтримки (обидва магазини вимагають контакт).
-- Публічне посилання на політику конфіденційності й сторінку підтримки (можна на Netlify).
-- Скріншоти для магазинів.
+- Тексти, URL, App Privacy, вікова категорія, примітка для рецензента — `app/store/app-store-listing.md` (англійською й українською).
+- Скріншоти iPhone 6.9″ (1320 × 2868) — `app/store/screenshots/en/` і `uk/`, 01–07. Перезняти: `tools/anim-qa`: `node qa/storeshots.js en`, `node qa/storeshots.js uk`, потім `node qa/storeframes.js`.
+- Політика конфіденційності, умови й підтримка — `standalone/privacy/`, `standalone/terms/`, `standalone/support/` (генерує `node tools/build-site-pages.js` з текстів застосунку). На Netlify завантажуй **усю папку `standalone`**, тоді працюють https://better-fit-you.netlify.app/privacy/ і /support/.
+- Запити на камеру й фото перекладені на 7 мов: `ios/App/App/<мова>.lproj/InfoPlist.strings`.
 
 ## Іконки й заставка
 

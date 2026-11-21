@@ -1,0 +1,5 @@
+/* Permission prompts shown by iOS (keep in sync with Info.plist and the languages in liftbook.html) */
+"CFBundleDisplayName" = "Relief";
+"NSCameraUsageDescription" = "O Relief usa a câmera para fotos de progresso e a avaliação de postura. As fotos ficam neste dispositivo.";
+"NSPhotoLibraryUsageDescription" = "O Relief permite escolher fotos de progresso e de postura da sua biblioteca. As fotos ficam neste dispositivo.";
+"NSPhotoLibraryAddUsageDescription" = "O Relief pode salvar na sua biblioteca de fotos as imagens que você cria para compartilhar.";
