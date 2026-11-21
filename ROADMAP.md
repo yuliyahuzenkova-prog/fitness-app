@@ -17,16 +17,6 @@ When we build the app:
 Keep the current data shape (`health.days["YYYY-MM-DD"] = { steps, sleep, rhr, kcal }`) so the
 readiness check and charts keep working with synced data. Keep file import as a fallback.
 
-### Apple Watch companion (owner agreed: after v1, together with Apple Health)
-A watch app can't reuse the web code: it is a separate native watchOS app (SwiftUI) that talks to
-the phone app over WatchConnectivity, added as a watchOS target to `app/ios`. Build it in the same
-release as HealthKit, since heart rate and saving workouts to Apple Health are the same work.
-1. **Current exercise and set** on the wrist; mark a set done with one tap (syncs back to the phone's log).
-2. **Rest timer** with a haptic tap when rest is over, so the phone can stay in the bag.
-3. **Heart rate during the workout** (HKWorkoutSession) and the finished workout saved to Apple Health.
-Keep the phone as the source of truth: the watch only shows the current workout and sends set results.
-Install the watchOS platform in Xcode (Settings → Components) only when this work starts.
-
 ## AI coach on the website version
 The AI coach works only in the Claude version for now (it uses the viewer's Claude account).
 To offer it on the Netlify website, add a small server function that holds an Anthropic API key
