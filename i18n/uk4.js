@@ -299,5 +299,11 @@ Object.assign(UK, {
   "In the app, everything is kept in the app's storage on this device.": "У застосунку все зберігається в його сховищі на цьому пристрої.",
   "Nothing, unless you send it yourself. Everything Relief needs, including the 3D graphics, is built into the app, so it works without an internet connection.": "Нічого, крім файлів, які ти надсилаєш. Усе потрібне Relief, зокрема 3D-графіка, вбудоване в застосунок, тож він працює без інтернету.",
   "You can change your answers at any time in Me, save a backup, or delete everything with “Delete all my data”. Deleting the app also removes it.": "Ти можеш будь-коли змінити відповіді у вкладці «Я», зберегти резервну копію або видалити все кнопкою «Видалити всі мої дані». Видалення застосунку теж усе стирає.",
-  "Also in your plan": "Також у плані"
+  "Also in your plan": "Також у плані",
+  "Saved on this phone only.": "Зберігається лише на цьому телефоні.",
+  "Photos stay on this phone only, and nobody else can see them. Deleting the app deletes them.": "Фото зберігаються лише на цьому телефоні, і ніхто інший їх не бачить. Видалення застосунку їх стирає.",
+  "Your data is saved on this phone, in the app.": "Дані зберігаються на цьому телефоні, у застосунку.",
+  "Save everything to one file to keep it safe or move it to another phone.": "Збережи все в один файл, щоб мати копію або перенести дані на інший телефон.",
+  "The phone is out of storage space, so the backup couldn't be restored.": "На телефоні закінчилося місце, тому копію не вдалося відновити.",
+  "Your data is stored only on this phone. Relief has no server and no tracking.": "Твої дані зберігаються лише на цьому телефоні. У Relief немає сервера й стеження."
 });

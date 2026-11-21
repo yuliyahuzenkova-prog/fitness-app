@@ -349,3 +349,35 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2045:"Także w planie"
 });
+
+// Native app: no browser wording (v367)
+I18N_FILL("es", {
+2046:"Guardado solo en este teléfono.",2047:"Las fotos se quedan solo en este teléfono y nadie más puede verlas. Si eliminas la app, se borran.",2048:"Tus datos se guardan en este teléfono, dentro de la app.",2049:"Guarda todo en un archivo para tener una copia o pasarlo a otro teléfono.",2050:"El teléfono no tiene espacio, así que no se pudo restaurar la copia."
+});
+I18N_FILL("de", {
+2046:"Nur auf diesem Telefon gespeichert.",2047:"Fotos bleiben nur auf diesem Telefon, und niemand sonst kann sie sehen. Wenn du die App löschst, werden sie gelöscht.",2048:"Deine Daten sind auf diesem Telefon in der App gespeichert.",2049:"Speichere alles in einer Datei, um eine Sicherung zu haben oder es auf ein anderes Telefon zu übertragen.",2050:"Auf dem Telefon ist kein Speicherplatz mehr frei, deshalb konnte das Backup nicht wiederhergestellt werden."
+});
+I18N_FILL("fr", {
+2046:"Enregistré uniquement sur ce téléphone.",2047:"Les photos restent uniquement sur ce téléphone, et personne d’autre ne peut les voir. Supprimer l’app les efface.",2048:"Tes données sont enregistrées sur ce téléphone, dans l’app.",2049:"Enregistre tout dans un fichier pour garder une copie ou le transférer sur un autre téléphone.",2050:"Le téléphone n’a plus d’espace, la sauvegarde n’a donc pas pu être restaurée."
+});
+I18N_FILL("pt", {
+2046:"Salvo só neste telefone.",2047:"As fotos ficam só neste telefone, e ninguém mais pode vê-las. Excluir o app as apaga.",2048:"Seus dados ficam salvos neste telefone, no app.",2049:"Salve tudo em um arquivo para ter uma cópia ou passar para outro telefone.",2050:"O telefone está sem espaço, então o backup não pôde ser restaurado."
+});
+I18N_FILL("pl", {
+2046:"Zapisane tylko na tym telefonie.",2047:"Zdjęcia zostają tylko na tym telefonie i nikt inny ich nie widzi. Usunięcie aplikacji je kasuje.",2048:"Twoje dane są zapisane na tym telefonie, w aplikacji.",2049:"Zapisz wszystko w jednym pliku, aby mieć kopię lub przenieść dane na inny telefon.",2050:"Na telefonie skończyło się miejsce, więc nie udało się przywrócić kopii."
+});
+I18N_FILL("es", {
+2051:"Tus datos se guardan solo en este teléfono. Relief no tiene servidor ni seguimiento."
+});
+I18N_FILL("de", {
+2051:"Deine Daten werden nur auf diesem Telefon gespeichert. Relief hat keinen Server und kein Tracking."
+});
+I18N_FILL("fr", {
+2051:"Tes données sont enregistrées uniquement sur ce téléphone. Relief n’a ni serveur ni suivi."
+});
+I18N_FILL("pt", {
+2051:"Seus dados ficam salvos só neste telefone. O Relief não tem servidor nem rastreamento."
+});
+I18N_FILL("pl", {
+2051:"Twoje dane są przechowywane tylko na tym telefonie. Relief nie ma serwera ani śledzenia."
+});
