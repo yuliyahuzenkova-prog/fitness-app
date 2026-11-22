@@ -9378,8 +9378,12 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   lateral_raise: { yaw: -90, front: true, A: { abd: 12, el: 6, props: [{ db: "wrist" }] }, B: { abd: 85, el: 10, props: [{ db: "wrist" }] } },
   calf_single: { yaw: 145, A: pose({ at: [95, 140], a: 4, b: -2, fd: 0, a2: 12, b2: -70, fd2: -40 }), B: pose({ at: [97, 131], a: 4, b: -2, fd: -55, a2: 12, b2: -70, fd2: -40 }) },
   good_morning: { yaw: -30, armsCrossed: true, A: pose({ at: [100, 140], u: 0, f: 0 }), B: pose({ at: [100, 140], a: 18, b: -8, t: 70, u: 0, f: 0 }) },
-  reverse_crunch: { yaw: -30, plantAll: true, A: { anchor: "hip", at: [105, 133], t: -90, a: 180, b: 90, fd: 90, u: 90, f: 90, a2: 180, b2: 90, fd2: 90, u2: 90, f2: 90 }, B: { anchor: "hip", at: [105, 128], t: -112, a: 228, b: 140, fd: 130, u: 90, f: 90, a2: 228, b2: 140, fd2: 130, u2: 90, f2: 90 } },
-  climber: { yaw: -25, hz: 15, handFix: 1, alt: true, period: 3200, A: pose({ at: [38, 138], a: -64, b: -64, t: 64, u: 0, f: 0, fd: -60, a2: -64, b2: -64, fd2: -60 }), B: pose({ at: [38, 138], a: -64, b: -64, t: 64, u: 0, f: 0, fd: -60, a2: 72, b2: -82, fd2: -55 }) },
+  // reverse crunch: the shoulders and head stay on the floor; the pelvis curls a few cm up (trunk only 10° off the floor, the lower back rounding, c)
+  // and the knees come to the chest. No plantAll: the feet are in the air, and pinning "whatever touches the floor" made the arms and legs jump mid-rep
+  reverse_crunch: { yaw: -30, A: { anchor: "hip", at: [105, 133], t: -90, a: 180, b: 90, fd: 90, u: 90, f: 90, a2: 180, b2: 90, fd2: 90, u2: 90, f2: 90 }, B: { anchor: "hip", at: [105, 126], t: -100, c: 6, a: 222, b: 132, fd: 122, u: 90, f: 90, a2: 222, b2: 132, fd2: 122, u2: 90, f2: 90 } },
+  // mountain climber: the knee travels forward just above the floor (no auto-kneel); M lifts the hips a little and folds the shin up mid-way.
+  // (M pulls the blend like a Bezier control point, so the body only gets half way to it: M is set twice as far as the wanted mid pose)
+  climber: { yaw: -25, hz: 15, handFix: 1, alt: true, noKneel: true, period: 3200, A: pose({ at: [38, 138], a: -64, b: -64, t: 64, u: 0, f: 0, fd: -60, a2: -64, b2: -64, fd2: -60 }), M: pose({ at: [38, 138], a: -36, b: -36, t: 36, u: 0, f: 0, fd: -60, a2: 40, b2: -200, fd2: -110 }), B: pose({ at: [38, 138], a: -61, b: -61, t: 61, u: 0, f: 0, fd: -60, a2: 72, b2: -82, fd2: -55 }) },
   calf_stretch: { yaw: -40, A: pose({ at: [122, 140], a: 22, b: -18, a2: -32, b2: -32, fd2: 0, t: 14, u: 78, f: 72, props: [{ wall: 172 }] }), B: pose({ at: [122, 140], a: 30, b: -26, a2: -34, b2: -34, fd2: 0, t: 18, u: 76, f: 70, props: [{ wall: 172 }] }) },
   child_pose: { yaw: -30, A: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: -90, u: 0, f: 0 }, B: { anchor: "hip", at: [66, 124], t: 108, a: 74, b: -90, fd: -90, u: 100, f: 96 } },
 });

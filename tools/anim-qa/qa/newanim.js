@@ -18,7 +18,7 @@ const { chromium } = require('playwright'); const path = require('path'); const 
       for (const [id, d] of Object.entries(module.exports)) ANIMS[id] = d;
       glInit(); glStyle(); await proLoad(); document.querySelectorAll('header,main,nav').forEach((e) => e.remove());
       const list = ids.split(','), phases = phs.split(',').map(Number);
-      document.body.insertAdjacentHTML('afterbegin', `<div id=g style="display:grid;grid-template-columns:repeat(${phases.length * 3},300px);gap:2px;background:#fff"></div>`);
+      document.body.insertAdjacentHTML('afterbegin', `<div id=g style="display:grid;grid-template-columns:repeat(${phases.length},300px);gap:2px;background:#fff"></div>`);
       const g = document.getElementById('g');
       for (const id of list) {
         const an = ANIMS[id], y0 = an.yaw ?? -40, ys = yawsArg ? yawsArg.split(',').map(Number) : [y0, -90, y0 + 90];
