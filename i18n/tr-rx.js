@@ -121,11 +121,11 @@
     pl: { "too easy": "za łatwo", "just right": "w sam raz", "too hard": "za ciężko" },
   };
   const PREHAB = {
-    es: { "your feet (lifting the arch)": "los pies (elevar el arco)", "posture (upper back and neck)": "la postura (espalda alta y cuello)", "your knees": "las rodillas", "your lower back": "la zona lumbar" },
-    de: { "your feet (lifting the arch)": "deine Füße (Gewölbe heben)", "posture (upper back and neck)": "die Haltung (oberer Rücken und Nacken)", "your knees": "deine Knie", "your lower back": "deinen unteren Rücken" },
-    fr: { "your feet (lifting the arch)": "tes pieds (lever la voûte)", "posture (upper back and neck)": "la posture (haut du dos et nuque)", "your knees": "tes genoux", "your lower back": "le bas de ton dos" },
-    pt: { "your feet (lifting the arch)": "os pés (elevar o arco)", "posture (upper back and neck)": "a postura (alto das costas e pescoço)", "your knees": "os joelhos", "your lower back": "a lombar" },
-    pl: { "your feet (lifting the arch)": "stóp (unoszenie łuku)", "posture (upper back and neck)": "postawy (góra pleców i szyja)", "your knees": "kolan", "your lower back": "lędźwi" },
+    es: { "the lower back curve (core, glutes and hips)": "la curva lumbar (core, glúteos y caderas)", "an even spine (side core and one-sided work)": "una columna equilibrada (core lateral y trabajo unilateral)", "your feet (lifting the arch)": "los pies (elevar el arco)", "posture (upper back and neck)": "la postura (espalda alta y cuello)", "your knees": "las rodillas", "your lower back": "la zona lumbar" },
+    de: { "the lower back curve (core, glutes and hips)": "die Lendenkrümmung (Rumpf, Gesäß und Hüften)", "an even spine (side core and one-sided work)": "eine gerade Wirbelsäule (seitliche Rumpfmuskeln und einseitige Übungen)", "your feet (lifting the arch)": "deine Füße (Gewölbe heben)", "posture (upper back and neck)": "die Haltung (oberer Rücken und Nacken)", "your knees": "deine Knie", "your lower back": "deinen unteren Rücken" },
+    fr: { "the lower back curve (core, glutes and hips)": "la cambrure lombaire (gainage, fessiers et hanches)", "an even spine (side core and one-sided work)": "une colonne équilibrée (gainage latéral et travail unilatéral)", "your feet (lifting the arch)": "tes pieds (lever la voûte)", "posture (upper back and neck)": "la posture (haut du dos et nuque)", "your knees": "tes genoux", "your lower back": "le bas de ton dos" },
+    pt: { "the lower back curve (core, glutes and hips)": "a curva lombar (core, glúteos e quadris)", "an even spine (side core and one-sided work)": "uma coluna equilibrada (core lateral e trabalho unilateral)", "your feet (lifting the arch)": "os pés (elevar o arco)", "posture (upper back and neck)": "a postura (alto das costas e pescoço)", "your knees": "os joelhos", "your lower back": "a lombar" },
+    pl: { "the lower back curve (core, glutes and hips)": "lordozy (korpus, pośladki i biodra)", "an even spine (side core and one-sided work)": "równego kręgosłupa (boczne mięśnie korpusu i ćwiczenia jednostronne)", "your feet (lifting the arch)": "stóp (unoszenie łuku)", "posture (upper back and neck)": "postawy (góra pleców i szyja)", "your knees": "kolan", "your lower back": "lędźwi" },
   };
   const savedItem = (h, x) => {
     let k;
