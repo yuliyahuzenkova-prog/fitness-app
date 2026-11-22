@@ -64,9 +64,11 @@ YOUR BODY, IN 3D
 • Then and now: compare your body 1, 3 or 6 months ago with today
 
 POSTURE CHECK
-• Two photos and a few taps show what to work on: head and shoulder position, knees and arches
+• Three photos (side, front and back) show what to work on: head and shoulders, the lower back curve, signs of a sideways spine curve, knees and arches
+• Points are placed automatically on your phone; check them and drag any that are off
+• A forward bend test uses the phone like a scoliometer
 • The plan adds the right exercises for it
-• A rough posture check from photos, not a medical diagnosis
+• A rough posture check from photos, not a medical diagnosis; when something stands out, Relief suggests seeing a doctor
 
 PROGRESS
 • Personal records, milestones and weekly streaks
@@ -129,9 +131,11 @@ Relief складає план силових тренувань під тебе
 • «Тоді й зараз»: порівняй тіло 1, 3 чи 6 місяців тому з теперішнім
 
 ОЦІНКА ПОСТАВИ
-• Два фото й кілька дотиків покажуть, над чим попрацювати: положення голови й плечей, коліна, склепіння стопи
+• Три фото (збоку, спереду й зі спини) покажуть, над чим попрацювати: голова й плечі, прогин попереку, ознаки бічного викривлення хребта, коліна, склепіння стопи
+• Точки розставляються автоматично просто на телефоні; перевір їх і посунь, якщо треба
+• Тест з нахилом уперед використовує телефон як сколіометр
 • План додасть потрібні вправи
-• Це орієнтовна оцінка постави за фото, а не медичний діагноз
+• Це орієнтовна оцінка постави за фото, а не медичний діагноз; якщо щось помітно, Relief порадить звернутися до лікаря
 
 ПРОГРЕС
 • Особисті рекорди, досягнення й тижні поспіль
@@ -160,7 +164,7 @@ Relief has no account or sign-in and makes no network requests: all data is stor
 
 To try it: tap "Set up my profile" and answer the questions (about a minute). The plan appears on the Plan tab and today's workout on the Today tab; tap Start to log sets. The Body tab shows trained muscles on the 3D figure.
 
-The camera is used only for progress photos and the optional posture check (Me tab or Body tab). Photos stay on the device. The posture check is clearly labelled as a rough estimate from photos, not a medical diagnosis, and the plan's health guidance cites public guidelines (Plan tab → "What this plan is based on").
+The camera is used only for progress photos and the optional posture check (Me tab or Body tab). Photos stay on the device: points are placed by an on-device pose model (MediaPipe), nothing is uploaded. The optional forward bend test uses the motion sensor to read the phone's tilt on the user's back, like a scoliometer. The posture check is clearly labelled as a rough estimate, not a medical diagnosis; when signs of a sideways spine curve appear, the app advises seeing a doctor. The plan's health guidance cites public guidelines (Plan tab → "What this plan is based on").
 ```
 
 ## App Privacy
