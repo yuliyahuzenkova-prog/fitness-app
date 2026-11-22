@@ -23,4 +23,8 @@ head = '''<!doctype html>
 '''
 os.makedirs(os.path.join(os.path.dirname(__file__), "standalone"), exist_ok=True)
 open(os.path.join(os.path.dirname(__file__), "standalone", "index.html"), "w").write(head + src + "\n</body>\n</html>\n")
+# the posture check's pose model, loaded only when points are placed automatically (Netlify serves it next to index.html)
+import shutil
+os.makedirs(os.path.join(os.path.dirname(__file__), "standalone", "models"), exist_ok=True)
+shutil.copyfile(os.path.join(os.path.dirname(__file__), "models", "pose_landmarker_lite.task"), os.path.join(os.path.dirname(__file__), "standalone", "models", "pose_landmarker_lite.task"))
 print("wrote standalone/index.html")

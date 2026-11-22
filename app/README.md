@@ -5,6 +5,7 @@
 - Bundle ID / applicationId: `com.betterfityou.relief` (міняється в `capacitor.config.json`, `ios/App/App.xcodeproj` і `android/app/build.gradle` — тільки **до** першого завантаження в магазин).
 - iPhone, iOS 16.4+ (з цієї версії працює 3D-фігура), лише вертикально, без iPad.
 - Android 7.0+ (API 24), лише вертикально.
+- Оцінка постави розставляє точки моделлю MediaPipe на пристрої: бібліотека з `node_modules/@mediapipe/tasks-vision` і модель `models/pose_landmarker_lite.task` копіюються в `app/www` під час `npm run build`.
 - Плагіни: Filesystem + Share (резервна копія й картинки «Поділитися» через системне меню), StatusBar (колір статус-бару за темою), SplashScreen.
 - Іконки й заставка згенеровані з `design/brand/` у `app/assets/` (`npx capacitor-assets generate --ios --android …`, див. нижче).
 

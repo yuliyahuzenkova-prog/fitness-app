@@ -377,5 +377,11 @@ Object.assign(UK, {
   "Measure": "Вимірювання",
   "Feet together, knees straight. Bend forward slowly until your back is level, arms hanging, palms together.": "Стопи разом, коліна прямі. Повільно нахились уперед, поки спина не стане горизонтальною, руки вільно звисають, долоні разом.",
   "Your helper lays the phone across your back, screen up, its middle on the spine, and slides it slowly from the shoulder blades down to the waist.": "Помічник кладе телефон упоперек спини екраном догори, серединою на хребет, і повільно веде його від лопаток до талії.",
-  "Take the case off if you can.": "Зніми чохол, якщо можеш."
+  "Take the case off if you can.": "Зніми чохол, якщо можеш.",
+  "Points placed automatically. Check each one and drag any that are off.": "Точки розставлено автоматично. Перевір кожну й перетягни ті, що стоять неточно.",
+  "Tap the spine and the shoulder blade tips yourself: they can't be seen reliably.": "Хребет і кути лопаток постав вручну: їх не видно достатньо надійно.",
+  "Place automatically": "Розставити автоматично",
+  "Arms hang loosely, a little in front so the line of your back shows. Barefoot, fitted clothes if you can.": "Руки вільно опущені, трохи попереду, щоб було видно лінію спини. Босоніж і в прилеглому одязі, якщо можливо.",
+  "When the posture check places points automatically, the pose-detection library (MediaPipe) is loaded from jsDelivr too. The photo itself is analysed on your device and isn't sent anywhere.": "Коли оцінка постави розставляє точки автоматично, бібліотеку розпізнавання пози (MediaPipe) теж завантажено з jsDelivr. Саме фото аналізується на твоєму пристрої й нікуди не надсилається.",
+  "Pose detection in the posture check: MediaPipe Pose Landmarker by Google (Apache 2.0 licence).": "Розпізнавання пози в оцінці постави: MediaPipe Pose Landmarker від Google (ліцензія Apache 2.0)."
 });

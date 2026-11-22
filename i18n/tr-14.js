@@ -765,3 +765,45 @@ I18N_FILL("pl", {
 2122:"Pomocnik kładzie telefon w poprzek pleców ekranem do góry, środkiem na kręgosłupie, i powoli przesuwa go od łopatek do talii.",
 2123:"Zdejmij etui, jeśli możesz."
 });
+
+// Posture check: automatic points (v371)
+I18N_FILL("es", {
+2124:"Puntos colocados automáticamente. Revisa cada uno y arrastra los que no estén bien.",
+2125:"Marca tú la columna y las puntas de los omóplatos: no se pueden detectar de forma fiable.",
+2126:"Colocar automáticamente",
+2127:"Brazos sueltos, un poco hacia delante para que se vea la línea de la espalda. Descalzo y con ropa ajustada si puedes.",
+2128:"Cuando la evaluación de postura coloca los puntos automáticamente, la biblioteca de detección de postura (MediaPipe) también se carga desde jsDelivr. La foto se analiza en tu dispositivo y no se envía a ninguna parte.",
+2129:"Detección de postura en la evaluación: MediaPipe Pose Landmarker de Google (licencia Apache 2.0)."
+});
+I18N_FILL("de", {
+2124:"Punkte automatisch gesetzt. Prüfe jeden und verschiebe die, die nicht stimmen.",
+2125:"Setze die Wirbelsäule und die Schulterblattspitzen selbst: Sie lassen sich nicht zuverlässig erkennen.",
+2126:"Automatisch setzen",
+2127:"Arme locker hängen lassen, etwas nach vorne, damit die Linie des Rückens sichtbar ist. Barfuß und in enger Kleidung, wenn möglich.",
+2128:"Wenn der Haltungs-Check Punkte automatisch setzt, wird auch die Bibliothek zur Haltungserkennung (MediaPipe) von jsDelivr geladen. Das Foto selbst wird auf deinem Gerät ausgewertet und nirgendwohin gesendet.",
+2129:"Haltungserkennung im Haltungs-Check: MediaPipe Pose Landmarker von Google (Apache-2.0-Lizenz)."
+});
+I18N_FILL("fr", {
+2124:"Points placés automatiquement. Vérifie chacun et fais glisser ceux qui sont mal placés.",
+2125:"Place toi-même la colonne et les pointes des omoplates : elles ne se détectent pas de façon fiable.",
+2126:"Placer automatiquement",
+2127:"Bras relâchés, un peu en avant pour que la ligne du dos se voie. Pieds nus et vêtements ajustés si possible.",
+2128:"Quand l’évaluation de la posture place les points automatiquement, la bibliothèque de détection de posture (MediaPipe) est aussi chargée depuis jsDelivr. La photo est analysée sur ton appareil et n’est envoyée nulle part.",
+2129:"Détection de posture dans l’évaluation : MediaPipe Pose Landmarker de Google (licence Apache 2.0)."
+});
+I18N_FILL("pt", {
+2124:"Pontos posicionados automaticamente. Confira cada um e arraste os que estiverem fora do lugar.",
+2125:"Marque você mesmo a coluna e as pontas das escápulas: elas não podem ser detectadas com segurança.",
+2126:"Posicionar automaticamente",
+2127:"Braços soltos, um pouco à frente para que a linha das costas apareça. Descalço e com roupa justa, se puder.",
+2128:"Quando a avaliação de postura posiciona os pontos automaticamente, a biblioteca de detecção de pose (MediaPipe) também é carregada do jsDelivr. A foto é analisada no seu dispositivo e não é enviada para lugar nenhum.",
+2129:"Detecção de pose na avaliação de postura: MediaPipe Pose Landmarker do Google (licença Apache 2.0)."
+});
+I18N_FILL("pl", {
+2124:"Punkty ustawione automatycznie. Sprawdź każdy i przeciągnij te, które są niedokładne.",
+2125:"Kręgosłup i kąty łopatek zaznacz ręcznie: nie da się ich wiarygodnie wykryć.",
+2126:"Ustaw automatycznie",
+2127:"Ręce swobodnie opuszczone, trochę z przodu, aby było widać linię pleców. Boso i w obcisłym ubraniu, jeśli możesz.",
+2128:"Gdy ocena postawy ustawia punkty automatycznie, biblioteka wykrywania pozy (MediaPipe) też jest pobierana z jsDelivr. Samo zdjęcie jest analizowane na twoim urządzeniu i nigdzie nie jest wysyłane.",
+2129:"Wykrywanie pozy w ocenie postawy: MediaPipe Pose Landmarker od Google (licencja Apache 2.0)."
+});

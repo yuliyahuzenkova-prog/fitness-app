@@ -24,4 +24,13 @@ out = out.replace("<style>:root{", "<style>html{touch-action:manipulation;-webki
 # the website's "add to home screen" tags mean nothing inside the app
 out = "\n".join(l for l in out.split("\n") if "apple-mobile-web-app" not in l)
 open(os.path.join(www, "index.html"), "w", encoding="utf-8").write(out)
-print("wrote app/www/index.html and app/www/three.min.js")
+# pose detection for the posture check, bundled so it works offline: the MediaPipe library, its WebAssembly and the model
+mp = os.path.join(root, "app", "node_modules", "@mediapipe", "tasks-vision")
+if not os.path.exists(mp):
+    sys.exit("build-app.py: run `npm install` in app/ first (@mediapipe/tasks-vision)")
+os.makedirs(os.path.join(www, "mediapipe", "wasm"), exist_ok=True); os.makedirs(os.path.join(www, "models"), exist_ok=True)
+shutil.copyfile(os.path.join(mp, "vision_bundle.mjs"), os.path.join(www, "mediapipe", "vision_bundle.mjs"))
+for f in ("vision_wasm_internal.js", "vision_wasm_internal.wasm"):
+    shutil.copyfile(os.path.join(mp, "wasm", f), os.path.join(www, "mediapipe", "wasm", f))
+shutil.copyfile(os.path.join(root, "models", "pose_landmarker_lite.task"), os.path.join(www, "models", "pose_landmarker_lite.task"))
+print("wrote app/www (index.html, three.min.js, mediapipe/, models/)")
