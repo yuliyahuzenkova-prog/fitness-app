@@ -116,4 +116,13 @@ const UK_NAMES = {
   "Rower or bike intervals": "Інтервали на гребному або велотренажері",
   "Brisk walk or marching in place": "Швидка ходьба або марш на місці",
   "Bodyweight circuit": "Коло з власною вагою",
+  "Dumbbell biceps curl": "Згинання рук з гантелями на біцепс",
+  "Dumbbell overhead triceps extension": "Розгинання рук з гантелями з-за голови",
+  "Dumbbell lateral raise": "Розведення гантелей у сторони",
+  "Single-leg calf raise": "Підйом на носок на одній нозі",
+  "Bodyweight good morning": "Нахили «добрий ранок» з власною вагою",
+  "Reverse crunch": "Зворотні скручування",
+  "Slow mountain climber": "Повільний «скелелаз»",
+  "Wall calf stretch": "Розтяжка литки біля стіни",
+  "Child's pose": "Поза дитини"
 };

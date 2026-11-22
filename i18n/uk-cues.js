@@ -101,4 +101,13 @@ const UK_CUES = {
   "40 s on, 20 s off: squats, mountain climbers, march or jumping jacks. Repeat.": "40 с роботи, 20 с відпочинку: присідання, «скелелаз», марш або стрибки «зірочка». Повторюй.",
   "3 days a week, alternating A and B. Rest 2–3 minutes between sets. Add a little weight each time you hit every rep.": "3 дні на тиждень, чергуй A і B. Відпочинок 2–3 хвилини між підходами. Додавай трохи ваги щоразу, коли виконуєш усі повторення.",
   "No equipment needed. 3 days a week, alternating A and B. Rest 60–90 seconds between sets.": "Без інвентарю. 3 дні на тиждень, чергуй A і B. Відпочинок 60–90 секунд між підходами.",
+  "Elbows by your sides. Curl up, lower for 3 s.": "Лікті біля тулуба. Зігни руки, опускай 3 с.",
+  "Elbows point up. Lower the weights behind your head.": "Лікті дивляться вгору. Опускай гантелі за голову.",
+  "Elbows slightly bent. Raise to shoulder height, no higher.": "Лікті трохи зігнуті. Піднімай до рівня плечей, не вище.",
+  "Hold a wall. Up for 1 s, down for 3 s. Reps per leg.": "Тримайся за стіну. Вгору 1 с, вниз 3 с. Повтори на кожну ногу.",
+  "Arms crossed on your chest. Push your hips back, back flat.": "Руки схрещені на грудях. Відводь таз назад, спина рівна.",
+  "Curl your hips off the floor, lower slowly.": "Відривай таз від підлоги, опускай повільно.",
+  "High plank, one knee to your chest at a time. Reps per side.": "Планка на прямих руках, по черзі коліно до грудей. Повтори на кожну сторону.",
+  "Back leg straight, heel down. Time per side.": "Задня нога пряма, п'ята на підлозі. Час на кожну сторону.",
+  "Hips back to your heels, arms forward. Breathe slowly.": "Таз до п'ят, руки вперед. Дихай повільно."
 };

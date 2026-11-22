@@ -383,5 +383,13 @@ Object.assign(UK, {
   "Place automatically": "Розставити автоматично",
   "Arms hang loosely, a little in front so the line of your back shows. Barefoot, fitted clothes if you can.": "Руки вільно опущені, трохи попереду, щоб було видно лінію спини. Босоніж і в прилеглому одязі, якщо можливо.",
   "When the posture check places points automatically, the pose-detection library (MediaPipe) is loaded from jsDelivr too. The photo itself is analysed on your device and isn't sent anywhere.": "Коли оцінка постави розставляє точки автоматично, бібліотеку розпізнавання пози (MediaPipe) теж завантажено з jsDelivr. Саме фото аналізується на твоєму пристрої й нікуди не надсилається.",
-  "Pose detection in the posture check: MediaPipe Pose Landmarker by Google (Apache 2.0 licence).": "Розпізнавання пози в оцінці постави: MediaPipe Pose Landmarker від Google (ліцензія Apache 2.0)."
+  "Pose detection in the posture check: MediaPipe Pose Landmarker by Google (Apache 2.0 licence).": "Розпізнавання пози в оцінці постави: MediaPipe Pose Landmarker від Google (ліцензія Apache 2.0).",
+  "Curl up": "Зігни руки",
+  "Lower behind your head": "Опусти за голову",
+  "Raise to the sides": "Підніми в сторони",
+  "Hips back, lean forward": "Таз назад, нахились",
+  "Curl your hips up": "Підніми таз",
+  "Knee to chest": "Коліно до грудей",
+  "Sit back": "Сідай назад",
+  "Breathe": "Дихай"
 });
