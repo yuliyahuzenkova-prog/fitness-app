@@ -1419,3 +1419,20 @@ I18N_FILL("pl", {
 2248:"Połóż poduszkę między biodrami a piętami.",
 2249:"Przesuń dłonie w bok, żeby rozciągnąć bok pleców."
 });
+
+// Breathing labels for new exercises (v373)
+I18N_FILL("es", {
+2250:"Baja despacio detrás de la cabeza",2251:"Vuelve atrás despacio"
+});
+I18N_FILL("de", {
+2250:"Langsam hinter den Kopf senken",2251:"Langsam zurücksetzen"
+});
+I18N_FILL("fr", {
+2250:"Descends lentement derrière la tête",2251:"Recule lentement le pied"
+});
+I18N_FILL("pt", {
+2250:"Desça devagar atrás da cabeça",2251:"Volte devagar"
+});
+I18N_FILL("pl", {
+2250:"Powoli opuszczaj za głowę",2251:"Powoli odstaw nogę"
+});

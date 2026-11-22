@@ -391,5 +391,7 @@ Object.assign(UK, {
   "Curl your hips up": "Підніми таз",
   "Knee to chest": "Коліно до грудей",
   "Sit back": "Сідай назад",
-  "Breathe": "Дихай"
+  "Breathe": "Дихай",
+  "Lower slowly behind your head": "Повільно опускай за голову",
+  "Step back slowly": "Повільно відстав ногу"
 });
