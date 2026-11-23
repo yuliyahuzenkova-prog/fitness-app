@@ -11773,14 +11773,15 @@ function proPose0(B) {
     }
     // Kneeling with the feet relaxed (shin and the top of the foot on the floor): the instep rests on the floor, so the ankle sits
     // a few cm up and the foot slopes gently down to the toes, heel up, rather than the ankle sinking into the floor
-    // (eased in over the last ~3 cm as the knee and ankle come down, instead of switching on in one frame: the foot jumped up as a
+    // (eased in over the last ~7 cm as the knee and ankle come down, instead of switching on in one frame: the foot jumped up as a
     // knee landed, e.g. coming back down from a donkey kick)
     let restTop = null, restW = 0;
     if (!footEx && !kneel && !B.roll && K.y < -128 && A.y < -126 && (fu.y < -.7 || B.restFoot)) { // (restFoot: a kneeling back leg whose foot lies behind it, e.g. the hip flexor stretch)
-      restW = cl01((-K.y - 128) / 3) * cl01((-A.y - 126) / 3) * (B.restFoot ? 1 : cl01((-fu.y - .7) / .15)); restW = restW * restW * (3 - 2 * restW);
+      restW = cl01((-K.y - 128) / 7) * cl01((-A.y - 126) / 7) * (B.restFoot ? 1 : cl01((-fu.y - .7) / .15)); restW = restW * restW * (3 - 2 * restW);
       const fl = R[L + "Foot"].distanceTo(R[L + "Toe_End"]) * S, hA = B.restFoot ? REST_FOOT.ankle : KNEEL_REST.ankle, th = B.restFoot ? rad(REST_FOOT.tilt) : Math.asin(Math.min(.6, (hA - KNEEL_REST.toe) / fl)), hb = sole.clone().setY(0).normalize();
       const sole1 = hb.multiplyScalar(Math.cos(th)).add(new T.Vector3(0, -Math.sin(th), 0)).normalize(), fu1 = new T.Vector3(0, -1, 0).sub(sole1.clone().multiplyScalar(-sole1.y)).normalize();
-      sole = sole.clone().lerp(sole1, restW).normalize(); fu = fu.clone().lerp(fu1, restW); fu.sub(sole.clone().multiplyScalar(fu.dot(sole))).normalize();
+      if (PRO.chrome) { const qr = flat(fu, sole).slerp(flat(fu1, sole1), restW); fu = new T.Vector3(0, 1, 0).applyQuaternion(qr); sole = new T.Vector3(0, 0, 1).applyQuaternion(qr); } // (turned, not blended: blending the two directions passed through zero and flipped the foot sideways)
+      else { sole = sole.clone().lerp(sole1, restW).normalize(); fu = fu.clone().lerp(fu1, restW); fu.sub(sole.clone().multiplyScalar(fu.dot(sole))).normalize(); }
       restTop = A.clone().add(new T.Vector3(0, hA, 0));
     }
     // Back foot on a bench (Bulgarian split squat, chrome): the top of the foot lies on the bench just behind its front edge, toes
@@ -11789,7 +11790,7 @@ function proPose0(B) {
       const bx = B.boxes.find(([x0, x1]) => A.x > x0 - 10 && A.x < x1 + 10);
       if (bx) { const dep = Math.min(1, Math.max(0, (-INSTEP.hipTop - V3(h).y) / INSTEP.hipSpan)), fl = R[L + "Foot"].distanceTo(R[L + "Toe_End"]) * S, hA = INSTEP.ankle + INSTEP.lift * dep * dep * (3 - 2 * dep), /* (lower in the rep the ankle rises and the foot rocks onto the toes, so the shin clears the bench edge) */ th0 = Math.asin(Math.min(.6, (hA - INSTEP.toe) / fl)), up = 1 - dep * dep * (3 - 2 * dep), hT = hA + INSTEP.top * up /* (standing tall the leg is nearly straight: the foot tips up onto the ball and toes, in line with the shin, instead of lying flat and bending the ankle double) */, th = Math.asin(Math.min(.8, (hT - INSTEP.toe) / fl)), hb = V3(B.fwd).setY(0).normalize().negate();
         sole = hb.clone().multiplyScalar(Math.cos(th)).add(new T.Vector3(0, -Math.sin(th), 0)).normalize(); fu = new T.Vector3(0, -1, 0).sub(sole.clone().multiplyScalar(-sole.y)).normalize();
-        restTop = new T.Vector3(bx[1], bx[2] + hT - INSTEP.topDrop * up, A.z).add(hb.clone().multiplyScalar(INSTEP.edge)); /* (the ankle keeps its place over the bench and rises; the toes slide in a little as the foot tips up) */ /* (the ankle this far back from the bench's front edge: the whole top of the foot lies on it, toes and all) */ }
+        restW = 1; restTop = new T.Vector3(bx[1], bx[2] + hT - INSTEP.topDrop * up, A.z).add(hb.clone().multiplyScalar(INSTEP.edge)); /* (the ankle keeps its place over the bench and rises; the toes slide in a little as the foot tips up) */ /* (the ankle this far back from the bench's front edge: the whole top of the foot lies on it, toes and all) */ }
     }
     const tN = A.clone().add((kneelToe ? kneelToe.fu0 : fu).clone().multiplyScalar((R[L + "Foot"].y - (PRO.sole || 0)) * S));
     let target = restTop ? tN.clone().lerp(restTop, restW) : footEx ? new T.Vector3(A.x, -140 + (R[L + "Foot"].y - (PRO.sole || 0)) * S + (GL.foot.kind === "towel" ? .9 : 0), A.z) : kneel ? tN.lerp(new T.Vector3(A.x, -140 + kneelToe.lift, A.z), kw) : tN;
