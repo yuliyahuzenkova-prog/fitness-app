@@ -10722,9 +10722,12 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   floor_press: { yaw: -30, flare: .5,
     A: pose({ at: [125, 140], a: 128, b: 19, t: -90, u: 178, f: 178, props: [{ db: "wrist" }] }),
     B: pose({ at: [125, 140], a: 128, b: 19, t: -90, u: 95, f: 178, props: [{ db: "wrist" }] }) },
-  knee_pushup: { yaw: -25, hz: 15, plantAll: true, plantPole: [200, 1.5, 1, 0, 1], reachK: 1.2, noKneel: true, ankle: 50,
-    A: pose({ at: [38, 138], a: -56.3, b: -120, t: 56.3, u: 0, f: 0, fd: 125 }),
-    B: pose({ at: [38, 138], a: -66, b: -120, t: 66, u: -47.7, f: 32, fd: 125 }) },
+  // knee push-up: built from the knees — knees on the floor, body straight from knees to head, shins lifted behind, feet relaxed.
+  // (it used the push-up's ankle anchor, which put the knees under the floor; the body then lay down and the feet twisted)
+  // (the legs are solved for the model's own, shorter, leg lengths, so the knees really reach the floor: sketch a/b differ from the trunk line)
+  knee_pushup: { yaw: -25, hz: 15, plantAll: true, plantPole: [200, 1.5, 1, 0, 1], noKneel: true, ankle: 50,
+    A: { anchor: "hip", at: [86, 117.3], t: 54.3, a: -42, b: -132.7, fd: 125, u: 7, f: 7 },
+    B: { anchor: "hip", at: [91, 128], t: 75.5, a: -63.1, b: -136.4, fd: 125, u: -72.9, f: 50.8 } },
   wall_pushup: { yaw: -40, wallHands: 174, openHand: true,
     A: pose({ at: [100, 140], a: -18, b: -18, t: 18, u: 88, f: 88, props: [{ wall: 174 }] }),
     B: pose({ at: [100, 140], a: -26, b: -26, t: 26, u: 96, f: 96, props: [{ wall: 174 }] }) },
