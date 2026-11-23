@@ -10725,7 +10725,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   // (arms stretched overhead squeeze the model's shoulders thin); feet relaxed, tops on the floor, soles up (fd 180 + noKneel, otherwise the toes get tucked under)
   child_pose: { yaw: -30, noKneel: true, openHand: true, palmsUp: true, A: { anchor: "hip", at: [59.4, 115.5], t: 108, c: 7, a: 40, b: -90, fd: 180, u: -71, f: -84 }, B: { anchor: "hip", at: [59.4, 115.5], t: 108, c: 7, a: 40, b: -90, fd: 180, u: -71, f: -84 } },
   // ---- 20 more library exercises (v378), each checked with qa/collide.js and qa/smooth.js on both chrome figures ----
-  glute_march: { yaw: -25, alt: true, period: 6400, noKneel: true,
+  glute_march: { yaw: -25, alt: true, period: 6400, noKneel: true, ankle: 45, /* (relaxed foot on the lifted leg) */
     A: pose({ at: [125, 140], a: 96, b: 15, t: -122, u: 92, f: 92, a2: 96, b2: 15, fd2: 0 }),
     B: pose({ at: [125, 140], a: 96, b: 15, t: -122, u: 92, f: 92, a2: 160, b2: 50, fd2: 0 }) },
   hammer_curl: { yaw: -40, palmMid: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }] }), B: pose({ u: 8, f: 138, props: [{ db: "wrist" }] }) },
@@ -11857,11 +11857,9 @@ function proPose0(B) {
         if (Math.abs(thc - th) > 1e-4) {
           // which way "forward" is for the foot: when it's pointed almost in line with the shin, the bone alone can't tell
           // (it would tip the foot out sideways), so lean on the sole's own forward direction
-          let fr = bone.clone().sub(sd.clone().multiplyScalar(bone.dot(sd))); const frL = fr.length(), sf = sole.clone().sub(sd.clone().multiplyScalar(sole.dot(sd)));
+          let fr = bone.clone().sub(sd.clone().multiplyScalar(bone.dot(sd))); const frL = fr.length(), sf = front(k, a).clone().sub(sd.clone().multiplyScalar(front(k, a).dot(sd))); // (in line with the shin the foot bends towards the shin's front, as a real ankle does — the sole's own direction there was unstable and flipped)
           const wB = cl01((frL - .2) / .35); fr = (frL > 1e-6 ? fr.multiplyScalar(1 / frL) : by_.clone()).multiplyScalar(wB).add(sf.lengthSq() > 1e-6 ? sf.normalize().multiplyScalar(1 - wB) : new T.Vector3()); if (fr.lengthSq() < 1e-6) fr = by_.clone(); fr.normalize(); if (B.ankleFront) { const sf2 = front(k, a).clone().multiplyScalar(B.ankleFront); sf2.sub(sd.clone().multiplyScalar(sf2.dot(sd))); if (sf2.lengthSq() > 1e-4) fr = sf2.normalize(); } // (ankleFront: the foot turns the way the front of the shin faces, as standing)
-          // (a foot pointed almost in line with the shin can't tell which side to bend to: that side flipped from one frame to the next and the
-          // foot spun ~60°, as when a donkey kick's knee lands. Near that line the limit eases off, so the foot just stays pointed.)
-          const inLine = cl01((th - rad(6)) / rad(18)), wA = air * inLine * inLine * (3 - 2 * inLine);
+          const wA = air;
           const target = sd.clone().multiplyScalar(Math.cos(thc)).add(fr.multiplyScalar(Math.sin(thc))), qa = new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(bone, target), wA);
           fu = by_.clone().applyQuaternion(qa).normalize(); sole = bz.clone().applyQuaternion(qa).normalize();
         }
