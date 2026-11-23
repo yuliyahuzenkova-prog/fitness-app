@@ -10727,7 +10727,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     A: pose({ at: [125, 140], a: 96, b: 15, t: -122, u: 92, f: 92, a2: 96, b2: 15, fd2: 0 }),
     B: pose({ at: [125, 140], a: 96, b: 15, t: -122, u: 92, f: 92, a2: 160, b2: 50, fd2: 0 }) },
   hammer_curl: { yaw: -40, palmMid: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }] }), B: pose({ u: 8, f: 138, props: [{ db: "wrist" }] }) },
-  front_raise: { yaw: -40, palmDown: true, A: pose({ u: 0, f: 4, props: [{ db: "wrist" }] }), B: pose({ u: 86, f: 90, props: [{ db: "wrist" }] }) },
+  front_raise: { yaw: -40, palmDown: true, A: pose({ u: 8, f: 12, props: [{ db: "wrist" }] }), B: pose({ u: 86, f: 90, props: [{ db: "wrist" }] }) },
   db_row: { yaw: 35, hz: 15, palmMid: true,
     A: pose({ at: [95, 140], a: 35, b: -15, t: 50, u: 0, f: 0, props: [{ db: "wrist" }] }),
     M: pose({ at: [95, 140], a: 35, b: -15, t: 50, u: -40, f: 18, props: [{ db: "wrist" }] }),
@@ -10758,7 +10758,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     B: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: 180, u: 0, f: 0, a2: -88, b2: -178, fd2: 180 } },
   slr: { yaw: -30,
     A: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 90, b2: 90, fd2: 90, u: 90, f: 90 },
-    B: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 135, b2: 135, fd2: 75, u: 90, f: 90 } },
+    B: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 135, b2: 135, fd2: 128, u: 90, f: 90 } },
   heel_slide: { yaw: -30, alt: true, period: 7200,
     A: { anchor: "hip", at: [105, 133], t: -90, a: 90, b: 90, fd: 90, a2: 90, b2: 90, fd2: 90, u: 90, f: 90 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 90, b: 90, fd: 90, a2: 133.5, b2: 33.8, fd2: 0, u: 90, f: 90 } },
@@ -10777,9 +10777,10 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   knees_chest: { yaw: -30, noKneel: true,
     A: { anchor: "hip", at: [105, 133], t: -90, a: 210, b: 82, fd: 20, u: 132, f: 135 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 210, b: 82, fd: 20, u: 132, f: 135 } },
-  knee_ext: { yaw: -40,
-    A: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 0, fd2: 0, u: 20, f: 80, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] },
-    B: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 72, fd2: 70, u: 20, f: 80, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] } },
+  // (hands hold the sides of the seat, as the guide says: palms on the seat beside the hips)
+  knee_ext: { yaw: -40, handsOn: true, plantAll: true,
+    A: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 0, fd2: 0, u: 6, f: 12, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] },
+    B: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 72, fd2: 105, u: 6, f: 12, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] } },
 });
 for (const [id, o] of Object.entries(ANIM_3D)) if (ANIMS[id]) Object.assign(ANIMS[id], o);
 Object.assign(ANIMS.pull_assist, { A: ANIMS.pull_band.A, B: ANIMS.pull_band.B, bandKnee: ANIMS.pull_band.bandKnee, yaw: 145, palmFwd: true, ankle: 42 }); // (non-chrome figures: the band version)
