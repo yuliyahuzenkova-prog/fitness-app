@@ -11882,6 +11882,13 @@ function proPose0(B) {
     // on the floor and with the leg reaching back alike, so nothing switches as the leg comes down
     const bkD = B.footDown ? ankle.clone().sub(knee).setY(0) : null;
     if (bkD && bkD.lengthSq() > 1e-4) { bkD.normalize(); sole = new T.Vector3(0, -1, 0).add(bkD.clone().multiplyScalar(.18)).normalize(); fu = bkD.clone().negate(); fu.sub(sole.clone().multiplyScalar(fu.dot(sole))).normalize(); }
+    // footDown with the shin raised (the top of a donkey kick): the horizontal part of the shin is ~0 there and its direction wandered, so the
+    // foot spun. It follows the shin itself instead: toes towards the shin's front (with the knee bent that is away from the hip), the top of
+    // the foot towards the knee — the same shape as kneeling, carried round with the shin, so the foot is simply flexed, sole up
+    if (B.footDown && PRO.chrome) { const sdF = ankle.clone().sub(knee).normalize(), tfF = knee.clone().sub(Hm); tfF.sub(sdF.clone().multiplyScalar(tfF.dot(sdF)));
+      let wF = cl01((Math.abs(sdF.y) - .35) / .35); wF = wF * wF * (3 - 2 * wF);
+      if (wF > 0 && tfF.lengthSq() > 4) { tfF.normalize(); const s2 = tfF.clone().add(sdF.clone().multiplyScalar(.18)).normalize(), f2 = sdF.clone().negate(); f2.sub(s2.clone().multiplyScalar(f2.dot(s2))).normalize();
+        const qF = flat(fu, sole).slerp(flat(f2, s2), wF); fu = new T.Vector3(0, 1, 0).applyQuaternion(qF); sole = new T.Vector3(0, 0, 1).applyQuaternion(qF); } }
     setBone(L + "Foot", flat(fu, sole));
     (PRO.feet || (PRO.feet = {}))[L] = { u: fu.clone(), s: sole.clone(), h: (R[L + "Foot"].y - (PRO.sole || 0)) * S };
     // Toes: when the heel is up and the ball is on the floor, the toes bend and stay flat
