@@ -11721,7 +11721,7 @@ const W = { thigh: 11, shin: 8.5, upper: 8, fore: 6.5, foot: 5, neck: 6 };
 const HIPW = 6.5, SHW = 12.5;
 let ARM_TWIST = [95, .25]; // chrome, straight arms: beyond this turn (degrees) of the upper arm about its length relative to the collarbone, only this share of the rest is kept (an arm swung overhead the "other" way round turns ~180° and wrings the shoulder's skin thin)
 let TWIST_SHARE = { wrist: .5, bendMin: 15, bendMax: 50 }; // chrome arms: how much of the wrist's twist the forearm takes, and the elbow bend (degrees) below which the forearm's twist is shared with the upper arm
-let FINGER_CLEAR = 1.4; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
+let FINGER_CLEAR = 1.2; // chrome, hand on a surface: the fingertip joints sit this far above it (model units ÷ scale), so the skin rests on it
 let SIDE_LEG_REST = -12; // side-lying leg raise: the top leg tilts down this far (degrees) at rest, so it lies on the bottom leg
 let HT_BOX = 102.6;
 let HT_PAD = [4, 11, 17]; // hip thrust machine: the roller's shift from the hips towards the head, and its height above them // single-leg hip thrust: the bench top (sketch y)
@@ -11740,7 +11740,10 @@ let FOOT_RATE = 1500; // feet and toes turn at most this many degrees per loop's
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
-let FLAT_FINGERS = [6, -8, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape) — knuckle softly bent, the rest near straight, not a claw
+let FLAT_FINGERS = [-26, -12, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape). v404: the model's rest fingers hang down from the palm, so they straighten up to lie on the surface (was [6, −8, −6]: tips 3 cm into it, then the palm tipped up — a claw)
+let PALM_LIFT = 1.2; // chrome, hand on a surface: the wrist target this much higher (cm), so the heel of the palm rests on the surface instead of sinking into it
+let FLAT_THUMB = [30, 30, 20]; // chrome, hand resting on a surface: thumb bend per joint (degrees from the rest shape)
+let KNUCKLE_LEVEL = 1; // chrome, hand resting on a surface: how much of the knuckles' sideways slope is levelled (0–1)
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
 let PLANT_POLE = 4, PLANT_OUT = .5; // (PLANT_OUT: how far out to the side, against back towards the hips) // chrome, hands planted: how strongly (cm) the elbow leans to its natural direction when the pose's arm is almost straight
 let BEND_HAND = [2, 20]; // chrome arms: the elbow's bend (degrees) over which the upper arm turns from its straight-arm facing to face the bend
@@ -13946,14 +13949,14 @@ function proPose0(B) {
       PRO.group.updateMatrixWorld(true);
       const Sm = new T.Vector3().setFromMatrixPosition(by[L + "Arm"].matrixWorld), l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S;
       const E0 = E.clone(), W0 = Wv.clone();
-      const tgt = plantSpot(B, L, grabFix, tap, Sm, l1 + l2, grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S - Wv.y) * pw, Wv.z)), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
+      const tgt = plantSpot(B, L, grabFix, tap, Sm, l1 + l2, grabFix ? new T.Vector3(Wv.x, B.bar != null ? B.bar - 1.5 : Wv.y, Wv.z) : new T.Vector3(Wv.x, Wv.y + ((B.handsOn && B.surf != null ? B.surf : surf != null ? surf : -140) + 2.6 * S + (PRO.chrome ? PALM_LIFT : 0) - Wv.y) * pw, Wv.z)), st = tgt.clone().sub(Sm), Lr = (l1 + l2) * .999, d0 = st.length(), sw = tap ? Math.min(1, B.tapK / .25) ** 2 * (3 - 2 * Math.min(1, B.tapK / .25)) : 0, dl = sw && d0 > Lr * .88 ? Math.min(d0, Lr) * (1 - sw) + Lr * (.88 + .12 * (1 - Math.exp(-(d0 / Lr - .88) / .12))) * sw : Math.min(d0, Lr), hd = st.normalize(); // (tapping arm: straightens softly as it comes down, no sudden stop; exact on the floor)
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       let pole = grabFix ? V3(B.hip).sub(Sm) : tapPole ? tapPole.clone() : E.clone().sub(Sm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
       // A hand on the floor or a chair: when the pose's arm is nearly straight its elbow direction is all but undefined and the
       // elbow flipped over mid-rep. Lean on the natural one, back towards the hips and a little out, until the pose bends clearly.
       if (!grabFix && !tapPole && PRO.chrome) { const pref = (B.plantPole && B.plantPole[4] ? new T.Vector3(-B.plantPole[2], B.plantPole[3], 0) /* ("w": in world terms — back towards the feet and up) */ : B.plantPole && B.plantPole.length > 2 ? V3(B.fwd).normalize().multiplyScalar(-B.plantPole[2]).add(new T.Vector3(0, B.plantPole[3], 0)) : V3(B.hip).sub(Sm).normalize()) /* (plantPole [weight, out, back, up]: an explicit elbow direction in body terms) */.add(left.clone().multiplyScalar((L === "Left" ? 1 : -1) * (B.plantPole ? B.plantPole[1] : PLANT_OUT))); pref.sub(hd.clone().multiplyScalar(pref.dot(hd)));
         if (pref.lengthSq() > 1e-4) pole.add(pref.normalize().multiplyScalar(B.plantPole ? B.plantPole[0] : PLANT_POLE)); } if (pole.lengthSq() < 1e-4) pole = V3(B.fwd).negate().projectOnPlane(hd);
-      PRO.reach = PRO.reach || {}; PRO.reach[L] = { Sm: Sm.clone(), tgt: tgt.clone(), L: l1 + l2, planted: pw > .99, surf: tgt.y - 2.6 * S };
+      PRO.reach = PRO.reach || {}; PRO.reach[L] = { Sm: Sm.clone(), tgt: tgt.clone(), L: l1 + l2, planted: pw > .99, surf: tgt.y - 2.6 * S - (PRO.chrome ? PALM_LIFT : 0) };
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.normalize().multiplyScalar(hg)); Wv = Sm.clone().add(hd.clone().multiplyScalar(dl));
       if (!grabFix && !tap && pw < 1) { // (a tapping hand follows the IK all the way, so it lands on the shoulder, not on the sketch's arm) // part-way to the floor: blend from the pose's own arm directions to the floor reach
         const Ed = Sm.clone().add(E0.clone().sub(Sv).normalize().multiplyScalar(l1)), Wd = Ed.clone().add(W0.clone().sub(E0).normalize().multiplyScalar(l2));
@@ -14078,7 +14081,7 @@ function proPose0(B) {
     const cupH = PRO.bar && PRO.bar.goblet ? PRO.bar.gripL : null; // (goblet: open hands curled softly round the plate, like holding a bowl)
     const ang = (g, sd) => cupH && cupH !== "both" && sd !== cupH ? GOBLET_CUP.f : cupH ? { 1: 62, 2: 80, 3: 50 } : B.openHand ? { 1: -8, 2: -6, 3: -4 } : (B.hang || B.hook) && g ? BAR_HOOK.f : ({ 1: 10 + g * 52, 2: 12 + g * 68, 3: 8 + g * 42 }), thumb = (g, sd) => cupH && cupH !== "both" && sd !== cupH ? GOBLET_CUP.t : cupH ? { 1: 22, 2: 32, 3: 36 } : B.openHand ? { 1: 0, 2: 2, 3: 2 } : (B.hang || B.hook) && g ? BAR_HOOK.t : ({ 1: 4 + g * 18, 2: 6 + g * 26, 3: 6 + g * 30 });
     for (const [name, ax] of Object.entries(PRO.curl)) { const b = by[name]; if (!b) continue; const k = +name.slice(-1), fw = +((PRO.planted && PRO.planted[name.startsWith("Left") ? "Left" : "Right"]) || 0);
-      const flatA = name.includes("Thumb") ? 0 : { 1: FLAT_FINGERS[0], 2: FLAT_FINGERS[1], 3: FLAT_FINGERS[2] }[k] /* (a relaxed hand on a surface: flat with a soft bend; bent back further, it looked strained) */, restA = (name.includes("Thumb") ? thumb : ang)(gOf(name.startsWith("Left") ? "Left" : "Right"), name.startsWith("Left") ? "Left" : "Right")[k];
+      const flatA = name.includes("Thumb") ? (PRO.chrome ? FLAT_THUMB[k - 1] ?? 0 : 0) : { 1: FLAT_FINGERS[0], 2: FLAT_FINGERS[1], 3: FLAT_FINGERS[2] }[k] /* (a relaxed hand on a surface: flat with a soft bend; bent back further, it looked strained) */, restA = (name.includes("Thumb") ? thumb : ang)(gOf(name.startsWith("Left") ? "Left" : "Right"), name.startsWith("Left") ? "Left" : "Right")[k];
       b.quaternion.setFromAxisAngle(new T.Vector3(...ax), rad(restA + (flatA - restA) * fw)); }
     // A hand resting on a surface: the fingers lie close together (the model's rest pose has them spread, which looked tense).
     // Each knuckle turns, in the palm's plane, most of the way towards the middle finger's line.
@@ -14093,6 +14096,15 @@ function proPose0(B) {
         d.normalize(); mm.normalize(); const ang = Math.atan2(new T.Vector3().crossVectors(d, mm).dot(nrm), d.dot(mm)) * (f === "Thumb" ? THUMB_IN : FINGERS_TOGETHER) * fw;
         const qW = f === "Thumb" ? new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(a2.clone().sub(a1).normalize(), tgt), THUMB_IN * fw) /* (the thumb stands out of the palm, not across it: turn it straight towards the index line) */ : new T.Quaternion().setFromAxisAngle(nrm, ang), cur = new T.Quaternion(); b1.getWorldQuaternion(cur); const par = new T.Quaternion(); b1.parent.getWorldQuaternion(par);
         b1.quaternion.copy(par.invert().multiply(qW.multiply(cur))); b1.updateMatrixWorld(true); } }
+    // A hand resting on a surface: the knuckles lie level across the hand (the model's palm, laid flat by its wrist-to-middle-finger
+    // line, rolled down 1.6 cm towards the little finger; the guard below then tipped the whole palm up off the pinky, the knuckles
+    // rose 3 cm and the hand stood on its fingertips like a claw, the wrist pinched thin)
+    if (PRO.chrome) for (const Ls of ["Left", "Right"]) { const r = PRO.reach && PRO.reach[Ls], fw = +((PRO.planted && PRO.planted[Ls]) || 0); if (!r || !r.planted || fw < .99 || !by[Ls + "Hand"] || !by[Ls + "HandIndex1"] || !by[Ls + "HandPinky1"] || !by[Ls + "HandMiddle1"]) continue;
+      for (let it = 0; it < 2; it++) { PRO.group.updateMatrixWorld(true); const wp = (n) => new THREE.Vector3().setFromMatrixPosition(by[n].matrixWorld);
+        const hw = wp(Ls + "Hand"), ax = wp(Ls + "HandMiddle1").sub(hw).normalize(), a = wp(Ls + "HandIndex1").sub(wp(Ls + "HandPinky1")); a.sub(ax.clone().multiplyScalar(a.dot(ax))); const al = a.length(); if (al < .5) break; a.divideScalar(al);
+        const dy = new THREE.Vector3().crossVectors(ax, a).y; if (Math.abs(dy) < .05) break; const th = Math.max(-.6, Math.min(.6, -Math.asin(Math.max(-1, Math.min(1, a.y))) / dy * KNUCKLE_LEVEL)); if (Math.abs(th) < 1e-3) break;
+        const hq = new THREE.Quaternion(); by[Ls + "Hand"].getWorldQuaternion(hq); const pq = new THREE.Quaternion(); by[Ls + "Hand"].parent.getWorldQuaternion(pq);
+        by[Ls + "Hand"].quaternion.copy(pq.invert().multiply(new THREE.Quaternion().setFromAxisAngle(ax, th).multiply(hq))); } }
     // A hand resting on a surface: the fingertips lie on it, never through it (the palm tips up at the wrist just enough)
     if (PRO.chrome) for (const Ls of ["Left", "Right"]) { const r = PRO.reach && PRO.reach[Ls], fw = +((PRO.planted && PRO.planted[Ls]) || 0); if (!r || !r.planted || fw < .99 || !by[Ls + "Hand"]) continue;
       for (let it = 0; it < 3; it++) { PRO.group.updateMatrixWorld(true);
