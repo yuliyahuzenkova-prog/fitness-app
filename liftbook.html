@@ -15805,6 +15805,9 @@ const COACH_QUICK = [
 ];
 let COACH_EX_CACHE = null;
 // Exercises added to the library but not yet used by the plans; "New" shows next to them until they're checked
+// New exercises the owner has checked: they keep their place in LIB_NEW (their definitions live there) but lose the "New" tag.
+// v401: the whole "Legs and glutes" section.
+const LIB_CHECKED = new Set(["Bodyweight good morning", "Bodyweight squat hold", "Donkey kick", "Dumbbell calf raise", "Dumbbell squat", "Glute bridge hold", "Glute bridge march", "Heel-toe rocks", "Kneeling straight-leg kickback", "Lying straight-leg raise", "Prone leg lift", "Reverse lunge with knee drive", "Seated calf raise", "Seated knee extension", "Seated march", "Single-leg balance", "Single-leg calf raise", "Single-leg glute bridge hold", "Split squat hold", "Squat to calf raise", "Standing glute kickback", "Standing hamstring curl", "Standing march", "Sumo squat"]);
 const LIB_NEW = [["Dumbbell biceps curl", "weight", "Elbows by your sides. Curl up, lower for 3 s."], ["Dumbbell overhead triceps extension", "weight", "Elbows point up. Lower the weights behind your head."],
   ["Dumbbell lateral raise", "weight", "Elbows slightly bent. Raise to shoulder height, no higher."], ["Single-leg calf raise", "reps", "Hold a wall. Up for 1 s, down for 3 s. Reps per leg."],
   ["Bodyweight good morning", "reps", "Arms crossed on your chest. Push your hips back, back flat."], ["Reverse crunch", "reps", "Curl your hips off the floor, lower slowly."],
@@ -15863,7 +15866,7 @@ const LIB_NEW = [["Dumbbell biceps curl", "weight", "Elbows by your sides. Curl 
 function coachExercises() {
   if (COACH_EX_CACHE) return COACH_EX_CACHE;
   const out = {};
-  LIB_NEW.forEach(([name, type, cue]) => (out[name] = { name, type, cue, isNew: true }));
+  LIB_NEW.forEach(([name, type, cue]) => (out[name] = { name, type, cue, isNew: !LIB_CHECKED.has(name) }));
   for (const slot of Object.keys(LIB)) libItems(slot).forEach(([name, type, cue, bar]) => (out[name] = out[name] || { name, type, cue, slot, bar: !!bar }));
   for (const l of Object.values(PREHAB)) l.forEach((x) => (Array.isArray(x) ? [x] : Object.values(x)).forEach(([name, type, , cue]) => (out[name] = out[name] || { name, type, cue, prehab: true })));
   [["Bike intervals", "30 s fast, 60 s easy, repeat. Fast should feel hard but steady."], ["Rower or bike intervals", "30 s fast, 60 s easy, repeat. Fast should feel hard but steady."],
