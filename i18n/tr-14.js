@@ -1436,3 +1436,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2250:"Powoli opuszczaj za głowę",2251:"Powoli odstaw nogę"
 });
+// Child's pose, arms along the body (v377)
+I18N_FILL("es", {
+2252:"Deja los brazos a lo largo del cuerpo, con las palmas hacia arriba, y apoya la frente en el suelo.",2253:"Estira los brazos hacia delante en el suelo y luego lleva las manos hacia un lado para estirar el costado de la espalda."
+});
+I18N_FILL("de", {
+2252:"Die Arme neben dem Körper ablegen, Handflächen nach oben, und die Stirn auf dem Boden ablegen.",2253:"Die Arme auf dem Boden nach vorne strecken, dann die Hände zur Seite wandern lassen, um die Seite des Rückens zu dehnen."
+});
+I18N_FILL("fr", {
+2252:"Pose les bras le long du corps, paumes vers le haut, et laisse ton front reposer au sol.",2253:"Allonge les bras devant toi au sol, puis déplace les mains sur le côté pour étirer le flanc du dos."
+});
+I18N_FILL("pt", {
+2252:"Deixe os braços ao longo do corpo, palmas para cima, e apoie a testa no chão.",2253:"Estique os braços à frente no chão e depois leve as mãos para um lado para alongar a lateral das costas."
+});
+I18N_FILL("pl", {
+2252:"Połóż ręce wzdłuż ciała, dłońmi do góry, i oprzyj czoło o podłogę.",2253:"Wyciągnij ręce do przodu po podłodze, a potem przesuń dłonie w bok, aby rozciągnąć bok pleców."
+});
