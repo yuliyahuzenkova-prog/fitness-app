@@ -9981,6 +9981,8 @@ let FOOT_HANDS = [8, 48]; // seated foot exercises: upper arm and forearm angles
 const WALL_HANDS = { up: 2, off: 1.1, splay: .15, out: .5, tilt: 34 }; // wallHands: palm centre this far above the sketch wrist and the wrist this far off the wall (world units), fingers splayed out, elbows out
 const PALMS_UP = [-1, 34]; // palmsUp: the hand basis's second axis points down for a palm-up hand (measured on the model), fingers turned by the same 34° as on the wall
 let KNEE_INNER = .35; // knee corrective: how much the inner side of a bent knee is filled (relative to the back of the knee)
+let ANKLE_MIN = 5.2; // cm: the ankle joint's lowest height off the floor (the foot's own thickness under it)
+let FOOT_MAX = 65; // degrees: the most a relaxed foot in the air bends up from the shin line (was 82 — the owner: feet bent too strongly)
 let FOOT_RATE = 1500; // feet and toes turn at most this many degrees per loop's phase between frames (a real foot can't flick round instantly)
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
@@ -10753,16 +10755,16 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   bear_hold: { yaw: 30, noKneel: true, plantAll: true,
     A: { anchor: "hip", at: [80, 102], t: 80, a: 0, b: -95, fd: -75, u: 0, f: 0 },
     B: { anchor: "hip", at: [80, 102], t: 80, a: 0, b: -95, fd: -75, u: 0, f: 0 } },
-  donkey_kick: { noKneel: true, yaw: 30, handFix: -1, handFix2: false,
+  donkey_kick: { noKneel: true, ankle: 30, /* (one calm foot angle in the air, close to how it lies on the floor, so it doesn't bend over as the knee lands) */ yaw: 30, handFix: -1, handFix2: false,
     A: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: 180, u: 0, f: 0, a2: 0, b2: -90, fd2: 180 },
     B: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: 180, u: 0, f: 0, a2: -88, b2: -178, fd2: 180 } },
-  slr: { yaw: -30,
+  slr: { yaw: -30, ankle: 85, /* (toes pulled up, as the guide says) */
     A: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 90, b2: 90, fd2: 90, u: 90, f: 90 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 135, b2: 135, fd2: 128, u: 90, f: 90 } },
   heel_slide: { yaw: -30, alt: true, period: 7200,
     A: { anchor: "hip", at: [105, 133], t: -90, a: 90, b: 90, fd: 90, a2: 90, b2: 90, fd2: 90, u: 90, f: 90 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 90, b: 90, fd: 90, a2: 133.5, b2: 33.8, fd2: 0, u: 90, f: 90 } },
-  ham_curl_stand: { yaw: -40, wallHands: 138, openHand: true,
+  ham_curl_stand: { yaw: -40, wallHands: 138, openHand: true, ankle: 40, /* (relaxed foot, not bent up to a right angle) */
     A: pose({ at: [100, 140], t: 4, u: 72, f: 80, a2: 0, b2: 0, fd2: 0, props: [{ wall: 138 }] }),
     B: pose({ at: [100, 140], t: 4, u: 72, f: 80, a2: -5, b2: -100, fd2: -90, props: [{ wall: 138 }] }) },
   kickback_stand: { yaw: -40, wallHands: 140, openHand: true,
@@ -10778,7 +10780,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     A: { anchor: "hip", at: [105, 133], t: -90, a: 210, b: 82, fd: 20, u: 132, f: 135 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 210, b: 82, fd: 20, u: 132, f: 135 } },
   // (hands hold the sides of the seat, as the guide says: palms on the seat beside the hips)
-  knee_ext: { yaw: -40, handsOn: true, plantAll: true,
+  knee_ext: { yaw: -40, ankle: 85, /* (toes pulled up at the top, as the guide says) */ handsOn: true, plantAll: true,
     A: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 0, fd2: 0, u: 6, f: 12, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] },
     B: { anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, a2: 90, b2: 72, fd2: 105, u: 6, f: 12, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] } },
 });
@@ -11147,7 +11149,7 @@ let TOP_HAND = [27, -4]; // side-lying with the head on the bottom arm: where th
 let PILLOW_ARM = [1, 0, 0, .3]; // side-lying, head on the bottom arm: the upper arm's forward lean (per unit towards the head), and where the hand goes from the head (forward, towards the top of the head)
 const HAND_ON_HIP = { up: 4, fwd: 0, lift: 1.6 }; // side planks (chrome): where the top palm rests, from the hip joint (model units towards the head and front), and how far it sits off the skin (cm)
 const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the hand lands from the sketch's near shoulder (towards the head, towards the floor, sideways) // shoulder taps: where the hand lands from the opposite shoulder joint (model units: towards the floor, towards the head, outwards)
-const KNEEL_REST = { ankle: 7, toe: 1.5 }, INSTEP = { ankle: 4.9, toe: -1.5, edge: 4, lift: 2, hipTop: 84, hipSpan: 16, top: 8, topDrop: 5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
+const KNEEL_REST = { ankle: 5.5, toe: 1.8 }, /* (was 7: the resting foot sloped down to its toes and the toes bent up — the owner: "too strongly bent") */ INSTEP = { ankle: 4.9, toe: -1.5, edge: 4, lift: 2, hipTop: 84, hipSpan: 16, top: 8, topDrop: 5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
 let REST_FOOT = { ankle: 13, tilt: 55 }; // kneeling back foot (hip flexor stretch): the ankle joint's height off the floor, so the foot slopes down to the toes at a natural angle instead of lying pointed in line with the shin
@@ -11813,7 +11815,8 @@ function proPose0(B) {
     }
     const tN = A.clone().add((kneelToe ? kneelToe.fu0 : fu).clone().multiplyScalar((R[L + "Foot"].y - (PRO.sole || 0)) * S));
     let target = restTop ? tN.clone().lerp(restTop, restW) : footEx ? new T.Vector3(A.x, -140 + (R[L + "Foot"].y - (PRO.sole || 0)) * S + (GL.foot.kind === "towel" ? .9 : 0), A.z) : kneel ? tN.lerp(new T.Vector3(A.x, -140 + kneelToe.lift, A.z), kw) : tN;
-    if (B.footDown) target.y = Math.max(target.y, -140 + R[L + "Foot"].distanceTo(R[L + "ToeBase"]) * S * .95 + 1.4); // (footDown: the ankle stays high enough for the ball of the foot, toes bent under, to rest on the floor)
+    if (B.footDown) target.y = Math.max(target.y, -140 + R[L + "Foot"].distanceTo(R[L + "ToeBase"]) * S * .95 + 1.4);
+    if (PRO.chrome && !footEx) target.y = Math.max(target.y, -140 + ANKLE_MIN); // (the ankle joint is never closer to the floor than the foot under it is thick: a foot landing with its top down dipped the ankle below its resting height and it popped back up) // (footDown: the ankle stays high enough for the ball of the foot, toes bent under, to rest on the floor)
     // Two-bone IK with the model's own leg lengths, bending the knee towards the pose's knee, so the foot lands on the floor
     const Hm = new T.Vector3().setFromMatrixPosition(by[L + "UpLeg"].matrixWorld);
     const l1 = R[L + "Leg"].distanceTo(R[L + "UpLeg"]) * S, l2 = R[L + "Foot"].distanceTo(R[L + "Leg"]) * S;
@@ -11846,11 +11849,11 @@ function proPose0(B) {
     // Standing it is ~63°; a relaxed foot off the floor points at most ~30° from that and bends up at most ~19°.
     // Faded in with the height off the floor, so feet on the floor are untouched. B.ankle sets a relaxed angle instead.
     if (!footEx && (!kneel || (PRO.chrome && kw < 1)) && !B.kneeSide && !B.freeAnkle && !B.footDown) { // (chrome: fades out as the kneel fades in, instead of switching off in one frame)
-      const air = (1 - cl01((-Math.min(A.y, Tt.y) - 133) / 4)) * (kneel ? 1 - kw : 1);
+      const air = (1 - cl01((-Math.min(A.y, Tt.y) - 129.5) / 9)) * (kneel ? 1 - kw : 1); // (over the last ~9 cm: over 4 cm a foot lifting off or landing turned in a frame or two)
       if (air > 0) {
         const rd = by[L + "ToeBase"].position.clone().normalize(), [bx, by_, bz] = glBasis(fu, sole); // (the toe joint in the foot bone's own frame)
         const bone = bx.clone().multiplyScalar(rd.x).add(by_.clone().multiplyScalar(rd.y)).add(bz.clone().multiplyScalar(rd.z)).normalize();
-        const sd = ankle.clone().sub(knee).normalize(), th = sd.angleTo(bone), thc = B.ankle ? rad(B.ankle) : Math.min(rad(82), Math.max(rad(33), th));
+        const sd = ankle.clone().sub(knee).normalize(), th = sd.angleTo(bone), overStep = B.stepProp || (B.boxes || []).some(([x0, x1, top]) => A.x > x0 - 8 && A.x < x1 + 8 && A.y > top - 24), thc = B.ankle ? rad(B.ankle) : Math.min(rad(overStep ? 82 : FOOT_MAX), Math.max(rad(33), th)); // (stepping up onto a box or bench the foot still bends up fully to clear its edge) // (FOOT_MAX: a relaxed foot in the air isn't bent up hard; an exercise that pulls the toes up says so with B.ankle)
         if (Math.abs(thc - th) > 1e-4) {
           // which way "forward" is for the foot: when it's pointed almost in line with the shin, the bone alone can't tell
           // (it would tip the foot out sideways), so lean on the sole's own forward direction
@@ -11896,7 +11899,7 @@ function proPose0(B) {
     } else {
       const rest = restTop && restW > .999; // (relaxed foot fully down: the toes lie on the floor, tops down; part-way down they are eased in below)
       let qN = rest ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) : !B.kneeSide && hz.lengthSq() > .01 ? (() => { // (toes flatten onto the floor as the ball comes down: blended, not switched, so they don't flicker)
-          let w = cl01((-135.5 - Tt.y) / 2.5) * cl01((-sole.y - .06) / .12) * cl01((hz.length() - .1) / .2); w = w * w * (3 - 2 * w);
+          let w = cl01((-133 - Tt.y) / 6) * cl01((-sole.y - .06) / .12) * cl01((hz.length() - .1) / .2); // (over the last ~6 cm the toes come down, not 2.5: they flicked flat) w = w * w * (3 - 2 * w);
           return w > 0 ? flat(fu, sole).slerp(flat(new T.Vector3(0, 1, 0), hz.clone().normalize()), w) : flat(fu, sole); })() : flat(fu, sole);
       if (PRO.chrome && !rest && !B.kneeSide && !footEx && !B.roll && V3(h).y > K.y + 5 && K.y < -110 && V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) > -.97) { // (knee bent) // (on all fours, knee near the floor) chrome: the toes ease onto the floor (no flip when the foot passes through upright, as in bird dog)
         const hzF = K.clone().sub(A).setY(0); // the toes bend flat towards the knee, as when kneeling (stable even with the sole pointing straight down)
@@ -12925,7 +12928,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantSlide = an.plantSlide || 0; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmUp = !!an.palmUp; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.restFoot = !!an.restFoot; B.wallHands = an.wallHands; B.palmsUp = !!an.palmsUp; B.htPad = !!(p.props || []).find((q) => q.htmachine); B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantSlide = an.plantSlide || 0; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.palmFwd = !!an.palmFwd; B.palmUp = !!an.palmUp; B.palmMid = !!an.palmMid; B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.restFoot = !!an.restFoot; B.stepProp = (p.props || []).some((q) => q.box || q.chair || q.stool || q.stair || q.step) /* (something to step onto: feet keep their full bend) */; B.wallHands = an.wallHands; B.palmsUp = !!an.palmsUp; B.htPad = !!(p.props || []).find((q) => q.htmachine); B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
