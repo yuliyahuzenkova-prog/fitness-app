@@ -404,5 +404,6 @@ Object.assign(UK, {
   "Return slowly": "Повільно повернись",
   "Lift your chest slowly": "Повільно підніми груди",
   "Lower down": "Опустись",
-  "Straighten your knee": "Розігни коліно"
+  "Straighten your knee": "Розігни коліно",
+  "Delete set": "Видалити підхід"
 });

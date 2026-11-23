@@ -2614,3 +2614,19 @@ I18N_FILL("pt", {
 I18N_FILL("pl", {
 2481:"Chrom – mężczyzna"
 });
+// swipe to delete a set
+I18N_FILL("es", {
+2482:"Eliminar serie"
+});
+I18N_FILL("de", {
+2482:"Satz löschen"
+});
+I18N_FILL("fr", {
+2482:"Supprimer la série"
+});
+I18N_FILL("pt", {
+2482:"Excluir série"
+});
+I18N_FILL("pl", {
+2482:"Usuń serię"
+});
