@@ -127,7 +127,7 @@ textarea { font: 500 var(--fs-17)/1.4 var(--body); color: var(--ink); background
 .list li:last-child { border-bottom: 0; padding-bottom: 2px; }
 .list li > span:first-child { min-width: 0; }
 .kv { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 10px 12px; }
-.kv dt { color: var(--muted); overflow-wrap: anywhere; hyphens: auto; }
+.kv dt { color: var(--muted); overflow-wrap: break-word; hyphens: manual; }
 .kv dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 details > summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; background: var(--fill); border-radius: 12px; }
 details > summary::-webkit-details-marker { display: none; }
@@ -480,7 +480,8 @@ body:has(.restbar:not([hidden])) .toast { bottom: calc(var(--tabbar) + 140px + e
 /* Plan */
 .timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .phase { display: grid; gap: 2px; align-content: start; text-align: left; border: 0; background: var(--surface); color: var(--ink); border-radius: 14px; padding: 10px; cursor: pointer; font: inherit; min-width: 0; box-shadow: var(--shadow); }
-.phase b { font: 700 clamp(var(--fs-15), 3.9vw, var(--fs-17))/1.2 var(--display); overflow-wrap: normal; word-break: normal; hyphens: auto; -webkit-hyphens: auto; }
+.phase b { font: 700 var(--fs-17)/1.2 var(--display); overflow-wrap: break-word; word-break: normal; hyphens: manual; -webkit-hyphens: manual; } /* (whole words: "Founda-tion" broke mid-word in narrow tiles) */
+.phase .tag { margin-top: 4px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .kv dd.rot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; } .kv dd.rot span { white-space: nowrap; } .kv dd.rot i { font-style: normal; color: var(--muted); }
 .phase .pnum, .phase .pweeks { font-size: var(--fs-12); color: var(--muted); }
 .phase.now .pnum { color: var(--accent-text); font-weight: 600; }
@@ -829,8 +830,9 @@ dd.whydd { grid-column: 1 / -1; margin: 0; }
 @media (max-width: 360px) { .geasy { grid-template-columns: 1fr; } }
 svg.anim .towel { fill: none; stroke: var(--equip); stroke-width: 5; stroke-linecap: round; }
 
+@media (max-width: 560px) { .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .kv { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } } /* (labels get half the width on a phone, so a long word like "Hauptübungen" isn't broken in two) */ /* (four phase tiles side by side only where they fit: on a phone they squeezed the text) */
 @media (max-width: 420px) {
-  .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .exrow { grid-template-columns: minmax(0, 104px) minmax(0, 1fr); }
   .ltitle { font-size: var(--fs-34); }
