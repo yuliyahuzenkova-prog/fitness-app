@@ -9964,6 +9964,8 @@ let CROSS_ARMS = { inward: .3, down: -2, out: 13, layer: 6, stagger: -5 }; // ar
 let FOOT_HANDS = [8, 48]; // seated foot exercises: upper arm and forearm angles so the hands rest on the knees
 const WALL_HANDS = { up: 2, off: 1.1, splay: .15, out: .5, tilt: 34 }; // wallHands: palm centre this far above the sketch wrist and the wrist this far off the wall (world units), fingers splayed out, elbows out
 const PALMS_UP = [-1, 34]; // palmsUp: the hand basis's second axis points down for a palm-up hand (measured on the model), fingers turned by the same 34° as on the wall
+let KNEE_INNER = .35; // knee corrective: how much the inner side of a bent knee is filled (relative to the back of the knee)
+let FOOT_RATE = 1500; // feet and toes turn at most this many degrees per loop's phase between frames (a real foot can't flick round instantly)
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
 let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the full scrunch
@@ -11306,7 +11308,7 @@ function proArchMorph(PRO) {
         let wT = 0, wS = 0; for (let k = 0; k < 4; k++) { const nm = names[SI.array[i * 4 + k]], w = SW.array[i * 4 + k]; if (nm === side + "UpLeg") wT += w; else if (nm === side + "Leg") wS += w; }
         if (wT + wS < .5) continue;
         v.set(P.getX(i), P.getY(i), P.getZ(i)).sub(K); const along = v.dot(ax); v.sub(ax.clone().multiplyScalar(along)); const rl = v.length(); if (rl < .1) continue;
-        const back = Math.max(0, -v.z / rl), inner = Math.max(0, -(Math.sign(K.x) || 1) * v.x / rl), amt = KNEE_FIX * Math.min(1, 4 * wT * wS) * Math.exp(-((along / 11) ** 2)) * (.1 * (1 - inner) + .9 * back * back); // (mostly behind the knee; pushing the sides out as well tore a jagged notch in the knee at a deep squat) // only where the weights blend (that is what pinches); most at the back, some all round (less on the inner side, so knees held together don't merge), so a bent knee stays as full as the thigh and shin
+        const back = Math.max(0, -v.z / rl), inner = Math.max(0, -(Math.sign(K.x) || 1) * v.x / rl), amt = KNEE_FIX * Math.min(1, 4 * wT * wS) * Math.exp(-((along / 11) ** 2)) * (.1 * (1 - inner) + .9 * back * back + KNEE_INNER * inner * (1 - back)); // (KNEE_INNER: the inner side of a bent knee caved in a little — a small dip; a little fill there, much less than at the back) // (mostly behind the knee; pushing the sides out as well tore a jagged notch in the knee at a deep squat) // only where the weights blend (that is what pinches); most at the back, some all round (less on the inner side, so knees held together don't merge), so a bent knee stays as full as the thigh and shin
         kd[i * 3] = (v.x / rl) * amt; kd[i * 3 + 1] = (v.y / rl) * amt; kd[i * 3 + 2] = (v.z / rl) * amt;
       }
       let Lk = new Float32Array(W * 3); for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) Lk[wid[i] * 3 + c] += kd[i * 3 + c] / (cnt[wid[i]] || 1);
@@ -11757,7 +11759,7 @@ function proPose0(B) {
       // so use the foot's own top, square to the sole in the leg's plane
       if (!B.roll && Math.abs(sole.dot(bl)) < .3) {
         const amb = Math.abs(K.clone().sub(A).normalize().dot(sole)), w = Math.min(1, Math.max(0, (amb - .7) / .2));
-        if (w > 0) { const fx = new T.Vector3().crossVectors(sole, bl).normalize(); if (K.y < -128 && A.y < -126 && fx.dot(front(k, a)) < 0) fx.negate(); /* shin lying on the floor (kneeling, foot relaxed): the top of the foot faces the floor, like the shin */ fu = fu.clone().lerp(fx, w); fu.sub(sole.clone().multiplyScalar(fu.dot(sole))); fu = fu.lengthSq() > 1e-4 ? fu.normalize() : fx; }
+        if (w > 0) { const fx = new T.Vector3().crossVectors(sole, bl).normalize(); { const fr0 = front(k, a), fxF = fr0.clone().sub(sole.clone().multiplyScalar(fr0.dot(sole))); let wf = cl01((-K.y - 126) / 6) * cl01((-A.y - 124) / 6); wf = wf * wf * (3 - 2 * wf); if (wf > 0 && fxF.lengthSq() > 1e-3) { fxF.normalize(); fx.applyAxisAngle(sole, Math.atan2(sole.dot(new T.Vector3().crossVectors(fx, fxF)), fx.dot(fxF)) * wf); } } /* (shin on the floor: the top of the foot turns to face the way the shin's front does, eased in as the knee comes down. It used to flip by the sign of a dot product, so a foot near that line spun 180° between frames — the donkey kick's foot) */ /* shin lying on the floor (kneeling, foot relaxed): the top of the foot faces the floor, like the shin */ { const f0 = fu.clone().sub(sole.clone().multiplyScalar(fu.dot(sole))); if (f0.lengthSq() > 1e-4) { f0.normalize(); fu = f0.applyAxisAngle(sole, Math.atan2(sole.dot(new T.Vector3().crossVectors(f0, fx)), f0.dot(fx)) * w).normalize(); } else fu = fx; } } // (turned towards fx about the sole, not blended: the two can point nearly opposite ways, and a blend passed through zero and flipped the foot over in one frame)
       }
       // Side plank on the knees: the foot points straight back off the bent knee; its top faces the way the thigh runs (like the shin's front)
       if (B.kneeSide) { const tf = K.clone().sub(V3(h)); tf.sub(sole.clone().multiplyScalar(tf.dot(sole))); if (tf.lengthSq() > 1e-4) fu = tf.normalize(); }
@@ -11809,7 +11811,7 @@ function proPose0(B) {
     // chrome, foot flat on the floor: the knee points the way the toes do (a little further out), never caving in past them
     if (PRO.chrome && KNEE_TRACK && !B.roll && !kneel && !footEx && !B.kneeSide) { // (standing on the feet only: lying bridges keep their own knees)
       const sm = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); }; // (every condition fades in, so the knee never jumps as one is met)
-      const gate = sm((-120 - A.y) / 8) * sm((.6 - Math.abs(sole.y)) / .2) * sm((Hm.y - A.y - 21) / 5) * sm((K.y + 126) / 6); // (not a knee down on the floor: kneeling, the foot behind lies on its instep) // (hips more than ~26 cm above the ankles: squats down to the bottom; bridges, lying, stay under 20)
+      const gate = sm((-120 - A.y) / 8) * sm((.6 - Math.abs(sole.y)) / .2) * sm((Hm.y - A.y - 21) / 5) * sm((K.y + 126) / 6) * sm((K.y - A.y - 12) / 8); // (last: the shin stands, knee well above the ankle — a leg lifting off the floor on all fours swung its knee round) // (not a knee down on the floor: kneeling, the foot behind lies on its instep) // (hips more than ~26 cm above the ankles: squats down to the bottom; bridges, lying, stay under 20)
       const th = sole.clone().setY(0); if (gate > 0 && th.lengthSq() > 1e-4) { th.normalize();
         const out = left.clone().multiplyScalar(L === "Left" ? 1 : -1); th.add(out.multiplyScalar(Math.tan(rad(KNEE_TRACK[1])))).normalize();
         const tp = th.projectOnPlane(hd); const bendK = Math.acos(Math.max(-1, Math.min(1, K.clone().sub(Hm).normalize().dot(A.clone().sub(K).normalize())))), w = KNEE_TRACK[0] * gate * sm(bendK / rad(30));
@@ -11837,7 +11839,10 @@ function proPose0(B) {
           // (it would tip the foot out sideways), so lean on the sole's own forward direction
           let fr = bone.clone().sub(sd.clone().multiplyScalar(bone.dot(sd))); const frL = fr.length(), sf = sole.clone().sub(sd.clone().multiplyScalar(sole.dot(sd)));
           const wB = cl01((frL - .2) / .35); fr = (frL > 1e-6 ? fr.multiplyScalar(1 / frL) : by_.clone()).multiplyScalar(wB).add(sf.lengthSq() > 1e-6 ? sf.normalize().multiplyScalar(1 - wB) : new T.Vector3()); if (fr.lengthSq() < 1e-6) fr = by_.clone(); fr.normalize(); if (B.ankleFront) { const sf2 = front(k, a).clone().multiplyScalar(B.ankleFront); sf2.sub(sd.clone().multiplyScalar(sf2.dot(sd))); if (sf2.lengthSq() > 1e-4) fr = sf2.normalize(); } // (ankleFront: the foot turns the way the front of the shin faces, as standing)
-          const target = sd.clone().multiplyScalar(Math.cos(thc)).add(fr.multiplyScalar(Math.sin(thc))), qa = new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(bone, target), air);
+          // (a foot pointed almost in line with the shin can't tell which side to bend to: that side flipped from one frame to the next and the
+          // foot spun ~60°, as when a donkey kick's knee lands. Near that line the limit eases off, so the foot just stays pointed.)
+          const inLine = cl01((th - rad(6)) / rad(18)), wA = air * inLine * inLine * (3 - 2 * inLine);
+          const target = sd.clone().multiplyScalar(Math.cos(thc)).add(fr.multiplyScalar(Math.sin(thc))), qa = new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(bone, target), wA);
           fu = by_.clone().applyQuaternion(qa).normalize(); sole = bz.clone().applyQuaternion(qa).normalize();
         }
       }
@@ -11872,32 +11877,46 @@ function proPose0(B) {
             setBone(L + "Foot", flat(f2, s2)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(qr).multiply(flat(fu, sole))); const yy = tipY(); if (!best || yy > best.y) best = { y: yy, f2, s2, qr }; }
           fu = best.f2; sole = best.s2; setBone(L + "Foot", flat(fu, sole)); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(curlT)).multiply(flat(fu, sole))); } }
     } else {
-      let qN = restTop ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) /* relaxed foot: the toes lie on the floor, tops down */ : !B.kneeSide && hz.lengthSq() > .01 ? (() => { // (toes flatten onto the floor as the ball comes down: blended, not switched, so they don't flicker)
+      const rest = restTop && restW > .999; // (relaxed foot fully down: the toes lie on the floor, tops down; part-way down they are eased in below)
+      let qN = rest ? flat(new T.Vector3(0, -1, 0), hz.clone().normalize()) : !B.kneeSide && hz.lengthSq() > .01 ? (() => { // (toes flatten onto the floor as the ball comes down: blended, not switched, so they don't flicker)
           let w = cl01((-135.5 - Tt.y) / 2.5) * cl01((-sole.y - .06) / .12) * cl01((hz.length() - .1) / .2); w = w * w * (3 - 2 * w);
           return w > 0 ? flat(fu, sole).slerp(flat(new T.Vector3(0, 1, 0), hz.clone().normalize()), w) : flat(fu, sole); })() : flat(fu, sole);
-      if (PRO.chrome && !restTop && !B.kneeSide && !footEx && !B.roll && V3(h).y > K.y + 5 && K.y < -110 && V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) > -.97) { // (knee bent) // (on all fours, knee near the floor) chrome: the toes ease onto the floor (no flip when the foot passes through upright, as in bird dog)
+      if (PRO.chrome && !rest && !B.kneeSide && !footEx && !B.roll && V3(h).y > K.y + 5 && K.y < -110 && V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) > -.97) { // (knee bent) // (on all fours, knee near the floor) chrome: the toes ease onto the floor (no flip when the foot passes through upright, as in bird dog)
         const hzF = K.clone().sub(A).setY(0); // the toes bend flat towards the knee, as when kneeling (stable even with the sole pointing straight down)
         let wT = cl01((-133 - Tt.y) / 7) * cl01((-sole.y - .12) / .25) * cl01(hzF.length() / 3) * cl01((-K.y - 110) / 6) * cl01((V3(h).sub(K).normalize().dot(A.clone().sub(K).normalize()) + .97) / .25); wT = wT * wT * (3 - 2 * wT);
         qN = wT > 0 ? qN.clone().slerp(flat(new T.Vector3(0, 1, 0), hzF.normalize()), wT) : qN;
       }
+      // a relaxed foot coming down to rest on its instep: the toes ease onto the floor with it (restW), instead of snapping flat in one frame
+      if (restTop && !rest && restW > 0 && hz.lengthSq() > .01) qN = qN.clone().slerp(flat(new T.Vector3(0, -1, 0), hz.clone().normalize()), restW);
       // toeDrop (chrome poses): toes in their standing line, bent down from the ankle–ball line, not curled up towards the shin
-      if (B.toeDrop && !kneel && !restTop) { const ax = new T.Vector3().crossVectors(sole, fu.clone().negate()).normalize(); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(B.toeDrop)).multiply(flat(fu, sole))); }
+      if (B.toeDrop && !kneel && !rest) { const ax = new T.Vector3().crossVectors(sole, fu.clone().negate()).normalize(); setBone(L + "ToeBase", new T.Quaternion().setFromAxisAngle(ax, rad(B.toeDrop)).multiply(flat(fu, sole))); }
       else setBone(L + "ToeBase", kneel ? qN.slerp(flat(kneelToe.fu, kneelToe.sole), kw) : qN);
     }
     if (bkD && bkD.lengthSq() > 1e-4) { // toes: bent flat towards the knee on the floor, easing straight as the knee rises (by height alone, so it's smooth)
       let w = cl01((-knee.y - 111) / 23); /* (over the whole way the knee comes down, so the toes curl slowly, not in the last instant) */ w = w * w * (3 - 2 * w);
       setBone(L + "ToeBase", flat(fu, sole).slerp(flat(new T.Vector3(0, 1, 0), bkD.clone().negate()), w));
     }
-    if (PRO.chrome && !footEx && !B.footDown && (kneel ? kw < .999 : Tt.y > -139 && A.y > -134)) { // (only a foot meant to be in the air) chrome figures: the toes never dip into the floor (a foot swinging down to kneel); the foot tips up at the ankle instead
+    const wDip = kneel ? 1 - kw : cl01((A.y + 140) / 6) * cl01((Tt.y + 141) / 2); // (fades out as the foot comes down to the floor, instead of switching off in one frame: the toes jumped as a knee landed)
+    if (PRO.chrome && !footEx && !B.footDown && wDip > 0) { // (only a foot meant to be in the air) chrome figures: the toes never dip into the floor (a foot swinging down to kneel); the foot tips up at the ankle instead
       PRO.group.updateMatrixWorld(true);
       const aw = new T.Vector3().setFromMatrixPosition(by[L + "Foot"].matrixWorld), tw = new T.Vector3().setFromMatrixPosition(by[L + "Toe_End"].matrixWorld), fl = -140 + 1.2;
       if (tw.y < fl && aw.y > fl) {
         const v = tw.clone().sub(aw), len = v.length(), ax = new T.Vector3().crossVectors(v, new T.Vector3(0, -1, 0)); 
         if (ax.lengthSq() > 1e-6 && len > 1e-3) { ax.normalize(); const cur = Math.asin(Math.min(1, (aw.y - tw.y) / len)), want = Math.asin(Math.min(1, (aw.y - fl) / len)), d = cur - want;
-          const qr = new T.Quaternion().setFromAxisAngle(ax, -d); sole = sole.clone().applyQuaternion(qr); fu = fu.clone().applyQuaternion(qr); const qT = q[L + "ToeBase"] && q[L + "ToeBase"].clone(); setBone(L + "Foot", flat(fu, sole)); if (qT) setBone(L + "ToeBase", qr.clone().multiply(qT)); }
+          const qr = new T.Quaternion().setFromAxisAngle(ax, -d * wDip); sole = sole.clone().applyQuaternion(qr); fu = fu.clone().applyQuaternion(qr); const qT = q[L + "ToeBase"] && q[L + "ToeBase"].clone(); setBone(L + "Foot", flat(fu, sole)); if (qT) setBone(L + "ToeBase", qr.clone().multiply(qT)); }
       }
     }
   }
+  // Feet and toes never snap between frames: from one frame of an animation to the next on the same canvas, each foot and its toes
+  // turn at most FOOT_RATE degrees per whole loop's phase (a real foot can't flick round in 1/60 s). Whatever rule decides the foot's
+  // shape, a sudden change in it now plays as a quick, smooth turn. A jump in phase (new view, a scrub, a still) is taken as it is.
+  { const fr = GL.frame; if (fr && PRO.chrome) {
+      const mem = PRO.footMem || (PRO.footMem = new WeakMap()), m = mem.get(fr.c), dph = m && m.id === fr.id ? Math.abs(((fr.ph - m.ph) % 1 + 1.5) % 1 - .5) : 1;
+      const cont = dph > 1e-6 && dph < .06, maxA = rad(FOOT_RATE) * dph, keep = {};
+      for (const sd of ["Left", "Right"]) for (const part of ["Foot", "ToeBase"]) { const n = sd + part; if (!q[n]) continue;
+        let qn = q[n]; if (cont && m.q[n]) { const ang = m.q[n].angleTo(qn); if (ang > maxA) qn = m.q[n].clone().slerp(qn, maxA / ang); }
+        setBone(n, qn); keep[n] = qn.clone(); } // (the toes are set again after their foot, so they follow it)
+      mem.set(fr.c, { id: fr.id, ph: fr.ph, q: keep }); } }
   for (const [ai, [side, [s, e, w]]] of B.arms.entries()) {
     const tap = B.tapArm && ai === 1; // shoulder taps: the hand that lifts off and reaches across
     const L = V3(s).sub(V3(B.sh)).dot(left) >= 0 ? "Left" : "Right";
@@ -12909,6 +12928,7 @@ function seqPhase(an, ph) {
 function glDraw(canvas, id, ph, yaw, muscles) {
   const an = ANIMS[id]; if (!an || !glInit()) return false;
   const ph0 = ph; ph = seqPhase(an, ph);
+  GL.frame = reduceMotion() ? null : { c: canvas, id, ph: ph0 }; // (for the feet's frame-to-frame limit)
   const T = THREE, big = canvas.classList.contains("big"), still = reduceMotion();
   glStyle(); setHighlight(muscles);
   GL.used = {};
