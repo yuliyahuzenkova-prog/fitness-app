@@ -25,7 +25,7 @@ const { chromium } = require('playwright'); const path = require('path'); const 
       glInit(); glStyle(); await proLoad();
       const T = THREE, c = document.createElement('canvas'); c.width = 120; c.height = 120; document.body.appendChild(c);
       const ids = idsArg === 'all' ? Object.keys(ANIMS).filter((id) => ANIMS[id].A || ANIMS[id].keys) : idsArg.split(',');
-      const out = {}, FLOOR = -140, TOL = 1.2, KNEE_MAX = 140, ELBOW_MAX = 150, HIP_MAX = 135, /* (a hip folded past ~135° tears the shorts at the seat — child's pose) */ TORSO_R = 11, CHEST_R = 10, THIGH_R = 6.5, PELVIS_R = 9; // (body thickness around the bone lines, cm, a little under the model's: only a hand clearly inside counts) // (a bone this far past a surface is a real pass-through, not skin resting on it)
+      const out = {}, FLOOR = -140, TOL = 1.2, KNEE_MAX = 140, ELBOW_MAX = 150, HIP_MAX = 135, ELBOW_BACK = 10, /* (a hip folded past ~135° tears the shorts at the seat — child's pose) */ TORSO_R = 11, CHEST_R = 10, THIGH_R = 6.5, PELVIS_R = 9; // (body thickness around the bone lines, cm, a little under the model's: only a hand clearly inside counts) // (a bone this far past a surface is a real pass-through, not skin resting on it)
       // bones checked: the ends people see go through things (the spine's own bones sit deep inside the body)
       const pick = /(Hand(Index|Middle|Ring|Pinky|Thumb)?[0-9]?|ForeArm|Foot|ToeBase|Toe_End|Leg|Head|HeadTop_End)$/;
       for (const id of ids) {
@@ -51,6 +51,13 @@ const { chromium } = require('playwright'); const path = require('path'); const 
                 if (d > 1.5 && (!self || d > self.d)) self = { d: +d.toFixed(1), joint: sd + j, into: nm, ph }; } } }
           // joint shape: how far each knee and elbow is folded (180° = folded flat)
           const bp = (nm) => { const bn = PRO.bones.find((x) => x.name.replace('mixamorig:', '') === nm); return bn && bn.getWorldPosition(new T.Vector3()); };
+          // elbow bent the wrong way: the bend direction (forearm off the upper arm's line), seen in the upper arm bone's own frame,
+          // points to the biceps side (+z) for a real bend; towards -z the elbow is bending backwards (measured: curls +1, the old
+          // recumbent bike -0.98)
+          for (const sd of ['Left', 'Right']) { const A = bp(sd + 'Arm'), E = bp(sd + 'ForeArm'), W = bp(sd + 'Hand'), ab = PRO.bones.find((x) => x.name.replace('mixamorig:', '') === sd + 'Arm'); if (!A || !E || !W || !ab) continue;
+            const u = E.clone().sub(A).normalize(), f = W.clone().sub(E).normalize(), nb = f.clone().sub(u.clone().multiplyScalar(f.dot(u))), fold = Math.acos(Math.max(-1, Math.min(1, u.dot(f)))) * 180 / Math.PI;
+            if (nb.lengthSq() < 1e-6 || fold < ELBOW_BACK) continue; nb.normalize().applyQuaternion(ab.getWorldQuaternion(new T.Quaternion()).invert());
+            if (nb.z < -.3 && (!shape || 900 + fold > shape.bend)) shape = { bend: Math.round(900 + fold), joint: sd + ' elbow bent backwards ' + Math.round(fold) + '°', ph }; }
           { const Hp = bp('Hips'), Sp = bp('Spine1'); if (Hp && Sp) for (const sd of ['Left', 'Right']) { const U = bp(sd + 'UpLeg'), Kn = bp(sd + 'Leg'); if (!U || !Kn) continue;
               const fold = 180 - Sp.clone().sub(Hp).angleTo(Kn.clone().sub(U)) * 180 / Math.PI; // (hip: 0 standing straight, 180 thigh folded flat onto the belly)
               if (fold > HIP_MAX && (!shape || fold > shape.bend)) shape = { bend: Math.round(fold), joint: sd + ' hip', ph }; } }
@@ -92,7 +99,7 @@ const { chromium } = require('playwright'); const path = require('path'); const 
   const selfs = rows.filter(([, figs]) => Object.values(figs).some((w) => w.self));
   for (const [id, figs] of hits) console.log(id.padEnd(22), Object.entries(figs).filter(([, w]) => w.d || w.err).map(([f, w]) => w.err ? `${f}: ERROR ${w.err}` : `${f}: ${w.bone} ${w.d} into ${w.what} @${w.ph}`).join(' | '));
   console.log(hits.length ? `${hits.length} animation(s) with a body point through the floor or a prop` : 'no collisions');
-  for (const [id, figs] of shapes) console.log('shape', id.padEnd(16), Object.entries(figs).filter(([, w]) => w.shape).map(([f, w]) => `${f}: ${w.shape.joint} folded ${w.shape.bend}° @${w.shape.ph}`).join(' | '));
+  for (const [id, figs] of shapes) console.log('shape', id.padEnd(16), Object.entries(figs).filter(([, w]) => w.shape).map(([f, w]) => w.shape.bend >= 900 ? `${f}: ${w.shape.joint} @${w.shape.ph}` : `${f}: ${w.shape.joint} folded ${w.shape.bend}° @${w.shape.ph}`).join(' | '));
   console.log(shapes.length ? `${shapes.length} animation(s) with a knee or elbow folded so far it looks square` : 'joint shapes ok');
   for (const [id, figs] of selfs) console.log('body', id.padEnd(17), Object.entries(figs).filter(([, w]) => w.self).map(([f, w]) => `${f}: ${w.self.joint} ${w.self.d} into the ${w.self.into} @${w.self.ph}`).join(' | '));
   console.log(selfs.length ? `${selfs.length} animation(s) with a hand or forearm inside the body` : 'hands clear of the body');
