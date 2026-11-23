@@ -405,5 +405,19 @@ Object.assign(UK, {
   "Lift your chest slowly": "Повільно підніми груди",
   "Lower down": "Опустись",
   "Straighten your knee": "Розігни коліно",
-  "Delete set": "Видалити підхід"
+  "Delete set": "Видалити підхід",
+  "Rise on your toes": "Піднімись на носки",
+  "Rock back slowly onto your heels": "Повільно перекотись на п'яти",
+  "Stand up and rise on your toes": "Встань і піднімись на носки",
+  "Step up and drive your knee": "Встань і підніми коліно",
+  "Step back and lower slowly": "Крок назад, повільно опустись",
+  "Lower one foot slowly": "Повільно опусти одну стопу",
+  "Bring it back": "Поверни назад",
+  "Lower your legs slowly": "Повільно опусти ноги",
+  "Lift them back": "Підніми назад",
+  "Flatten your lower back": "Притисни поперек",
+  "Relax slowly": "Повільно розслабся",
+  "Straighten your arms": "Випрями руки",
+  "Lift one leg": "Підніми одну ногу",
+  "Rock back slowly": "Повільно відкотися назад"
 });
