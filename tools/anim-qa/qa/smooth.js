@@ -56,7 +56,8 @@ const { chromium } = require('playwright'); const path = require('path'); const 
           const d = qs.map((q, i) => q.angleTo(qs[(i + 1) % N]) * 180 / Math.PI);
           for (let i = 0; i < N; i++) { const around = []; for (let j = -4; j <= 4; j++) if (Math.abs(j) > 1) around.push(d[(i + j + N) % N]);
             around.sort((x, y) => x - y); const typ = Math.max(1.5, around[Math.floor(around.length / 2)]), r = d[i] / typ;
-            if (d[i] > 6 && r > 3 && (!twist || r > twist.r)) twist = { r: +r.toFixed(1), d: +d[i].toFixed(1), joint: rnames[k], ph: +(i / N).toFixed(3) }; } });
+            const lim = /Foot|ToeBase|Hand$/.test(rnames[k]) ? Math.max(6, 1500 / N * 1.1) : 6; // (feet, toes and hands are speed-limited in the app to 1500° a loop: a turn within that is smooth by design)
+            if (d[i] > lim && r > 3 && (!twist || r > twist.r)) twist = { r: +r.toFixed(1), d: +d[i].toFixed(1), joint: rnames[k], ph: +(i / N).toFixed(3) }; } });
         // hips going up and down: count the turns (up→down) bigger than 1 unit
         const hy = track[0].map((q) => q.y); let turns = 0, dir = 0, ext = hy[0], range = Math.max(...hy) - Math.min(...hy);
         for (let i = 1; i <= N; i++) { const y = hy[i % N]; if (dir >= 0 && y < ext - 1) { if (dir > 0) turns++; dir = -1; ext = y; } else if (dir <= 0 && y > ext + 1) { if (dir < 0) turns++; dir = 1; ext = y; } else if ((dir >= 0 && y > ext) || (dir <= 0 && y < ext)) ext = y; }

@@ -9967,6 +9967,7 @@ const PALMS_UP = [-1, 34]; // palmsUp: the hand basis's second axis points down 
 let KNEE_INNER = .35; // knee corrective: how much the inner side of a bent knee is filled (relative to the back of the knee)
 let ANKLE_MIN = 5.2; // cm: the ankle joint's lowest height off the floor (the foot's own thickness under it)
 let FOOT_MAX = 65; // degrees: the most a relaxed foot in the air bends up from the shin line (was 82 — the owner: feet bent too strongly)
+let HAND_RATE = 1500; // hands turn at most this many degrees per loop's phase between frames
 let FOOT_RATE = 1500; // feet and toes turn at most this many degrees per loop's phase between frames (a real foot can't flick round instantly)
 let KNEE_FWD = 6; // chrome legs: how strongly a nearly straight knee leans forward (it decides which way the knee bends)
 let TOE_TIP_CLEAR = 1.6; // towel scrunch: the curled toe tips' joints stay this high above the floor (the skin rests on the towel)
@@ -10739,9 +10740,11 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
   bear_hold: { yaw: 30, noKneel: true, plantAll: true,
     A: { anchor: "hip", at: [80, 102], t: 80, a: 0, b: -95, fd: -75, u: 0, f: 0 },
     B: { anchor: "hip", at: [80, 102], t: 80, a: 0, b: -95, fd: -75, u: 0, f: 0 } },
-  donkey_kick: { noKneel: true, ankle: 30, /* (one calm foot angle in the air, close to how it lies on the floor, so it doesn't bend over as the knee lands) */ yaw: 30, handFix: -1, handFix2: false,
-    A: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: 180, u: 0, f: 0, a2: 0, b2: -90, fd2: 180 },
-    B: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: 180, u: 0, f: 0, a2: -88, b2: -178, fd2: 180 } },
+  // donkey kick: toes tucked under on the floor and one foot shape the whole time (footDown, as in bird dog), so nothing switches as the knee
+  // lands or lifts — a relaxed foot (instep down) had to change shape at the floor, and that showed as a twitch, and it looked over-stretched
+  donkey_kick: { footDown: true, noKneel: true, yaw: 30, handFix: -1, handFix2: false,
+    A: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: -90, u: 0, f: 0, a2: 0, b2: -90, fd2: -90 },
+    B: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: -90, u: 0, f: 0, a2: -88, b2: -178, fd2: -90 } },
   slr: { yaw: -30, ankle: 85, /* (toes pulled up, as the guide says) */
     A: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 90, b2: 90, fd2: 90, u: 90, f: 90 },
     B: { anchor: "hip", at: [105, 133], t: -90, a: 140, b: 23.5, fd: 0, a2: 135, b2: 135, fd2: 128, u: 90, f: 90 } },
@@ -12927,6 +12930,19 @@ function seqPhase(an, ph) {
   const s = Math.min(1, t / .3), e = s * s * (3 - 2 * s);
   an.A = e < 1 ? lerpPose(an.seq[(i + n - 1) % n].A, an.seq[i].A, e) : an.seq[i].A; an.B = an.seq[i].B; an.seqI = i; return t;
 }
+// Hands never snap between frames either: from one frame of an animation to the next on the same canvas, each hand turns at most
+// HAND_RATE degrees per loop's phase (world orientation). A sudden change from any rule plays as a quick, smooth turn instead.
+function proLimitHands() {
+  const fr = GL.frame; if (!fr || !PRO.chrome || !PRO.by) return;
+  PRO.group.updateMatrixWorld(true);
+  const T = THREE, mem = PRO.handMem || (PRO.handMem = new WeakMap()), m = mem.get(fr.c), dph = m && m.id === fr.id ? Math.abs(((fr.ph - m.ph) % 1 + 1.5) % 1 - .5) : 1;
+  const cont = dph > 1e-6 && dph < .06, maxA = HAND_RATE * Math.PI / 180 * dph, keep = {};
+  for (const sd of ["Left", "Right"]) { const b = PRO.by[sd + "Hand"]; if (!b) continue;
+    let qw = b.getWorldQuaternion(new T.Quaternion());
+    if (cont && m.q[sd]) { const ang = m.q[sd].angleTo(qw); if (ang > maxA) { qw = m.q[sd].clone().slerp(qw, maxA / ang); const pw = b.parent.getWorldQuaternion(new T.Quaternion()); b.quaternion.copy(pw.invert().multiply(qw)); b.updateMatrixWorld(true); } }
+    keep[sd] = qw.clone(); }
+  mem.set(fr.c, { id: fr.id, ph: fr.ph, q: keep });
+}
 function glDraw(canvas, id, ph, yaw, muscles) {
   const an = ANIMS[id]; if (!an || !glInit()) return false;
   const ph0 = ph; ph = seqPhase(an, ph);
@@ -12936,7 +12952,7 @@ function glDraw(canvas, id, ph, yaw, muscles) {
   GL.used = {};
   if (isMeshStyle() && PRO.state === "idle") proLoad();
   const usePro = isMeshStyle() && PRO.state === "ready";
-  const glBody = (B) => (usePro ? (proPose(B), proPaint(), PRO.meshes.forEach((m) => m.morphTargetInfluences && (m.morphTargetInfluences[0] = GL.foot && GL.foot.kind === "arch" ? GL.foot.k : 0))) : glBodyMesh(B));
+  const glBody = (B) => (usePro ? (proPose(B), proLimitHands(), proPaint(), PRO.meshes.forEach((m) => m.morphTargetInfluences && (m.morphTargetInfluences[0] = GL.foot && GL.foot.kind === "arch" ? GL.foot.k : 0))) : glBodyMesh(B));
   for (const m of Object.values(MODELS)) if (m.group) m.group.visible = usePro && m === PRO;
   const hold = TECH[id] && TECH[id].lab && TECH[id].lab[0] === "Hold" && TECH[id].lab[1] === "Hold"; // static holds (plank, wall sit, hang) don't move
   // Alternating exercises (bird dog, dead bug, shoulder taps): one rep on each side per loop, the second one mirrored
