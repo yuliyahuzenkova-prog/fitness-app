@@ -25,7 +25,7 @@ const { chromium } = require('playwright'); const path = require('path'); const 
       glInit(); glStyle(); await proLoad();
       const T = THREE, c = document.createElement('canvas'); c.width = 120; c.height = 120; document.body.appendChild(c);
       const ids = idsArg === 'all' ? Object.keys(ANIMS).filter((id) => ANIMS[id].A || ANIMS[id].keys) : idsArg.split(',');
-      const out = {}, FLOOR = -140, TOL = 1.2, KNEE_MAX = 140, ELBOW_MAX = 150, TORSO_R = 11, CHEST_R = 10, THIGH_R = 6.5, PELVIS_R = 9; // (body thickness around the bone lines, cm, a little under the model's: only a hand clearly inside counts) // (a bone this far past a surface is a real pass-through, not skin resting on it)
+      const out = {}, FLOOR = -140, TOL = 1.2, KNEE_MAX = 140, ELBOW_MAX = 150, HIP_MAX = 135, /* (a hip folded past ~135° tears the shorts at the seat — child's pose) */ TORSO_R = 11, CHEST_R = 10, THIGH_R = 6.5, PELVIS_R = 9; // (body thickness around the bone lines, cm, a little under the model's: only a hand clearly inside counts) // (a bone this far past a surface is a real pass-through, not skin resting on it)
       // bones checked: the ends people see go through things (the spine's own bones sit deep inside the body)
       const pick = /(Hand(Index|Middle|Ring|Pinky|Thumb)?[0-9]?|ForeArm|Foot|ToeBase|Toe_End|Leg|Head|HeadTop_End)$/;
       for (const id of ids) {
@@ -51,6 +51,9 @@ const { chromium } = require('playwright'); const path = require('path'); const 
                 if (d > 1.5 && (!self || d > self.d)) self = { d: +d.toFixed(1), joint: sd + j, into: nm, ph }; } } }
           // joint shape: how far each knee and elbow is folded (180° = folded flat)
           const bp = (nm) => { const bn = PRO.bones.find((x) => x.name.replace('mixamorig:', '') === nm); return bn && bn.getWorldPosition(new T.Vector3()); };
+          { const Hp = bp('Hips'), Sp = bp('Spine1'); if (Hp && Sp) for (const sd of ['Left', 'Right']) { const U = bp(sd + 'UpLeg'), Kn = bp(sd + 'Leg'); if (!U || !Kn) continue;
+              const fold = 180 - Sp.clone().sub(Hp).angleTo(Kn.clone().sub(U)) * 180 / Math.PI; // (hip: 0 standing straight, 180 thigh folded flat onto the belly)
+              if (fold > HIP_MAX && (!shape || fold > shape.bend)) shape = { bend: Math.round(fold), joint: sd + ' hip', ph }; } }
           for (const [j, a1, a2, a3, lim] of [['knee', 'UpLeg', 'Leg', 'Foot', KNEE_MAX], ['elbow', 'Arm', 'ForeArm', 'Hand', ELBOW_MAX]]) for (const sd of ['Left', 'Right']) {
             const A = bp(sd + a1), Bj = bp(sd + a2), C = bp(sd + a3); if (!A || !Bj || !C) continue;
             const bend = 180 - A.clone().sub(Bj).angleTo(C.clone().sub(Bj)) * 180 / Math.PI;
