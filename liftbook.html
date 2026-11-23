@@ -12588,7 +12588,8 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     B: { anchor: "hip", at: [84, 110], t: 0, a: 97, b: 0, fd: -40, a2: 97, b2: 0, fd2: -40, u: 2, f: 4, props: [{ box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] } },
   // ---- standing ----
   stand_march: { yaw: -40, alt: true, period: 4800, hz: 11, A: pose({ a: 2, b: -2, a2: 2, b2: -2, fd2: 0, u: 6, f: 10 }), B: pose({ a: 2, b: -2, a2: 72, b2: -18, fd2: -20, u: 6, f: 10 }) },
-  balance: { yaw: -40, hz: 13, A: pose({ a: 2, b: -2, a2: 40, b2: -50, fd2: -30, u: 8, f: 12 }), B: pose({ a: 2, b: -2, a2: 40, b2: -50, fd2: -30, u: 8, f: 12 }) },
+  // (the lifted leg: knee forward, shin hanging nearly straight down, as "lift the other foot, knee bent" — thigh 40° with the shin swung 50° back pointed the knee at the floor and folded it oddly)
+  balance: { yaw: -40, hz: 13, A: pose({ a: 3, b: -3, a2: 60, b2: -8, fd2: -20, u: 8, f: 12 }), B: pose({ a: 3, b: -3, a2: 60, b2: -8, fd2: -20, u: 8, f: 12 }) },
   heel_toe: { yaw: -40, hz: 11, period: 5600, keys: [pose({ at: [94, 140], a: 6, b: 0, t: 3, fd: 22, u: 40, f: 50 }), pose({ at: [95, 140], a: 4, b: -2, fd: 0, u: 40, f: 50 }), pose({ at: [97, 131], a: 4, b: -2, fd: -55, u: 40, f: 50 })],
     A: pose({ at: [94, 140], a: 6, b: 0, t: 3, fd: 22, u: 40, f: 50 }), B: pose({ at: [97, 131], a: 4, b: -2, fd: -55, u: 40, f: 50 }) },
   squat_calf: { yaw: -40, fz: 4, period: 6400, keys: [pose({ a: 82, b: -25, t: 42, u: 90, f: 90 }), pose({ at: [95, 140], a: 4, b: -2, fd: 0, u: 20, f: 20 }), pose({ at: [97, 131], a: 4, b: -2, fd: -55, u: 20, f: 20 })],
