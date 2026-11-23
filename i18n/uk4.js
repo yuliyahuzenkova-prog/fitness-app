@@ -142,7 +142,7 @@ Object.assign(UK, { "Edit": "Змінити", "Editing": "Редагування
   "No exercises left. Save to keep it empty, or cancel. To remove the whole workout, use Delete.": "Вправ не лишилося. Збережи порожнім або скасуй. Щоб видалити все тренування, натисни «Видалити»." });
 Object.assign(UK, { "Change this week's answers": "Змінити відповіді за тиждень", "Back to this week": "Повернутися до цього тижня", "Save": "Зберегти", "Cancel": "Скасувати", "Body weight": "Вага тіла", "Body weight saved": "Вагу збережено" });
 Object.assign(UK, { "Realistic": "Реалістична" });
-Object.assign(UK, { "Chrome": "Хром", "Chrome woman": "Хром — жінка" });
+Object.assign(UK, { "Chrome": "Хром", "Chrome woman": "Хром — жінка", "Chrome man": "Хром — чоловік" });
 Object.assign(UK, { "You took last week off": "Минулого тижня була перерва", "No workouts last week — that happens. Want to repeat last week's step so you ease back in, instead of jumping to heavier work?": "Минулого тижня тренувань не було — таке буває. Повторимо той самий крок, щоб плавно повернутися в ритм, а не одразу брати важче?", "Ease back in": "Повторити тиждень" });
 Object.assign(UK, {
   "What should we call you?": "Як до тебе звертатися?",
@@ -393,5 +393,16 @@ Object.assign(UK, {
   "Sit back": "Сідай назад",
   "Breathe": "Дихай",
   "Lower slowly behind your head": "Повільно опускай за голову",
-  "Step back slowly": "Повільно відстав ногу"
+  "Step back slowly": "Повільно відстав ногу",
+  "Lift one knee": "Підніми одне коліно",
+  "Raise to the front": "Підніми перед собою",
+  "Switch legs": "Зміни ноги",
+  "Slide your heel in": "Підтягни п'яту",
+  "Slide it out slowly": "Повільно випрями",
+  "Curl your heel up": "Підтягни п'яту вгору",
+  "Push the leg back": "Відведи ногу назад",
+  "Return slowly": "Повільно повернись",
+  "Lift your chest slowly": "Повільно підніми груди",
+  "Lower down": "Опустись",
+  "Straighten your knee": "Розігни коліно"
 });
