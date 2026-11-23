@@ -12144,13 +12144,14 @@ const ANIMS = {
   band_pulldown: { A: pose({ at: [95, 140], a: 10, b: -5, u: 160, f: 165, props: [{ doorband: [138, -56] }] }), B: pose({ at: [95, 140], a: 10, b: -5, u: -15, f: 160, props: [{ doorband: [138, -56] }] }), view: "0 -70 200 214" },
   // one arm pulls, the other hangs relaxed at the side
   band_pulldown1: { A: pose({ at: [95, 140], a: 10, b: -5, u: 160, f: 165, u2: 6, f2: 12, props: [{ doorband: [138, -56] }] }), B: pose({ at: [95, 140], a: 10, b: -5, u: -15, f: 160, u2: 6, f2: 12, props: [{ doorband: [138, -56] }] }), view: "0 -70 200 214" },
-  prone_y: { A: { anchor: "hip", at: [85, 133], t: 90, a: -90, b: -90, u: 88, f: 88, h: 0, fd: -90 }, B: { anchor: "hip", at: [85, 133], t: 80, a: -90, b: -90, u: 104, f: 106, h: -10, fd: -90 } },
+  // (face down: feet relaxed on their tops, as in the newer prone holds — fd −90 stood them on their toes and pushed the toes 8 cm into the floor)
+  prone_y: { A: { anchor: "hip", at: [85, 133], t: 90, a: -90, b: -94, u: 88, f: 88, h: 0, fd: 180 }, B: { anchor: "hip", at: [85, 133], t: 80, a: -90, b: -94, u: 104, f: 106, h: -10, fd: 180 } },
   // Y, then T, then W: one rep of each shape per loop. fu/ff: upper arm / forearm angle from pointing at the feet (0) through
   // straight out to the side (90) to overhead (180); fx < 0 lifts the hands off the floor
   prone_ytw: { frontArms: true, period: 12600, seq: [["Y", 135, 135], ["T", 90, 90], ["W", 50, 160]].map(([l, fu, ff]) => ({ l,
-    A: { anchor: "hip", at: [85, 133], t: 90, a: -90, b: -90, u: 88, f: 88, h: 0, fd: -90, fu, ff, fx: 2 },
-    B: { anchor: "hip", at: [85, 133], t: 82, a: -90, b: -90, u: 104, f: 106, h: -10, fd: -90, fu: fu + 4, ff: ff + 4, fx: -8 } })) },
-  superman: { A: { anchor: "hip", at: [85, 133], c: 0, t: 90, a: -90, b: -90, u: 88, f: 88, fd: -90 }, B: { anchor: "hip", at: [85, 133], c: -7, t: 78, a: -100, b: -100, u: 104, f: 106, h: -10, fd: -90 } },
+    A: { anchor: "hip", at: [85, 133], t: 90, a: -90, b: -94, u: 88, f: 88, h: 0, fd: 180, fu, ff, fx: 2 },
+    B: { anchor: "hip", at: [85, 133], t: 82, a: -90, b: -94, u: 104, f: 106, h: -10, fd: 180, fu: fu + 4, ff: ff + 4, fx: -8 } })) },
+  superman: { A: { anchor: "hip", at: [85, 133], c: 0, t: 90, a: -90, b: -94, u: 88, f: 88, fd: 180 }, B: { anchor: "hip", at: [85, 133], c: -7, t: 78, a: -100, b: -104, u: 104, f: 106, h: -10, fd: 180 } },
   // Harder version: both legs straight up; one straight leg lowers to just above the floor as the opposite arm reaches back
   dead_bug_straight: { A: { anchor: "hip", at: [105, 133], t: -90, a: 178, b: 178, fd: 150, u: 180, f: 180, a2: 178, b2: 178, fd2: 150, u2: 180, f2: 180 }, B: { anchor: "hip", at: [105, 133], t: -90, a: 104, b: 104, fd: 95, u: 180, f: 180, a2: 178, b2: 178, fd2: 150, u2: 260, f2: 260 } },
   dead_bug: { A: { anchor: "hip", at: [105, 133], t: -90, a: 180, b: 90, fd: 90, u: 180, f: 180, a2: 180, b2: 90, fd2: 90, u2: 180, f2: 180 }, B: { anchor: "hip", at: [105, 133], t: -90, a: 102, b: 100, fd: 80, u: 180, f: 180, a2: 180, b2: 90, fd2: 90, u2: 260, f2: 260 } },
@@ -12992,6 +12993,7 @@ let TOP_HAND = [27, -4]; // side-lying with the head on the bottom arm: where th
 let PILLOW_ARM = [1, 0, 0, .3]; // side-lying, head on the bottom arm: the upper arm's forward lean (per unit towards the head), and where the hand goes from the head (forward, towards the top of the head)
 const HAND_ON_HIP = { up: 4, fwd: 0, lift: 1.6 }; // side planks (chrome): where the top palm rests, from the hip joint (model units towards the head and front), and how far it sits off the skin (cm)
 const TAP_TGT_CHROME = [1, 8, -2]; // shoulder taps, chrome figures: where the hand lands from the sketch's near shoulder (towards the head, towards the floor, sideways) // shoulder taps: where the hand lands from the opposite shoulder joint (model units: towards the floor, towards the head, outwards)
+let PRONE_ANKLE = 0; // lying face down, a foot on its instep: the ankle target this far above the drawing's ankle, at rest and lifting alike (one height, so lifting the leg doesn't pull the ankle down first)
 const KNEEL_REST = { ankle: 5.5, toe: 1.8 }, /* (was 7: the resting foot sloped down to its toes and the toes bent up — the owner: "too strongly bent") */ INSTEP = { ankle: 4.9, toe: -1.5, edge: 4, lift: 2, hipTop: 84, hipSpan: 16, top: 8, topDrop: 5 }; // kneeling with relaxed feet: the ankle joint's height off the floor and the toe tips' (cm)
 const KNEE_SIDE_FOOT = 55; // side plank on the knees (chrome figures): the foot's angle off the shin's line, in degrees (0 = pointed straight on)
 const KNEEL_BLEND_CHROME = [118, 12, 124, 11, 131, 9]; // kneeling (toes tucked) fades in over these sketch heights: knee, ankle and toe (start, span)
@@ -13642,7 +13644,7 @@ function proPose0(B) {
     let restTop = null, restW = 0;
     if (!footEx && !kneel && !B.roll && K.y < -128 && A.y < -126 && (fu.y < -.7 || B.restFoot)) { // (restFoot: a kneeling back leg whose foot lies behind it, e.g. the hip flexor stretch)
       restW = cl01((-K.y - 128) / 7) * cl01((-A.y - 126) / 7) * (B.restFoot ? 1 : cl01((-fu.y - .7) / .15)); restW = restW * restW * (3 - 2 * restW);
-      const fl = R[L + "Foot"].distanceTo(R[L + "Toe_End"]) * S, hA = B.restFoot ? REST_FOOT.ankle : KNEEL_REST.ankle, th = B.restFoot ? rad(REST_FOOT.tilt) : Math.asin(Math.min(.6, (hA - KNEEL_REST.toe) / fl)), hb = sole.clone().setY(0).normalize();
+      const fl = R[L + "Foot"].distanceTo(R[L + "Toe_End"]) * S, hA = B.restFoot ? REST_FOOT.ankle : PRONE_ANKLE, th = B.restFoot ? rad(REST_FOOT.tilt) : Math.asin(Math.min(.6, (KNEEL_REST.ankle - KNEEL_REST.toe) / fl)) /* (the resting foot's slope stays as it was; PRONE_ANKLE only sets the ankle's height target) */, hb = sole.clone().setY(0).normalize();
       const sole1 = hb.multiplyScalar(Math.cos(th)).add(new T.Vector3(0, -Math.sin(th), 0)).normalize(), fu1 = new T.Vector3(0, -1, 0).sub(sole1.clone().multiplyScalar(-sole1.y)).normalize();
       if (PRO.chrome) { const qr = flat(fu, sole).slerp(flat(fu1, sole1), restW); fu = new T.Vector3(0, 1, 0).applyQuaternion(qr); sole = new T.Vector3(0, 0, 1).applyQuaternion(qr); } // (turned, not blended: blending the two directions passed through zero and flipped the foot sideways)
       else { sole = sole.clone().lerp(sole1, restW).normalize(); fu = fu.clone().lerp(fu1, restW); fu.sub(sole.clone().multiplyScalar(fu.dot(sole))).normalize(); }
@@ -13656,7 +13658,10 @@ function proPose0(B) {
         sole = hb.clone().multiplyScalar(Math.cos(th)).add(new T.Vector3(0, -Math.sin(th), 0)).normalize(); fu = new T.Vector3(0, -1, 0).sub(sole.clone().multiplyScalar(-sole.y)).normalize();
         restW = 1; restTop = new T.Vector3(bx[1], bx[2] + hT - INSTEP.topDrop * up, A.z).add(hb.clone().multiplyScalar(INSTEP.edge)); /* (the ankle keeps its place over the bench and rises; the toes slide in a little as the foot tips up) */ /* (the ankle this far back from the bench's front edge: the whole top of the foot lies on it, toes and all) */ }
     }
-    const tN = A.clone().add((kneelToe ? kneelToe.fu0 : fu).clone().multiplyScalar((R[L + "Foot"].y - (PRO.sole || 0)) * S));
+    const tOff = (kneelToe ? kneelToe.fu0 : fu).clone().multiplyScalar((R[L + "Foot"].y - (PRO.sole || 0)) * S);
+    { const wPr = cl01((-V3(B.hip).y - 115) / 6); /* (lying down only — the hips low over the floor; constant through a rep, so nothing switches. A sole turned up high in the air, as at the top of a donkey kick, keeps its own offset) */
+      if (PRO.chrome && !kneelToe && tOff.y < 0 && wPr > 0) tOff.y += (-tOff.y / ((R[L + "Foot"].y - (PRO.sole || 0)) * S) * (B.restFoot ? REST_FOOT.ankle : PRONE_ANKLE) - tOff.y) * wPr; } /* (a foot with its top facing down — lying on its instep, or lifted from there — has the ankle above it, as high as when it rests: offset down along the foot's top, the ankle target went into the floor, was held there as the knee rose, and the foot pointed and snapped back as a prone leg lifted off. Equal to the resting height, the two blend with no step; continuous through level) */
+    const tN = A.clone().add(tOff);
     let target = restTop ? tN.clone().lerp(restTop, restW) : footEx ? new T.Vector3(A.x, -140 + (R[L + "Foot"].y - (PRO.sole || 0)) * S + (GL.foot.kind === "towel" ? .9 : 0), A.z) : kneel ? tN.lerp(new T.Vector3(A.x, -140 + kneelToe.lift, A.z), kw) : tN;
     if (B.footDown) target.y = Math.max(target.y, -140 + R[L + "Foot"].distanceTo(R[L + "ToeBase"]) * S * .95 + 1.4);
     if (PRO.chrome && !footEx) target.y = Math.max(target.y, -140 + ANKLE_MIN); // (the ankle joint is never closer to the floor than the foot under it is thick: a foot landing with its top down dipped the ankle below its resting height and it popped back up) // (footDown: the ankle stays high enough for the ball of the foot, toes bent under, to rest on the floor)
