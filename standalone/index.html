@@ -13711,15 +13711,16 @@ function proPose0(B) {
         const rd = by[L + "ToeBase"].position.clone().normalize(), [bx, by_, bz] = glBasis(fu, sole); // (the toe joint in the foot bone's own frame)
         const bone = bx.clone().multiplyScalar(rd.x).add(by_.clone().multiplyScalar(rd.y)).add(bz.clone().multiplyScalar(rd.z)).normalize();
         const sd = ankle.clone().sub(knee).normalize(), th = sd.angleTo(bone), overStep = B.stepProp || (B.boxes || []).some(([x0, x1, top]) => A.x > x0 - 8 && A.x < x1 + 8 && A.y > top - 24), thc = B.ankle ? rad(B.ankle) : Math.min(rad(overStep ? 82 : FOOT_MAX), Math.max(rad(33), th)); // (stepping up onto a box or bench the foot still bends up fully to clear its edge) // (FOOT_MAX: a relaxed foot in the air isn't bent up hard; an exercise that pulls the toes up says so with B.ankle)
-        if (Math.abs(thc - th) > 1e-4) {
-          // which way "forward" is for the foot: when it's pointed almost in line with the shin, the bone alone can't tell
-          // (it would tip the foot out sideways), so lean on the sole's own forward direction
-          let fr = bone.clone().sub(sd.clone().multiplyScalar(bone.dot(sd))); const frL = fr.length(), sf = front(k, a).clone().sub(sd.clone().multiplyScalar(front(k, a).dot(sd))); // (in line with the shin the foot bends towards the shin's front, as a real ankle does — the sole's own direction there was unstable and flipped)
-          const wB = cl01((frL - .2) / .35); fr = (frL > 1e-6 ? fr.multiplyScalar(1 / frL) : by_.clone()).multiplyScalar(wB).add(sf.lengthSq() > 1e-6 ? sf.normalize().multiplyScalar(1 - wB) : new T.Vector3()); if (fr.lengthSq() < 1e-6) fr = by_.clone(); fr.normalize(); if (B.ankleFront) { const sf2 = front(k, a).clone().multiplyScalar(B.ankleFront); sf2.sub(sd.clone().multiplyScalar(sf2.dot(sd))); if (sf2.lengthSq() > 1e-4) fr = sf2.normalize(); } // (ankleFront: the foot turns the way the front of the shin faces, as standing)
-          const wA = air;
-          const target = sd.clone().multiplyScalar(Math.cos(thc)).add(fr.multiplyScalar(Math.sin(thc))), qa = new T.Quaternion().slerp(new T.Quaternion().setFromUnitVectors(bone, target), wA);
-          fu = by_.clone().applyQuaternion(qa).normalize(); sole = bz.clone().applyQuaternion(qa).normalize();
-        }
+        // The bend is measured and limited as a signed angle in the shin's own plane (shin direction × front of the shin), and the foot turns
+        // about the axis across that plane. Before, "forward" was a blend of the bone's direction and the shin's front: with the foot nearly
+        // in line with the shin (lying on its instep, prone leg lift) those two point almost opposite ways, the blend went through ~0 and
+        // the foot flipped round in a frame. A signed angle never flips: bent back past in line it simply comes forward, continuously.
+        const sfr = front(k, a).clone(); sfr.sub(sd.clone().multiplyScalar(sfr.dot(sd)));
+        if (B.ankleFront) { const sf2 = front(k, a).clone().multiplyScalar(B.ankleFront); sf2.sub(sd.clone().multiplyScalar(sf2.dot(sd))); if (sf2.lengthSq() > 1e-4) sfr.copy(sf2); } // (ankleFront: the foot turns the way the front of the shin faces, as standing)
+        if (sfr.lengthSq() > 1e-6) { sfr.normalize(); const ax = new T.Vector3().crossVectors(sd, sfr).normalize(), phi = Math.atan2(bone.dot(sfr), bone.dot(sd));
+          const lo = B.ankle ? rad(B.ankle) : rad(33), hi = B.ankle ? rad(B.ankle) : rad(overStep ? 82 : FOOT_MAX), phc = Math.min(hi, Math.max(lo, phi));
+          if (Math.abs(phc - phi) > 1e-4) { const qa = new T.Quaternion().slerp(new T.Quaternion().setFromAxisAngle(ax, phc - phi), air);
+            fu = by_.clone().applyQuaternion(qa).normalize(); sole = bz.clone().applyQuaternion(qa).normalize(); } }
       }
     }
     if (B.kneeSide) { // side plank on the knees: the foot follows the model's own shin (not the flat sketch), pointed like a kneeling foot, no sideways roll
