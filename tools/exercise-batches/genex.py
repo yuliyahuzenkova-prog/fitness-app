@@ -2,6 +2,15 @@
 import json,re,sys,os
 exf,defsf,trname,ver=sys.argv[1:5]; S=os.path.dirname(os.path.abspath(__file__)); R='/home/user/fitness-app/'
 exec(open(exf).read())
+GD=json.load(open(S+'/guides.json')) if os.path.exists(S+'/guides.json') else {'G':{},'M':{}}
+for e in EX:
+  b=e.get('base')
+  if not b: continue
+  g=GD['G'][b]
+  for k in ['feel','setup','breathe','easier','harder']: e.setdefault(k,g[k])
+  e.setdefault('steps',list(g['steps'])); e.setdefault('mistakes',list(g['mistakes'])); e.setdefault('tags',g.get('tags',[])); e.setdefault('mus',GD['M'].get(b,['Core']))
+  if e.get('steps_add'): e['steps']=[e['steps_add']]+e['steps'][:3]
+
 D=json.load(open(S+'/dict.json')); K=D['keys']; Kset=set(K); L=['uk','es','de','fr','pt','pl']
 def tr(s,l): x=T.get(s); return (x and x[L.index(l)]) or D[l].get(s)
 strs=[]
