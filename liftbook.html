@@ -13981,6 +13981,7 @@ let TOE_CURL = 34; // towel scrunch: how far the toes curl down (degrees) at the
 let FLAT_FINGERS = [-26, -12, -6]; // chrome, hand resting on a surface: finger bend per joint (knuckle, middle, tip; degrees from the model's rest shape). v404: the model's rest fingers hang down from the palm, so they straighten up to lie on the surface (was [6, −8, −6]: tips 3 cm into it, then the palm tipped up — a claw)
 let PALM_LIFT = 1.2; // chrome, hand on a surface: the wrist target this much higher (cm), so the heel of the palm rests on the surface instead of sinking into it
 let FLAT_THUMB = [30, 30, 20]; // chrome, hand resting on a surface: thumb bend per joint (degrees from the rest shape)
+let HOLD_SHOW = 30; // (v422) a static hold's counter runs to this many seconds, then starts again
 let SOFT_REACH = .975; // softReach legs: from this share of the leg's length the reach eases in to straight
 let KNUCKLE_LEVEL = 1; // chrome, hand resting on a surface: how much of the knuckles' sideways slope is levelled (0–1)
 let FINGERS_TOGETHER = .7, THUMB_IN = .35; // (the thumb: how far it comes in towards the index finger) // chrome, hand resting on a surface: how far each finger turns towards the middle finger's line (0–1)
@@ -17001,7 +17002,7 @@ for (const [id, [base]] of Object.entries(ANIM_VARIANTS)) TECH[id] = TECH[id] ||
 // The slow move (the one labelled "slowly", usually the way down) takes the named seconds; the other move about 1.2 s.
 function tempoSecs(id) {
   const an = ANIMS[id], tm = an.tm, lab = (TECH[id] && TECH[id].lab) || ["", ""], slowIdx = /slow/i.test(lab[1]) && !/slow/i.test(lab[0]) ? 1 : 0;
-  const mv = [1.2, 1.2]; if (tm.down) mv[slowIdx] = tm.down; else mv[slowIdx] = 1.8;
+  const mv = [1.2, 1.2]; if (tm.down) mv[slowIdx] = tm.down; else mv[slowIdx] = 1.8; if (tm.up) mv[1 - slowIdx] = tm.up; // (v422: the way back can be timed too)
   return [.4, mv[0], tm.pause || .5, mv[1]];
 }
 // "Bodyweight squat, 3 s down" / "Seated cable row, 1 s pause": the same movement, timed as the name says
@@ -17310,14 +17311,20 @@ function glTechnique(ctx, w, h, an, id, B, tp, still) {
   const box = ctx.canvas.closest(".anim3d")?.querySelector(".repsteps"); if (!box) return;
   const lab = tp.lab, hold = lab[0] === lab[1], tm = tp.tm, key = LANG + "|" + lab.join("|") + "|" + JSON.stringify(tm || 0);
   if (box.dataset.k !== key) {
-    box.dataset.k = key;
+    box.dataset.k = key; delete box.dataset.t0;
     const breath = (l) => (/slow/i.test(l) ? "Breathe in" : "Breathe out");
     const sec = (n) => `${n} ${scanL("s", "с")}`, dn = (i) => (tm && tm.down && i === tp.slow ? sec(tm.down) + " · " : "");
-    const rows = hold ? [[tr(lab[0]), lab[0] === "Hold" ? tr("Breathe normally") : ""]] : [[tr(lab[0]), dn(0) + tr(breath(lab[0]))], [tr("Pause"), tm && tm.pause ? sec(tm.pause) : ""], [tr(lab[1]), dn(1) + tr(breath(lab[1]))]];
+    const rows = hold ? [[tr(lab[0]), lab[0] === "Hold" ? tr("Breathe normally") : ""]] : [[tr(lab[0]), dn(0) + tr(breath(lab[0]))], [tr(tm && tm.pause >= 3 ? "Hold" : "Pause"), tm && tm.pause ? sec(tm.pause) : ""], [tr(lab[1]), dn(1) + tr(breath(lab[1]))]];
     box.classList.toggle("one", hold);
     box.innerHTML = rows.map(([t, b]) => `<div class="rs"><b>${esc(t)}</b>${b ? `<span>${esc(b)}</span>` : ""}<i></i></div>`).join("");
   }
-  const cur = still ? -1 : hold ? 0 : tp.seg === 0 ? 0 : tp.seg === 1 ? 1 : tp.seg === 1.5 ? 2 : -1, prog = hold ? 1 : tp.seg === 0 ? tp.k : tp.seg === 1.5 ? 1 - tp.k : 1;
+  const cur = still ? -1 : hold ? 0 : tp.seg === 0 ? 0 : tp.seg === 1 ? 1 : tp.seg === 1.5 ? 2 : -1, now = performance.now();
+  let prog = hold ? 1 : tp.seg === 0 ? tp.k : tp.seg === 1.5 ? 1 - tp.k : 1;
+  // (v422) a hold counts its seconds (the bar fills over HOLD_SHOW seconds, then starts again); a timed pause counts down
+  const secs = (n) => `${n} ${scanL("s", "с")}`, spanOf = (i) => box.querySelectorAll(".rs")[i]?.querySelector("span");
+  if (hold && !still) { if (!box.dataset.t0) box.dataset.t0 = now; const el = Math.floor((now - +box.dataset.t0) / 1000) % (HOLD_SHOW + 1), sp = spanOf(0); prog = el / HOLD_SHOW; const txt = (lab[0] === "Hold" ? tr("Breathe normally") + " · " : "") + secs(el); if (sp && sp.textContent !== txt) sp.textContent = txt; }
+  if (!hold && tm && tm.pause >= 2) { const sp = spanOf(1); if (cur === 1) { if (box.dataset.c !== "1") box.dataset.t1 = now; const left = Math.max(1, Math.ceil(tm.pause - (now - +box.dataset.t1) / 1000)), txt = secs(left); if (sp && sp.textContent !== txt) sp.textContent = txt; prog = 1 - (left - 1) / tm.pause; } else if (sp && sp.textContent !== secs(tm.pause)) sp.textContent = secs(tm.pause); }
+  box.dataset.c = cur;
   box.querySelectorAll(".rs").forEach((el, i) => { el.classList.toggle("on", i === cur); el.style.setProperty("--p", i === cur ? prog.toFixed(3) : 0); });
   // alternating exercises: which side this rep is, so it's clear the sides take turns
   let sideEl = box.parentNode.querySelector(".repside");
@@ -18417,7 +18424,7 @@ const HH = ANIMS.hollow_hold, SM = ANIMS.superman_hold, TT = ANIMS.toe_taps, DB 
   prone_t: one(1),
   prone_w: one(2),
   prone_t_hold: hold(one(1)),
-  dead_bug_hold: { ...DB, A: DB.B, B: DB.B, alt: false },
+  dead_bug_hold: { ...DB, alt: true, tm: { down: 2.5, pause: 8, up: 2 }, period: 25800 }, // (v422: reach out for 2.5 s, hold 8 s with a countdown, come back, then the other side — the still pose showed neither movement nor time)
   hollow_overhead: { ...HH, A: { ...HH.A, u: 180, f: 180 }, B: { ...HH.B, u: 180, f: 180 } },
   superman_sides: { ...SM, A: { ...SM.A, u: -82, f: -82 }, B: { ...SM.B, u: -82, f: -82 } },
   tabletop_hold: { ...TT, alt: false, A: TT.A, B: TT.A },
@@ -18451,7 +18458,7 @@ Object.assign(TECH, {
   prone_t: { ...TECH.prone_y },
   prone_w: { ...TECH.prone_y },
   prone_t_hold: { ...TECH.prone_y_hold },
-  dead_bug_hold: { ...TECH.hollow_hold },
+  dead_bug_hold: { lab: ["Reach out slowly", "Return"] },
   hollow_overhead: { ...TECH.hollow_hold },
   superman_sides: { ...TECH.superman_hold },
   tabletop_hold: { ...TECH.hollow_hold },
