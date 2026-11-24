@@ -13698,7 +13698,12 @@ function proPose0(B) {
     const along = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hgt = Math.sqrt(Math.max(0, l1 * l1 - along * along));
     let pole = K.clone().sub(Hm); pole.sub(hd.clone().multiplyScalar(pole.dot(hd)));
     // nearly straight legs: a slight bias to the front, so the knee doesn't flip about as the bend starts
-    if (!B.roll) pole.add(V3(B.fwd).projectOnPlane(hd).multiplyScalar(PRO.chrome ? KNEE_FWD : 1.5)); // (chrome: firmer, so a near-straight knee never flips back and forth, as in calf raises)
+    if (!B.roll) { const fp = V3(B.fwd).projectOnPlane(hd);
+      // chrome: a leg pointing along the body's facing (lying on the back, legs raised to vertical) has almost no "forward" across it,
+      // and what is left turns over as the leg passes through — the knee jumped sideways (leg lowers). There the lean comes, eased in,
+      // from the front of the thigh in the pose, which turns with the leg (v407)
+      if (PRO.chrome) { const fl = fp.length(), tf = front(h, k).projectOnPlane(hd); if (tf.lengthSq() > 1e-6) { tf.normalize(); const x = Math.min(1, fl / .5), wF = 1 - x * x * (3 - 2 * x); if (wF > 0) { const dir = fl > 1e-6 ? fp.clone().divideScalar(fl).lerp(tf, wF) : tf; if (dir.lengthSq() > 1e-6) fp.copy(dir.normalize().multiplyScalar(Math.max(fl, .5))); } } }
+      pole.add(fp.multiplyScalar(PRO.chrome ? KNEE_FWD : 1.5)); } // (chrome: firmer, so a near-straight knee never flips back and forth, as in calf raises) // (chrome: firmer, so a near-straight knee never flips back and forth, as in calf raises)
     if (pole.lengthSq() < 1e-4) pole = V3(B.fwd).sub(hd.clone().multiplyScalar(V3(B.fwd).dot(hd)));
     // chrome, foot flat on the floor: the knee points the way the toes do (a little further out), never caving in past them
     if (PRO.chrome && KNEE_TRACK && !B.roll && !kneel && !footEx && !B.kneeSide && !B.legsStay) { // (legsStay, sitting: the pose sets the knees (fz); this rule only acts with the foot down, so a leg lifting off the floor drifted in) // (standing on the feet only: lying bridges keep their own knees)
