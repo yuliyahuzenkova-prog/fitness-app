@@ -12880,7 +12880,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     // the shoulders stay over the hands the whole rep (palms planted); while the knee passes under the body the hips rise a little
     // (support leg -64 → -59, trunk 64 → 72°, which keeps the shoulder in place), so the knee clears the floor
     const K = [S(-64, 64, { a2: -64, b2: -68, fd2: -22 }), S(-60, 70, { a2: -32, b2: -104, fd2: -40 }), S(-59, 72, { a2: 22, b2: -110, fd2: -50 }), S(-61, 69, { a2: 52, b2: -78, fd2: -20 })];
-    return { yaw: -25, hz: 15, handFix: 1, plantAll: true, plantPole: [200, 1.5, 1, 0, 1], alt: true, noKneel: true, softReach: true, period: 6400, /* (v411: twice as slow — 3.2 s a side; at 1.6 s it did not look slow) */ A: K[0], B: K[3], keys: K }; })(),
+    return { yaw: -25, hz: 15, handFix: 1, plantAll: true, plantPole: [200, 1.5, 1, 0, 1], alt: true, noKneel: true, softReach: true, footDown: true, footLean: .5, toeFix: -30, period: 6400, /* (v411: twice as slow — 3.2 s a side; at 1.6 s it did not look slow) */ A: K[0], B: K[3], keys: K }; })(),
   // wall calf stretch: palms flat on the wall (wallHands), never through it
   calf_stretch: { yaw: -40, wallHands: 172, openHand: true, A: pose({ at: [127, 140], a: 22, b: -18, a2: -32, b2: -32, fd2: 0, t: 14, u: 88, f: 88, props: [{ wall: 172 }] }), B: pose({ at: [127, 140], a: 30, b: -26, a2: -34, b2: -34, fd2: 0, t: 18, u: 88, f: 88, props: [{ wall: 172 }] }) },
   // (v389: hips higher over the heels — thigh 25° instead of 40°, back rounded more, head tucked: the deep hip fold tore the shorts
