@@ -13774,7 +13774,9 @@ const ANIMS = {
   wall_sit: { A: pose({ at: [97, 140], a: 55, b: -12, t: 0, u: 5, f: 5, props: [{ wall: 72 }] }), B: pose({ at: [97, 140], a: 55, b: -12, t: 0, u: 5, f: 5, props: [{ wall: 72 }] }) },
   wall_sit_deep: { A: pose({ at: [108, 140], a: 88, b: 0, t: 0, u: 5, f: 5, props: [{ wall: 72 }] }), B: pose({ at: [108, 140], a: 88, b: 0, t: 0, u: 5, f: 5, props: [{ wall: 72 }] }) },
   leg_press: { A: { anchor: "hip", at: [70, 112], t: -60, a: 150, b: 60, u: 58, f: 64, fd: 90, props: [{ legpress: 1 }, { sled: 1 }, { lprails: 1 }] }, B: { anchor: "hip", at: [70, 112], t: -60, a: 115, b: 105, u: 58, f: 64, fd: 90, props: [{ legpress: 1 }, { sled: 1 }, { lprails: 1 }] } },
-  split_squat: { noKneel: true, A: pose({ at: [122, 140], a: 8, b: 0, a2: -22, b2: -35, fd2: -50, u: 0, f: 0 }), B: pose({ at: [122, 140], a: 80, b: -15, t: 5, a2: -12, b2: -95, fd2: -50, u: 0, f: 0 }) },
+  // (v417: the back foot stays on one spot all rep, the hips go straight down and up between the feet — at the top the back foot was a short
+  // step behind and slid back as the hips dropped, so it looked like the reverse lunge)
+  split_squat: { noKneel: true, A: pose({ at: [122, 140], a: 37.8, b: 7.9, a2: -28, b2: -45.9, fd2: -50, u: 0, f: 0 }), B: pose({ at: [122, 140], a: 80, b: -15, t: 5, a2: -12, b2: -95, fd2: -50, u: 0, f: 0 }) },
   // Back foot rests on the bench (top of the foot down, ankle at [72, 103]); the back leg angles are solved so it stays there
   bulgarian: { noKneel: true, freeAnkle: true, instepOn: true, A: pose({ at: [125, 140], a: 5, b: 0, a2: -39.2, b2: -89.9, fd2: 180, u: 2, f: 2, props: [{ box: [46, 108, 30, 32] }, { db: "wrist" }] }), B: pose({ at: [125, 140], a: 70, b: -10, t: 10, a2: -23.7, b2: -149.4, fd2: 180, u: 2, f: 2, props: [{ box: [46, 108, 30, 32] }, { db: "wrist" }] }) },
   // Short step: the back foot lands closer, and the body only lowers part way (back knee stays well off the floor)
