@@ -1,3 +1,5 @@
 backups/
 node_modules/
 *.zip
+tools/exercise-batches/dict.json
+tools/exercise-batches/guides.json
