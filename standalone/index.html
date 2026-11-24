@@ -18689,6 +18689,9 @@ for (const n of ["Dumbbell reverse lunge, short step", "Dumbbell sit-to-stand", 
 // v418: the owner checked the "Legs and glutes" section of the newer exercises
 for (const n of ["Bird dog, leg only", "Dumbbell box squat", "Dumbbell deadlift", "Dumbbell single-leg Romanian deadlift", "Dumbbell split squat", "Goblet Bulgarian split squat", "Goblet good morning", "Goblet reverse lunge", "Goblet split squat", "Goblet squat to a chair", "Goblet step-up", "Goblet sumo squat", "Wide-stance dumbbell Romanian deadlift", "Wide-stance glute bridge"]) LIB_CHECKED.add(n);
 
+// v431: the owner checked every exercise marked New — nothing is new any more
+for (const [n] of LIB_NEW) LIB_CHECKED.add(n);
+
 function coachExercises() {
   if (COACH_EX_CACHE) return COACH_EX_CACHE;
   const out = {};
