@@ -13943,7 +13943,7 @@ const EX_MAP = [
   [/^Goblet squat to a box/, "goblet", "squat_goblet_box"], [/^Goblet squat/, "goblet", "squat_goblet"],
   [/^(Barbell back squat|Squat)$/, "backsquat", "squat_bar"], [/^Box squat to a high box/, "boxsquat", "squat_box_high"], [/^Slow squat to a chair/, "boxsquat", "squat_chair"], [/^Box squat/, "boxsquat", "squat_box"],
   [/^Sit-to-stand from a high chair/, "sitstand", "sit_to_stand_high"], [/^Sit-to-stand/, "sitstand", "sit_to_stand"], [/^Bodyweight [Ss]quat/, "bwsquat", "squat_bw"], [/^Wall sit, a bit deeper/, "wallsit", "wall_sit_deep"], [/^Wall sit/, "wallsit", "wall_sit"],
-  [/^Leg press/, "legpress", "leg_press"], [/Bulgarian split squat/, "bulgarian", "bulgarian"], [/^Split squat/, "splitsquat", "split_squat"],
+  [/^Leg press/, "legpress", "leg_press"], [/^Dumbbell Bulgarian split squat/, "bulgarian", "bulgarian"], [/Bulgarian split squat/, "bulgarian", "bulgarian_bw"], [/^Split squat/, "splitsquat", "split_squat"],
   [/[Dd]umbbell reverse lunge/, "revlunge", "reverse_lunge_db"], [/^Reverse lunge, short step/, "revlunge", "reverse_lunge_short"], [/[Rr]everse [Ll]unge/, "revlunge", "reverse_lunge"], [/[Dd]umbbell step-up|[Ss]tep-up, holding dumbbells/, "stepup", "step_up_db"], [/[Ss]tep-up on a stair/, "stepup", "step_up_stair"], [/^Step-up onto a chair/, "stepup", "step_up_chair"], [/[Ss]tep-up/, "stepup", "step_up"],
   [/Single-leg Romanian deadlift/, "slrdl", "sl_rdl"], [/^Barbell Romanian deadlift/, "rdl", "rdl_bar"], [/^Backpack Romanian deadlift/, "rdl", "rdl_pack"], [/Romanian deadlift/, "rdl", "rdl"], [/^(Trap bar deadlift|Barbell deadlift|Deadlift)$/, "deadlift", "deadlift"],
   [/^Single-leg hip thrust/, "hipthrust", "hip_thrust_single"], [/^Hip thrust, back on the couch/, "hipthrust", "hip_thrust_couch"], [/^Hip thrust machine/, "hipthrust", "hip_thrust_machine"], [/[Hh]ip thrust/, "hipthrust", "hip_thrust"], [/^Single-leg glute bridge/, "bridge", "glute_bridge_single"], [/[Gg]lute [Bb]ridge/, "bridge", "glute_bridge"], [/^Cable pull-through/, "pullthrough", "pull_through"],
@@ -14329,6 +14329,7 @@ for (const [id, o] of Object.entries(ANIM_3D)) if (ANIMS[id]) Object.assign(ANIM
 Object.assign(ANIMS.pull_assist, { A: ANIMS.pull_band.A, B: ANIMS.pull_band.B, bandKnee: ANIMS.pull_band.bandKnee, yaw: 145, palmFwd: true, ankle: 42 }); // (non-chrome figures: the band version)
 // Loaded variants: the same movement, holding the equipment the exercise names (dumbbells at the sides, or a barbell)
 const ANIM_VARIANTS = {
+  bulgarian_bw: ["bulgarian", (ps) => ps.filter((pp) => !pp.db)], // (v420: the plain Bulgarian split squat is bodyweight — only the dumbbell version holds weights)
   reverse_lunge_db: ["reverse_lunge", (ps) => [...ps, { db: "wrist" }]],
   step_up_db: ["step_up", (ps) => [...ps, { db: "wrist" }]],
   rdl_bar: ["rdl", (ps) => ps.map((pp) => (pp.db ? { plate: "wrist" } : pp))],
