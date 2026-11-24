@@ -424,3 +424,85 @@ I18N_FILL("pl", {
 3162:"Utrzymanie W leżąc na brzuchu",
 3163:"Leżąc na brzuchu, łokcie zgięte w W. Lekko unieś ręce i utrzymaj."
 });
+// v423: hollow hold with arms overhead, step 2
+I18N_FILL("es", {
+3164:"Levanta un poco la cabeza y los hombros, con los brazos estirados por encima de la cabeza junto a las orejas."
+});
+I18N_FILL("de", {
+3164:"Heb Kopf und Schultern leicht an, die Arme über dem Kopf neben den Ohren gestreckt."
+});
+I18N_FILL("fr", {
+3164:"Décolle un peu la tête et les épaules, bras tendus au-dessus de la tête près des oreilles."
+});
+I18N_FILL("pt", {
+3164:"Levante um pouco a cabeça e os ombros, com os braços esticados acima da cabeça junto às orelhas."
+});
+I18N_FILL("pl", {
+3164:"Lekko unieś głowę i barki, ręce wyciągnięte za głowę przy uszach."
+});
+// v423: v421 directions that disagreed with their animations
+I18N_FILL("es", {
+3165:"Baja hasta que los muslos queden más o menos horizontales, con la mancuerna cerca del pecho.",
+3166:"Da un paso corto hacia atrás y apoya la parte delantera del pie de atrás.",
+3167:"Pon las manos en el borde de una mesa firme, más abiertas que los hombros. Retrocede con los pies hasta que el cuerpo quede recto.",
+3168:"Pon las manos en el borde de una mesa firme, más juntas que los hombros. Retrocede con los pies hasta que el cuerpo quede recto.",
+3169:"Baja el pecho hasta el borde, con los codos hacia atrás pegados al cuerpo.",
+3170:"Pon las manos en la parte delantera del asiento de una silla firme (contra la pared), más abiertas que los hombros. Retrocede con los pies hasta que el cuerpo quede recto.",
+3171:"Pon las manos en la parte delantera del asiento de una silla firme (contra la pared), más juntas que los hombros. Retrocede con los pies hasta que el cuerpo quede recto.",
+3172:"Empieza en posición de flexión, acerca los pies y sube la cadera para formar una V invertida. Manos más abiertas que los hombros.",
+3173:"Sujeta una mancuerna en cada mano, palmas hacia atrás. Afloja las rodillas, lleva la cadera atrás e inclínate con la espalda recta.",
+3174:"Tira de ellas hacia el pecho, con los codos hacia los lados.",
+3175:"Mantén 8 segundos y luego vuelve."
+});
+I18N_FILL("de", {
+3165:"Geh runter, bis die Oberschenkel etwa waagerecht sind, die Hantel nah an der Brust.",
+3166:"Mach einen kurzen Schritt zurück und lande auf dem Fußballen des hinteren Fußes.",
+3167:"Setz die Hände an die Kante eines stabilen Tisches, weiter als schulterbreit. Geh mit den Füßen zurück, bis dein Körper gerade ist.",
+3168:"Setz die Hände an die Kante eines stabilen Tisches, enger als schulterbreit. Geh mit den Füßen zurück, bis dein Körper gerade ist.",
+3169:"Senk die Brust zur Kante, Ellbogen nach hinten am Körper.",
+3170:"Setz die Hände vorne auf die Sitzfläche eines stabilen Stuhls (an der Wand), weiter als schulterbreit. Geh mit den Füßen zurück, bis dein Körper gerade ist.",
+3171:"Setz die Hände vorne auf die Sitzfläche eines stabilen Stuhls (an der Wand), enger als schulterbreit. Geh mit den Füßen zurück, bis dein Körper gerade ist.",
+3172:"Starte im Liegestütz, geh mit den Füßen näher und heb die Hüfte hoch, sodass ein umgekehrtes V entsteht. Hände weiter als schulterbreit.",
+3173:"Halte in jeder Hand eine Hantel, Handflächen nach hinten. Knie locker, Hüfte zurück und mit geradem Rücken vorbeugen.",
+3174:"Zieh sie zur Brust hoch, Ellbogen zur Seite.",
+3175:"8 Sekunden halten, dann zurückbringen."
+});
+I18N_FILL("fr", {
+3165:"Descends jusqu'à ce que les cuisses soient à peu près horizontales, l'haltère près de la poitrine.",
+3166:"Fais un petit pas en arrière et pose l'avant du pied arrière.",
+3167:"Pose les mains sur le bord d'une table stable, plus larges que les épaules. Recule les pieds jusqu'à ce que ton corps soit droit.",
+3168:"Pose les mains sur le bord d'une table stable, plus serrées que les épaules. Recule les pieds jusqu'à ce que ton corps soit droit.",
+3169:"Descends la poitrine vers le bord, coudes vers l'arrière le long du corps.",
+3170:"Pose les mains à l'avant de l'assise d'une chaise stable (contre un mur), plus larges que les épaules. Recule les pieds jusqu'à ce que ton corps soit droit.",
+3171:"Pose les mains à l'avant de l'assise d'une chaise stable (contre un mur), plus serrées que les épaules. Recule les pieds jusqu'à ce que ton corps soit droit.",
+3172:"Commence en position de pompe, rapproche les pieds et monte le bassin pour former un V inversé. Mains plus larges que les épaules.",
+3173:"Tiens un haltère dans chaque main, paumes vers l'arrière. Fléchis les genoux, pousse les hanches en arrière et penche-toi, dos plat.",
+3174:"Tire-les vers la poitrine, coudes sur les côtés.",
+3175:"Tiens 8 secondes, puis ramène-les."
+});
+I18N_FILL("pt", {
+3165:"Desça até as coxas ficarem mais ou menos na horizontal, com o halter perto do peito.",
+3166:"Dê um passo curto para trás e apoie a ponta do pé de trás.",
+3167:"Apoie as mãos na borda de uma mesa firme, mais afastadas que os ombros. Afaste os pés para trás até o corpo ficar reto.",
+3168:"Apoie as mãos na borda de uma mesa firme, mais juntas que os ombros. Afaste os pés para trás até o corpo ficar reto.",
+3169:"Desça o peito até a borda, com os cotovelos para trás junto ao corpo.",
+3170:"Apoie as mãos na frente do assento de uma cadeira firme (encostada na parede), mais afastadas que os ombros. Afaste os pés para trás até o corpo ficar reto.",
+3171:"Apoie as mãos na frente do assento de uma cadeira firme (encostada na parede), mais juntas que os ombros. Afaste os pés para trás até o corpo ficar reto.",
+3172:"Comece na posição de flexão, aproxime os pés e suba o quadril formando um V invertido. Mãos mais afastadas que os ombros.",
+3173:"Segure um halter em cada mão, palmas para trás. Destrave os joelhos, leve o quadril para trás e incline-se com as costas retas.",
+3174:"Puxe-os em direção ao peito, cotovelos para os lados.",
+3175:"Segure 8 segundos e depois volte."
+});
+I18N_FILL("pl", {
+3165:"Zejdź, aż uda będą mniej więcej poziomo, hantla blisko klatki.",
+3166:"Zrób krótki krok w tył i stań na przodostopiu tylnej nogi.",
+3167:"Połóż dłonie na krawędzi stabilnego stołu, szerzej niż barki. Odejdź stopami do tyłu, aż ciało będzie proste.",
+3168:"Połóż dłonie na krawędzi stabilnego stołu, węziej niż barki. Odejdź stopami do tyłu, aż ciało będzie proste.",
+3169:"Opuść klatkę do krawędzi, łokcie w tył wzdłuż boków.",
+3170:"Połóż dłonie na przedniej krawędzi siedziska stabilnego krzesła (przy ścianie), szerzej niż barki. Odejdź stopami do tyłu, aż ciało będzie proste.",
+3171:"Połóż dłonie na przedniej krawędzi siedziska stabilnego krzesła (przy ścianie), węziej niż barki. Odejdź stopami do tyłu, aż ciało będzie proste.",
+3172:"Zacznij w pozycji pompki, przejdź stopami bliżej i unieś biodra wysoko, tworząc odwrócone V. Dłonie szerzej niż barki.",
+3173:"Trzymaj hantlę w każdej dłoni, dłonie do tyłu. Lekko ugnij kolana, przesuń biodra w tył i pochyl się z prostymi plecami.",
+3174:"Przyciągaj je do klatki, łokcie na boki.",
+3175:"Utrzymaj 8 sekund, potem wróć."
+});
