@@ -17300,12 +17300,14 @@ function proBarGrip(B) {
     if (s > -1e8) { if (s > 0) c.add(d.clone().multiplyScalar(s)); else if (B.barHug) { const x = Math.min(1, Math.max(0, (s + 22) / 14)), k = x * x * (3 - 2 * x); c.add(d.clone().multiplyScalar(s * k)); } } }
   // the palm faces: the body for pulls and the squat, forward for the press, the feet for the bench
   const palmTo = B.barPalm === "fwd" ? fwd.clone() : B.barPalm === "feet" ? upB.clone().negate() : d.clone().negate();
+  const curlG = B.barPalm === "curl" ? 1 : B.barPalm === "rcurl" ? -1 : 0; // (curls: the palm keeps facing the inside of the elbow (underhand) or away from it (overhand) as the forearm swings up, instead of a fixed world direction that it passes through)
+  const curlRef = (Sm, E, fd) => { const tu = Sm.clone().sub(E); tu.sub(fd.clone().multiplyScalar(tu.dot(fd))); const k = Math.min(1, tu.lengthSq() / 30), w = k * k * (3 - 2 * k), f0 = fwd.clone().sub(fd.clone().multiplyScalar(fwd.dot(fd))); const r = f0.lengthSq() > 1e-6 ? f0.normalize() : fwd.clone(); if (tu.lengthSq() > 1e-6) r.lerp(tu.normalize(), w); return r.normalize().multiplyScalar(curlG); };
   for (const L of ["Left", "Right"]) {
     const Sm = wp(L + "Arm"), side = Math.sign(Sm.clone().sub(c).dot(a)) || (L === "Left" ? 1 : -1), tgt = c.clone().add(a.clone().multiplyScalar(side * hw));
     const l1 = R[L + "ForeArm"].distanceTo(R[L + "Arm"]) * S, l2 = R[L + "Hand"].distanceTo(R[L + "ForeArm"]) * S, hl = R[L + "HandMiddle1"].distanceTo(R[L + "Hand"]) * S;
     let E = wp(L + "ForeArm"), W = wp(L + "Hand"), fd = W.clone().sub(E).normalize(), poleK = d.clone();
     for (let it = 0; it < 4; it++) {
-      const pn = palmTo.clone().sub(fd.clone().multiplyScalar(palmTo.dot(fd))).sub(a.clone().multiplyScalar(palmTo.dot(a))); if (pn.lengthSq() < 1e-6) pn.copy(e); pn.normalize();
+      const pT = curlG ? curlRef(Sm, E, fd) : palmTo, pn = pT.clone().sub(fd.clone().multiplyScalar(pT.dot(fd))).sub(a.clone().multiplyScalar(palmTo.dot(a))); if (pn.lengthSq() < 1e-6) pn.copy(e); pn.normalize();
       const Wt = tgt.clone().sub(fd.clone().multiplyScalar(hl * BAR_FIT.knuckle)).sub(pn.multiplyScalar(BAR_FIT.grip)), st = Wt.clone().sub(Sm), dl = Math.min(st.length(), (l1 + l2) * .995), hd = st.normalize();
       const al = (l1 * l1 + dl * dl - l2 * l2) / (2 * dl), hg = Math.sqrt(Math.max(0, l1 * l1 - al * al));
       // the elbow's side: mostly its natural one for the lift (a near-straight arm gives no reliable direction of its own, and it flipped mid-rep)
@@ -17314,7 +17316,7 @@ function proBarGrip(B) {
       E = Sm.clone().add(hd.clone().multiplyScalar(al)).add(pole.multiplyScalar(hg)); W = Sm.clone().add(hd.clone().multiplyScalar(dl)); fd = W.clone().sub(E).normalize();
     }
     // palm square to the bar and the forearm, on the chosen side
-    let pn = fd.clone().cross(a).normalize(); if (pn.dot(palmTo) < 0) pn.negate();
+    let pn = fd.clone().cross(a).normalize(); if (pn.dot(curlG ? curlRef(Sm, E, fd) : palmTo) < 0) pn.negate();
     proArmTo(M, L, E, W, poleK.clone().negate(), pn); // (the elbow folds away from the side it points to: the same side every frame)
     if (B.barMode === "sh" && SQUAT_UNWIND) { const t = boneTwist(M, L + "Arm"); if (Math.abs(t) > 90) boneRoll(M, L + "Arm", L + "ForeArm", Math.sign(t) * Math.min(SQUAT_UNWIND, Math.abs(t) - 90)); } // (back squat: the hands behind the head wring the upper arm round ~160°; give some of that back so the shoulder keeps its shape)
   }
@@ -17847,14 +17849,15 @@ function proPose0(B) {
       const fd = Wv.clone().sub(E).normalize(), ud = E.clone().sub(Sv).normalize(), toUpper = ud.clone().negate().sub(fd.clone().multiplyScalar(-ud.dot(fd)));
       // The forearm follows the elbow hinge (its inner side faces the upper arm), so the elbow doesn't twist;
       // the turn of the palm happens towards the wrist, like the real forearm bones rolling over each other
-      const palmUpTo = () => { const t = Math.min(1, toUpper.lengthSq() / .08), tn = toUpper.lengthSq() > 1e-6 ? toUpper.clone().normalize() : null; return tn ? fwd.clone().lerp(tn, t * t * (3 - 2 * t)).normalize() : fwd.clone(); }; // (straight arm: palm forward; bent: palm towards the shoulder)
+      const palmUpTo = () => { const t = Math.min(1, toUpper.lengthSq() / (B.palmUpFront ? .3 : .08)), tn = toUpper.lengthSq() > 1e-6 ? toUpper.clone().normalize() : null, f0 = B.palmUpFront ? fU.clone().sub(fd.clone().multiplyScalar(fU.dot(fd))) : null, base = f0 && f0.lengthSq() > 1e-4 ? f0.normalize() : fwd.clone(); return tn ? base.clone().lerp(tn, t * t * (3 - 2 * t)).normalize() : base; }; /* (palmUpFront: a straight arm's underhand palm faces the upper arm's own front — the side the elbow bends to — not the body's front; overhead the two are opposite) */ // (straight arm: palm forward; bent: palm towards the shoulder)
       const skyN = () => { const n = new T.Vector3().crossVectors(fd, new T.Vector3(0, 1, 0)).multiplyScalar((L === "Left" ? 1 : -1) * (B.thumbSky || 1)); const m = B.skyMix ?? 1; return n.lengthSq() > .04 ? new T.Vector3(0, B.skyUp ? 1 : -1, 0).lerp(n.normalize(), m).normalize() : fwd.clone(); }; /* (skyMix: 0 palms to the floor … 1 thumbs to the ceiling) */ /* (thumbSky: the hand turned so the thumb points at the ceiling, e.g. prone T/W raises) */ const palmTo = B.thumbSky ? skyN() : B.palmUp ? palmUpTo() : B.palmMid ? left.clone().multiplyScalar(L === "Left" ? -1 : 1) : B.palmDown ? new T.Vector3(0, -1, 0) : B.palmHead ? V3(B.sh).sub(V3(B.hip)).setY(0).normalize() : fwd; aim(L + "ForeArm", L + "Hand", fd, palmTo, pR); const qPalm = q[L + "ForeArm"].clone();
       // (the hinge only tells which way the elbow bends while the arm is bent: fade it out smoothly as the arm straightens, rather than switching it off)
-      const wHinge = PRO.chrome && B.palmHead ? Math.min(1, Math.max(0, toUpper.lengthSq() / 2e-4)) : PRO.chrome && (B.hang || B.wideBar) ? Math.min(1, Math.max(0, toUpper.lengthSq() / 2e-3)) : toUpper.lengthSq() > .05 ? 1 : 0; // (table rows: the arms pass through straight, so keep the hinge; elsewhere a straight arm has no hinge to follow)
+      const wHinge = PRO.chrome && B.palmHead ? Math.min(1, Math.max(0, toUpper.lengthSq() / 2e-4)) : PRO.chrome && (B.hang || B.wideBar) ? Math.min(1, Math.max(0, toUpper.lengthSq() / (B.palmUpFront ? (window.__HH || .05) : 2e-3))) : toUpper.lengthSq() > .05 ? 1 : 0; // (table rows: the arms pass through straight, so keep the hinge; elsewhere a straight arm has no hinge to follow)
       // chrome: as the arm straightens, the hinge hands over to the upper arm's own front (the way the elbow would bend),
       // so the forearm never rolls suddenly when the bend direction runs out
       let hingeDir = toUpper.lengthSq() > 1e-6 ? toUpper.clone().normalize() : null, wH = wHinge;
       if (PRO.chrome && !B.palmHead && !B.hang && !B.wideBar) { const fu0 = fU.clone().sub(fd.clone().multiplyScalar(fU.dot(fd))); if (fu0.lengthSq() > 1e-4) { fu0.normalize(); const t = Math.min(1, toUpper.lengthSq() / (B.thumbSky ? 1 : .08)); hingeDir = hingeDir ? fu0.clone().lerp(hingeDir, t * t * (3 - 2 * t)).normalize() : fu0; wH = 1; } }
+      if (B.palmUpFront && hingeDir && wH < 1) { const pp = palmTo.clone().sub(fd.clone().multiplyScalar(palmTo.dot(fd))); if (pp.lengthSq() > 1e-6) { hingeDir = pp.normalize().lerp(hingeDir, wH).normalize(); wH = 1; } } // (an almost straight underhand arm: its hinge is still unreliable, so the forearm follows the palm until the bend is clear)
       if (wH > 0 && hingeDir) {
         aim(L + "ForeArm", L + "Hand", fd, hingeDir, fwdRest);
         // with a twist bone the elbow follows its hinge and the lower forearm turns halfway; without one, split it at the elbow
@@ -18620,7 +18623,7 @@ function mirrorBody(B) {
 function glPose(an, id, k, still) {
   GL.kNow = k; GL.animNow = arguments[1]; // (planted hands: remember where they land at the start of the rep)
   if (an.front) {
-    const fp = still ? an.B : lerpPose(an.A, an.B, k), B = frontBody(fp); B.bendHand = "old"; /* (arms moving in the body's frontal plane, e.g. wall angels: the side-plane facing rule doesn't apply and spun the upper arm) */ B.openHand = !!an.openHand; B.thumbSky = an.thumbSky || 0; B.skyMix = an.skyMix; B.skyUp = !!an.skyUp; if (an.bandGrip && MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome) B.palmDown = true; // (chrome: the band is held in the fists, palms down)
+    const fp = still ? an.B : lerpPose(an.A, an.B, k), B = frontBody(fp); B.bendHand = "old"; /* (arms moving in the body's frontal plane, e.g. wall angels: the side-plane facing rule doesn't apply and spun the upper arm) */ B.openHand = !!an.openHand; B.thumbSky = an.thumbSky || 0; B.palmUpFront = !!an.palmUpFront; B.skyMix = an.skyMix; B.skyUp = !!an.skyUp; if (an.bandGrip && MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome) B.palmDown = true; // (chrome: the band is held in the fists, palms down)
     // Jumps (jumping jacks): the body leaves the floor between the two positions, toes pointing down in the air
     if (an.jump && !still) {
       // a smooth arc in the air, and a soft landing: around touchdown the knees bend a little forward over the toes and the body dips
@@ -18640,7 +18643,7 @@ function glPose(an, id, k, still) {
   const Mid = alt && alt.M ? (GL.segUp && alt.Mup ? alt.Mup : alt.M) : an.M; // (chrome: the way back can take its own path, e.g. stepping back up rather than pulling)
   const KS = (alt && alt.keys) || an.keys; // (keys: several poses in turn — up through them, back down the same way; a smooth curve through them, no stop at each)
   const p = KS ? (still ? KS[KS.length - 1] : keyPose(KS, k)) : still ? Bp : Mid ? lerpPose(lerpPose(A, Mid, k), lerpPose(Mid, Bp, k), k) : lerpPose(A, Bp, k);
-  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.fingersFwd = !!an.fingersFwd; B.kneeSketch = !!an.kneeSketch; B.softReach = !!an.softReach; B.legScale2 = !!an.legScale2; B.plantKeepZ = !!an.plantKeepZ; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantSlide = an.plantSlide || 0; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.thumbSky = an.thumbSky || 0; B.skyMix = an.skyMix; B.skyUp = !!an.skyUp; B.palmFwd = !!an.palmFwd; B.palmUp = !!an.palmUp; B.palmMid = !!an.palmMid || !!an.seatGrip; if (an.hipStay && an.A) B.legsStay = lift(sidePoints(an.A), an, an.A).legs; /* (seatGrip: hands hold the sides of a chair seat — palms in against its sides, fingers closed round the edge) */ B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.restFoot = !!an.restFoot; B.holdsWeight = (p.props || []).some((q) => q.db || q.plate || q.kb); B.stepProp = (p.props || []).some((q) => q.box || q.chair || q.stool || q.stair || q.step) /* (something to step onto: feet keep their full bend) */; B.wallHands = an.wallHands; B.footLean = an.footLean; B.toeFix = an.toeFix; B.palmsUp = !!an.palmsUp; B.htPad = !!(p.props || []).find((q) => q.htmachine); B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
+  const B = lift(sidePoints(p), an, p); B.animId = id; { const pl = (p.props || []).find((q) => q.plate); B.barMode = pl ? pl.plate : an.goblet ? "goblet" : an.dbFront || an.pack ? "wrist" : null; B.pack = !!an.pack; B.dbPair = !!an.dbFront && !pl; B.barHalf = an.barHalf; B.barPalm = an.barPalm; B.barHug = !!an.barHug; B.barHang = !!an.barHang; B.barUp = an.barUp; } B.curve = p.c || 0; B.fingersFwd = !!an.fingersFwd; B.kneeSketch = !!an.kneeSketch; B.softReach = !!an.softReach; B.legScale2 = !!an.legScale2; B.plantKeepZ = !!an.plantKeepZ; B.flare = an.flare || 0; B.bendHand = an.bendHand; B.freeArm0 = !!an.hand2At || !!an.noPlant; if (an.noPlant) B.freeArm1 = true; B.kneelFoot = !!an.kneelFoot; B.plantPole = an.plantPole; B.plantAll = !!an.plantAll; B.plantSlide = an.plantSlide || 0; B.armsCrossed = !!an.armsCrossed; if (B.armsCrossed) B.closeGrip = true; B.plantFrom = an.plantFrom || 0; B.plantX = an.plantX; /* (one-arm row: the working arm holds a dumbbell and never rests on the bench) */ B.openHand = !!an.openHand; B.thumbSky = an.thumbSky || 0; B.palmUpFront = !!an.palmUpFront; B.skyMix = an.skyMix; B.skyUp = !!an.skyUp; B.palmFwd = !!an.palmFwd; B.palmUp = !!an.palmUp; B.palmMid = !!an.palmMid || !!an.seatGrip; if (an.hipStay && an.A) B.legsStay = lift(sidePoints(an.A), an, an.A).legs; /* (seatGrip: hands hold the sides of a chair seat — palms in against its sides, fingers closed round the edge) */ B.palmIn = !!an.palmIn || !!an.thumbsUp; B.thumbsUp = !!an.thumbsUp; B.closeGrip = B.closeGrip || !!an.closeGrip; B.handsOn = !!an.handsOn; B.hook = !!an.hook; B.roll = !!an.roll; B.hTilt = p.h || 0; B.hShift = p.hx || 0; B.hang = p.anchor === "hand"; B.plant = an.handFix != null; B.reachK = an.reachK || 1; B.noKneel = !!an.noKneel; B.restFoot = !!an.restFoot; B.holdsWeight = (p.props || []).some((q) => q.db || q.plate || q.kb); B.stepProp = (p.props || []).some((q) => q.box || q.chair || q.stool || q.stair || q.step) /* (something to step onto: feet keep their full bend) */; B.wallHands = an.wallHands; B.footLean = an.footLean; B.toeFix = an.toeFix; B.palmsUp = !!an.palmsUp; B.htPad = !!(p.props || []).find((q) => q.htmachine); B.clam = !!an.clam; B.instepOn = !!an.instepOn; B.freeAnkle = !!an.freeAnkle; B.ankle = an.ankle || 0; B.kneelHold = !!an.kneelHold; B.handOnHip = !!an.handOnHip; B.armHinge = !!an.armHinge; B.wideBar = !!an.wideBar; B.footDown = !!an.footDown && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome); B.palmHead = !!an.tableAtHands && !!(MODELS[FIG_STYLE] && MODELS[FIG_STYLE].chrome);
   // a box the hands rest on (incline push-up): its top is the surface under the hands
   if (alt && alt.set) Object.assign(B, alt.set);
   for (const pp of p.props || []) if (pp.line && pp.line[1] === pp.line[3] && an.handFix != null) B.bar = -pp.line[1];
@@ -20218,25 +20221,25 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   incline_db: { ...BP, A: incl({ ...BP.A, u: 115, f: 217 }), B: incl({ ...BP.B, u: 190, f: 190 }) },
   db_bench_neutral: { ...BP, palmMid: true, flare: .2 },
   db_pullover: { ...BP, closeGrip: true, hz: 3, palmMid: true, flare: 0, A: { ...BP.A, u: 178, f: 182 }, B: { ...BP.A, u: 250, f: 262 } },
-  bb_floor_press: { ...mp(ANIMS.floor_press, toBar), hz: 22 },
+  bb_floor_press: { ...mp(ANIMS.floor_press, toBar), hz: 22, barPalm: ANIMS.bench_bar.barPalm, barHug: ANIMS.bench_bar.barHug },
   push_press: { ...PP, M: { ...PP.A, a: 18, b: -18 } },
   bb_front_raise: { ...mp(ANIMS.front_raise, toBar), hz: 12 },
-  bb_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16 },
-  bb_reverse_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16, palmUp: false, palmDown: true },
+  bb_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16, barPalm: "curl" },
+  bb_reverse_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16, palmUp: false, palmDown: true, barPalm: "rcurl" },
   cable_curl: { ...ANIMS.curl_db, hz: 14, A: { ...ANIMS.curl_db.A, props: [...col(150, 134), { handle: 1 }] }, B: { ...ANIMS.curl_db.B, props: [...col(150, 134), { handle: 1 }] } },
   pushdown: { yaw: -40, palmDown: true, hz: 9, A: pose({ t: 8, u: 6, f: 100, props: [...col(140, 8), { handle: 1 }] }), B: pose({ t: 8, u: 4, f: 4, props: [...col(140, 8), { handle: 1 }] }) },
   rope_pushdown: { yaw: -40, palmMid: true, rope: true, hz: 5, A: pose({ t: 8, u: 6, f: 100, props: col(140, 8) }), B: pose({ t: 8, u: 4, f: 0, hz: 14, props: col(140, 8) }) },
   lying_tri_bench: { ...BP, palmMid: true, flare: 0, A: { ...BP.A, u: 190, f: 190 }, B: { ...BP.A, u: 195, f: 298 } },
   bb_skull: { ...BB, hz: 9, palmDown: true, A: { ...BB.A, u: 190, f: 190 }, B: { ...BB.A, u: 195, f: 298 } },
   pulldown_close: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmMid: true, hz: 7, A: { ...LPD.A, u: 175, f: 178 }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
-  pulldown_under: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmUp: true, hz: 14, A: { ...LPD.A, u: 175, f: 178 }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
+  pulldown_under: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: "old", hz: 14, A: { ...LPD.A, u: 175, f: 178 }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
   straight_pd: { yaw: -40, palmDown: true, hz: 14, A: pose({ a: 10, b: -6, t: 22, u: 150, f: 152, props: [...col(185, 10), { handle: 1 }] }), B: pose({ a: 10, b: -6, t: 22, u: 4, f: 6, props: [...col(185, 10), { handle: 1 }] }) },
   cable_row_wide: CRW,
-  chinup: { ...PU, frontArms: false, palmFwd: false, palmUp: true, hz: 13, A: { ...PU.A, u: 180, f: 180 }, B: chinB },
-  chinup_neg: { ...PN, frontArms: false, palmFwd: false, palmUp: true, hz: 13 },
+  chinup: { ...PU, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13, A: { ...PU.A, u: 180, f: 180 }, B: chinB },
+  chinup_neg: { ...PN, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13 },
   hang_knee: { ...DH, A: DH.A, B: { ...DH.A, t: -6, a: 96, b: 2 } },
   hang_leg: { ...DH, A: DH.A, B: { ...DH.A, t: -14, a: 86, b: 84 } },
-  flexed_hang: { ...PU, frontArms: false, palmFwd: false, palmUp: true, hz: 13, A: chinB, B: chinB },
+  flexed_hang: { ...PU, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13, A: chinB, B: chinB },
   ...EXTRA,
   });
 }
@@ -20489,7 +20492,6 @@ LIB_NEW.push(
   ["Hanging knee raise", "reps", "Hang still, then lift your knees toward your chest without swinging. Lower slowly."],
   ["Hanging leg raise", "reps", "Hang still, then lift your straight legs to hip height without swinging. Lower slowly."],
   ["Flexed-arm hang", "time", "Chin over the bar, palms facing you. Hold the top of a chin-up as long as you can."],
-  ["Single-leg hip thrust machine", "weight", "In the machine, one foot on the floor, the other knee up. Drive through your heel and squeeze your bum at the top."],
   ["Barbell glute bridge", "weight", "Lying on the floor, padded bar over your hips. Push through your heels and lift until your body is a straight line."]);
 // v425: the owner checked the "Legs and glutes" section again
 for (const n of ["Dumbbell reverse lunge, short step", "Dumbbell sit-to-stand", "Dumbbell squat to a chair", "Dumbbell step-up on a stair", "Dumbbell sumo squat", "Goblet box squat", "Goblet calf raise", "Goblet reverse lunge, short step", "Goblet sit-to-stand", "Goblet split squat hold", "Goblet squat hold", "Goblet squat to a high box", "Goblet step-up on a stair", "Goblet wall sit"]) LIB_CHECKED.add(n);
