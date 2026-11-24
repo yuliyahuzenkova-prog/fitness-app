@@ -20150,6 +20150,7 @@ const PL = { plate: "wrist" }, SHB = { plate: "sh" }, DBW = { db: "wrist" };
 const swapP = (p, f) => ({ ...p, props: (p.props || []).map(f) });
 const mp = (an, f) => { const o = { ...an }; for (const k of ["A", "M", "B"]) if (o[k]) o[k] = f(o[k]); if (o.keys) o.keys = o.keys.map(f); return o; };
 const toBar = (p) => swapP(p, (q) => (q.db ? PL : q));
+const BBS = { barHalf: ANIMS.squat_bar.barHalf, barUp: ANIMS.squat_bar.barUp, barHug: ANIMS.squat_bar.barHug, hz: 20, fz: 5 }; /* (bar on the back: the same grip, height and hug as the back squat) */
 const backBar = (p) => ({ ...p, u: -45, f: 150, props: [...(p.props || []).filter((q) => !q.db), SHB] });
 const gobT = (p) => ({ ...p, u: 30 + (p.t || 0), f: 140 + (p.t || 0) });
 const ang = (v) => Math.atan2(v[0], v[1]) * 180 / Math.PI;
@@ -20176,7 +20177,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   E.incline_bb = { ...BB, hz: 22, A: incl({ ...BB.A, u: 115, f: 217 }), B: incl({ ...BB.B, u: 190, f: 190 }) };
   const sit = (o) => ({ ...o, anchor: "hip", at: [84, 110], t: 0, a: 90, b: 0, fd: 0, props: [...(o.props || []), { box: [62, 116, 40, 24] }, { slab: [66, 115, 66, 84, 5, 34] }] });
   E.seated_bb_press = { ...PP, A: sit(PP.A), B: sit(PP.B) };
-  E.bb_stepup = mp(ANIMS.step_up_db, backBar);
+  E.bb_stepup = { ...mp(ANIMS.step_up_db, backBar), ...BBS };
   E.ht_machine_single = { ...HTM, A: { ...HTM.A, a2: HTS.A.a2, b2: HTS.A.b2, fd2: HTS.A.fd2 }, B: { ...HTM.B, a2: HTS.B.a2, b2: HTS.B.b2, fd2: HTS.B.fd2 } };
   E.bb_glute_bridge = { ...GB2, plantAll: false, plantPole: undefined, plantSlide: 0, hz: 20, A: onHip(GB2.A, -10), B: onHip(GB2.B, -10) };
   E.bb_hipthrust = { ...HT, hz: 20, A: onHip(HT.A), B: onHip(HT.B) };
@@ -20195,11 +20196,11 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   leg_press_high: { ...LP, A: { ...lpA, a: 165, b: 72 }, B: { ...lpB, a: 128, b: 112 } },
   leg_press_narrow: { ...LP, fz: 1 },
   leg_press_calf: { ...LP, A: { ...lpB, fd: 70 }, B: { ...lpB, fd: 118 } },
-  bb_box_squat: { ...ANIMS.squat_box, hz: 20, fz: 5, A: backBar(ANIMS.squat_box.A), B: backBar(ANIMS.squat_box.B) },
-  bb_reverse_lunge: mp(ANIMS.reverse_lunge_db, backBar),
-  bb_split_squat: { ...mp(ANIMS.split_squat_db, backBar), hz: 20 },
-  bb_calf: { ...mp(ANIMS.calf_db, backBar), palmMid: false, hz: 20 },
-  bb_bulgarian: { ...mp(ANIMS.bulgarian, backBar), hz: 20 },
+  bb_box_squat: { ...ANIMS.squat_box, ...BBS, A: backBar(ANIMS.squat_box.A), B: backBar(ANIMS.squat_box.B) },
+  bb_reverse_lunge: { ...mp(ANIMS.reverse_lunge_db, backBar), ...BBS },
+  bb_split_squat: { ...mp(ANIMS.split_squat_db, backBar), ...BBS },
+  bb_calf: { ...mp(ANIMS.calf_db, backBar), palmMid: false, ...BBS },
+  bb_bulgarian: { ...mp(ANIMS.bulgarian, backBar), ...BBS },
   bench_close: { ...BB, hz: 11 },
   bench_wide: { ...BB, hz: 31 },
   incline_db: { ...BP, A: incl({ ...BP.A, u: 115, f: 217 }), B: incl({ ...BP.B, u: 190, f: 190 }) },
