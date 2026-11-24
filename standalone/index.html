@@ -14448,7 +14448,7 @@ const ANIMS = {
     // chrome figures: the toes on the floor (not sunk into it) and the body low enough that straight arms reach it, so the hands never lift off at the top
     glChrome: { A: pose({ at: [38, 132], a: -73, b: -73, t: 73, u: 0, f: 0, fd: -60 }), B: pose({ at: [38, 132], a: -80, b: -80, t: 80, u: -60, f: 62, fd: -60 }) } },
   // Hands on a table (top 75 cm up) at its front edge, body in one straight line from the heels; lowers until the chest nears the edge
-  incline_pushup: { A: pose({ at: [40, 138], a: -25.5, b: -25.5, t: 25.5, u: 64.5, f: 64.5, fd: -28, props: [{ box: [123.5, 65, 50, 75] }] }), B: pose({ at: [40, 138], a: -34, b: -34, t: 34, u: -40, f: 70, fd: -40, props: [{ box: [123.5, 65, 50, 75] }] }) }, // (bottom: elbows ~105°, chest just short of the edge; deeper folded the arms shut)
+  incline_pushup: { A: pose({ at: [40, 138], a: -25.5, b: -25.5, t: 25.5, u: 64.5, f: 64.5, fd: -28, props: [{ box: [117.5, 65, 56, 75, 40] }] }), B: pose({ at: [40, 138], a: -34, b: -34, t: 34, u: -40, f: 70, fd: -40, props: [{ box: [117.5, 65, 56, 75, 40] }] }) }, // (bottom: elbows ~105°, chest just short of the edge; deeper folded the arms shut)
   pike_pushup: { A: pose({ at: [50, 138], a: -22, b: -22, t: 128, u: 28, f: 28, fd: -30 }), B: pose({ at: [50, 138], a: -22, b: -22, t: 145, u: 70, f: -10, fd: -30 }) },
   // Barbell bench press: one bar across both hands, grip a little wider than the shoulders, lowered to the lower chest
   bench_bar: { A: { anchor: "hip", at: [100, 104], t: -90, a: 120, b: 15, u: 70, f: 172, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] }, B: { anchor: "hip", at: [100, 104], t: -90, a: 120, b: 15, u: 178, f: 178, props: [{ box: [35, 114.5, 80, 7] }, { benchlegs: [35, 121.5, 80] }, { benchrack: [54, 64] }, { plate: "wrist" }] },
@@ -16821,7 +16821,7 @@ function glProps(props, B, an, p) {
       const wz = V3(B.arms[0][1][2]).z, sz = Math.sign(V3(B.arms[1][1][2]).z - wz) || 1, m = glMesh("box", g.box, M.box); m.receiveShadow = true;
       const zNear = V3(B.arms[1][1][2]).z - sz * ROW_BENCH_CLEAR, zFar = zNear + sz * 34, c = L(v[0] + v[2] / 2, v[1] + v[3] / 2); c.z = (zNear + zFar) / 2;
       glPlace(m, c, new T.Vector3(1, 0, 0), new T.Vector3(0, 1, 0), new T.Vector3(0, 0, 1), v[2], v[3], 34);
-    } else if (k === "box") box(v[0], v[1], v[0] + v[2], v[1] + v[3], 17);
+    } else if (k === "box") box(v[0], v[1], v[0] + v[2], v[1] + v[3], v[4] || 17); // (v[4]: half the width across, cm — a table is wider than a step)
     if (k === "rowmachine") { // seated cable row machine: a padded seat on a long low frame, angled footplates at the feet, a column with the weight stack and pulley in front
       const E = M.equip; box(54, 119.5, 98, 125, 15); rod(L(76, 125), L(76, 134), 2.2, E); rod(L(46, 134), L(190, 134), 2.6, E);
       for (const x of [48, 186]) { rod(L(x, 134, -13), L(x, 134, 13), 2.2, E); for (const o of [-12, 12]) rod(L(x, 134, o), L(x, 140, o), 1.8, E); }
@@ -18514,7 +18514,7 @@ const HH = ANIMS.hollow_hold, SM = ANIMS.superman_hold, TT = ANIMS.toe_taps, DB 
   lunge_short_db: mp(ANIMS.reverse_lunge_short, dbs),
   incline_wide: { ...ANIMS.incline_pushup, hz: 24, plantKeepZ: true },
   incline_close: { ...ANIMS.incline_pushup, hz: 9, plantKeepZ: true, plantPole: [40, .2, 1, -.8, 1] },
-  incline_chair_wide: { ...ANIMS.incline_chair, hz: 24, plantKeepZ: true },
+  incline_chair_wide: { ...mp(ANIMS.incline_chair, (p) => ({ ...p, props: (p.props || []).map((q) => (q.chair ? { chair: [q.chair[0], q.chair[1], q.chair[2], q.chair[3], 28] } : q)) })), hz: 24, plantKeepZ: true }, // (v426: a wider seat — on a 40 cm seat the wide hands were off its sides, in the air)
   incline_chair_close: { ...ANIMS.incline_chair, hz: 9, plantKeepZ: true, plantPole: [40, .2, .5, -1, 1] },
   pike_wide: { ...ANIMS.pike_pushup, hz: 22 },
   curl_reverse: { ...ANIMS.curl_db, palmUp: false, palmDown: true },
