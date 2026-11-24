@@ -190,5 +190,15 @@ const UK_CUES = {
   "Palms facing each other. Curl up, lower for 3 s. Squeeze 2 s at the top.": "Долоні дивляться одна на одну. Зігни руки, опускай 3 с. Напруж і утримуй 2 с угорі.",
   "Curl your hips off the floor, lower slowly. Lower for 3 s.": "Відривай таз від підлоги, опускай повільно. Вниз — 3 с.",
   "Legs up, knees soft. Lower them only as far as your back stays down. Lower for 4 s.": "Ноги вгору, коліна м'які. Опускай лише доти, доки спина на підлозі. Вниз — 4 с.",
-  "Lying, knees bent. Press your lower back to the floor, then relax. Hold each press for 3 s.": "Лежачи, коліна зігнуті. Притисни поперек до підлоги, потім розслабся. Утримуй кожне притискання 3 с."
+  "Lying, knees bent. Press your lower back to the floor, then relax. Hold each press for 3 s.": "Лежачи, коліна зігнуті. Притисни поперек до підлоги, потім розслабся. Утримуй кожне притискання 3 с.",
+  "Feet wide, toes out, a dumbbell at your chest. Sit down between your knees.": "Стопи широко, носки назовні, гантеля біля грудей. Сідай між колінами.",
+  "Dumbbells by your sides, one foot forward. Lower the back knee toward the floor. Reps per leg.": "Гантелі в опущених руках, одна нога попереду. Опускай заднє коліно до підлоги. Повтори на кожну ногу.",
+  "A dumbbell at your chest. Step back and lower, then push back up. Reps per leg.": "Гантеля біля грудей. Крок назад і опустись, потім повернись угору. Повтори на кожну ногу.",
+  "Hands wider than your shoulders. Lower your chest between your hands.": "Долоні ширше за плечі. Опускай груди між долонями.",
+  "Knees down, hands under your shoulders, elbows back along your sides.": "Коліна на підлозі, долоні під плечима, лікті назад уздовж боків.",
+  "Lying, arms up. Lower one leg at a time, back pressed down. Reps per side.": "Лежачи, руки вгору. Опускай по одній нозі, поперек притиснутий. Повтори на кожну сторону.",
+  "Lying, knees over hips. Lower one arm behind your head at a time. Reps per side.": "Лежачи, коліна над тазом. Опускай по одній руці за голову. Повтори на кожну сторону.",
+  "Dumbbells in front of your legs. Hips back and knees bent, back flat, stand up tall.": "Гантелі перед ногами. Таз назад, коліна зігнуті, спина рівна, встань рівно.",
+  "A dumbbell at your chest. Push your hips back, back flat, then stand tall.": "Гантеля біля грудей. Відведи таз назад зі спиною рівною, потім випрямся.",
+  "Stand tall, belly braced. Press the dumbbells overhead, lower to your shoulders.": "Стань рівно, прес напружений. Вижми гантелі над головою, опусти до плечей."
 };

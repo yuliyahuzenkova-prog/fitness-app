@@ -204,5 +204,15 @@ const UK_NAMES = {
   "Dumbbell hammer curl, 2 s squeeze": "Молоткові згинання з гантелями, утримання 2 с",
   "Reverse crunch, 3 s down": "Зворотні скручування, 3 с вниз",
   "Lying leg lowers, 4 s down": "Опускання ніг лежачи, 4 с вниз",
-  "Pelvic tilt, 3 s hold": "Нахил таза лежачи, утримання 3 с"
+  "Pelvic tilt, 3 s hold": "Нахил таза лежачи, утримання 3 с",
+  "Goblet sumo squat": "Сумо-присідання з гантелею біля грудей",
+  "Dumbbell split squat": "Присідання в розніжці з гантелями",
+  "Goblet reverse lunge": "Зворотний випад з гантелею біля грудей",
+  "Wide push-up": "Віджимання з широкою постановкою рук",
+  "Close-grip knee push-up": "Віджимання з колін, вузька постановка рук",
+  "Dead bug, legs only": "«Мертвий жук», лише ноги",
+  "Dead bug, arms only": "«Мертвий жук», лише руки",
+  "Dumbbell deadlift": "Станова тяга з гантелями",
+  "Goblet good morning": "«Добрий ранок» з гантелею біля грудей",
+  "Standing dumbbell shoulder press": "Жим гантелей над головою стоячи"
 };
