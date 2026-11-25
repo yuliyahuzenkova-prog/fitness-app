@@ -65,7 +65,7 @@ module.exports = {
   bb_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16, barPalm: "curl" },
   bb_reverse_curl: { ...mp(ANIMS.curl_db, toBar), hz: 16, palmUp: false, palmDown: true, barPalm: "rcurl" },
   cable_curl: { ...ANIMS.curl_db, hz: 14, A: { ...ANIMS.curl_db.A, props: [...col(150, 134), { handle: 1 }] }, B: { ...ANIMS.curl_db.B, props: [...col(150, 134), { handle: 1 }] } },
-  pushdown: { yaw: -40, palmDown: true, closeGrip: true, hz: 8, hzk: 1, A: pose({ t: 12, u: 6, f: 100, props: [...col(140, 8), { handle: 1 }] }), B: pose({ t: 12, u: 6, f: 30, props: [...col(140, 8), { handle: 1 }] }) }, /* (v447: the bar stays in front of the thighs at the bottom, hands close, a slight lean) */
+  pushdown: { yaw: -40, palmAway: true, closeGrip: true, hz: 8, hzk: 1, A: pose({ t: 12, u: 6, f: 100, props: [...col(140, 8), { handle: 1 }] }), B: pose({ t: 12, u: 6, f: 30, props: [...col(140, 8), { handle: 1 }] }) }, /* (v447: the bar stays in front of the thighs at the bottom, hands close, a slight lean) */
   rope_pushdown: { yaw: -40, palmMid: true, rope: true, hz: 5, A: pose({ t: 12, u: 6, f: 100, props: col(140, 8) }), B: pose({ t: 12, u: 6, f: 22, hz: 14, props: col(140, 8) }) },
   lying_tri_bench: { ...BP, palmMid: true, flare: 0, A: { ...BP.A, u: 190, f: 190 }, B: { ...BP.A, u: 195, f: 298 } },
   bb_skull: { ...BB, hz: 9, palmDown: true, A: { ...BB.A, u: 190, f: 190 }, B: { ...BB.A, u: 195, f: 298 } },
