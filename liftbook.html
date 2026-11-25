@@ -20517,6 +20517,8 @@ LIB_NEW.push(
     return { ...p, u: u * 180 / Math.PI, f: Math.atan2(HX[0] - E[0], HX[1] - E[1]) * 180 / Math.PI }; };
   const pz = (o) => grip({ anchor: "hip", at: HIP, t: 90, h: -8, fd: 0, props, ...o });
   ANIMS.reverse_hyper = { ...ANIMS.reverse_hyper, hz: 22, hzk: 1, palmDown: true, A: pz({ a: -6, b: -4, fd: 30 }), B: pz({ a: -86, b: -88, fd: -40 }) }; }
+// v441: the owner checked the "Legs and glutes" section of the gym exercises (v432)
+for (const n of ["Barbell box squat", "Barbell Bulgarian split squat", "Barbell calf raise", "Barbell glute bridge", "Barbell good morning", "Barbell hip thrust", "Barbell reverse lunge", "Barbell split squat", "Barbell step-up", "Calf press on the leg press", "Leg press, feet close together", "Leg press, feet high", "Leg press, feet wide", "Leg press, full range", "Reverse hyperextension on a bench", "Sumo deadlift"]) LIB_CHECKED.add(n);
 // v425: the owner checked the "Legs and glutes" section again
 for (const n of ["Dumbbell reverse lunge, short step", "Dumbbell sit-to-stand", "Dumbbell squat to a chair", "Dumbbell step-up on a stair", "Dumbbell sumo squat", "Goblet box squat", "Goblet calf raise", "Goblet reverse lunge, short step", "Goblet sit-to-stand", "Goblet split squat hold", "Goblet squat hold", "Goblet squat to a high box", "Goblet step-up on a stair", "Goblet wall sit"]) LIB_CHECKED.add(n);
 // v418: the owner checked the "Legs and glutes" section of the newer exercises
