@@ -43,7 +43,7 @@ module.exports = {
   hyperext_weight: { ...HYP, A: { ...HYP.A, t: 135, props: [...hxProps, DBW] }, B: { ...HYP.B, props: [...hxProps, DBW] } },
   reverse_hyper: RH,
   bb_row_under: { ...ANIMS.row_barbell, palmUp: true, hz: 17 },
-  bb_goodmorning: { ...ANIMS.squat_bar, A: backBar(pose({})), B: backBar(pose({ a: 15, b: -8, t: 68 })) },
+  bb_goodmorning: { ...ANIMS.squat_bar, barBack: true, A: backBar(pose({})), B: backBar(pose({ a: 15, b: -8, t: 68 })) },
   sumo_dl: { ...ANIMS.deadlift, fz: 14, hz: 9, A: pose({ at: [100, 140], a: 55, b: -22, t: 42, u: 0, f: 0, props: [PL] }), M: pose({ at: [100, 140], a: 30, b: -8, t: 22, u: 8, f: 8, props: [PL] }), B: pose({ at: [100, 140], u: 6, f: 8, props: [PL] }) },
   leg_press_full: { ...LP, A: { ...lpA, a: 160, b: 50 } },
   leg_press_high: { ...LP, A: { ...lpA, a: 165, b: 72 }, B: { ...lpB, a: 128, b: 112 } },
