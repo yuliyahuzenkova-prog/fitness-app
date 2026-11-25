@@ -40,7 +40,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
 }
 module.exports = {
   hyperext: HYP,
-  hyperext_weight: { ...HYP, A: { ...HYP.A, t: 135, props: [...hxProps, DBW] }, B: { ...HYP.B, props: [...hxProps, DBW] } },
+  hyperext_weight: { ...HYP, crossPlate: true, A: { ...HYP.A, t: 135, props: [...hxProps, { chestplate: 1 }] }, B: { ...HYP.B, props: [...hxProps, { chestplate: 1 }] } }, // (v459: a weight plate hugged to the chest, fingers round it)
   reverse_hyper: RH,
   bb_row_under: { ...ANIMS.row_barbell, palmUp: true, hz: 17 },
   bb_goodmorning: { ...ANIMS.squat_bar, barBack: true, A: backBar(pose({})), B: backBar(pose({ a: 15, b: -8, t: 68 })) },
