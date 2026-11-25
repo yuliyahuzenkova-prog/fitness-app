@@ -20517,6 +20517,11 @@ LIB_NEW.push(
     return { ...p, u: u * 180 / Math.PI, f: Math.atan2(HX[0] - E[0], HX[1] - E[1]) * 180 / Math.PI }; };
   const pz = (o) => grip({ anchor: "hip", at: HIP, t: 90, h: -8, fd: 0, props, ...o });
   ANIMS.reverse_hyper = { ...ANIMS.reverse_hyper, hz: 22, hzk: 1, palmDown: true, A: pz({ a: -6, b: -4, fd: 30 }), B: pz({ a: -86, b: -88, fd: -40 }) }; }
+// v442: barbell grip widths per exercise (the bar solver otherwise used one width lying down and one standing), and a skull crusher that
+// lowers the bar to the forehead, not past the head, with no rack in the way
+{ const set = (id, o) => { if (ANIMS[id]) Object.assign(ANIMS[id], o); };
+  set("bench_close", { barHalf: 17 }); set("bench_wide", { barHalf: 40 }); set("incline_bb", { barHalf: 28 }); set("push_press", { barHalf: 25 }); set("seated_bb_press", { barHalf: 25 });
+  const SK = ANIMS.bb_skull; if (SK) { const np = (q) => ({ ...q, props: (q.props || []).filter((x) => !x.benchrack) }); Object.assign(SK, { barHalf: 10, barPalm: "rcurl" /* (overhand, held relative to the elbow: no flip as the forearms pass upright) */, A: np(SK.A), B: { ...np(SK.B), u: 192, f: 282 } }); } }
 // v441: the owner checked the "Legs and glutes" section of the gym exercises (v432)
 for (const n of ["Barbell box squat", "Barbell Bulgarian split squat", "Barbell calf raise", "Barbell glute bridge", "Barbell good morning", "Barbell hip thrust", "Barbell reverse lunge", "Barbell split squat", "Barbell step-up", "Calf press on the leg press", "Leg press, feet close together", "Leg press, feet high", "Leg press, feet wide", "Leg press, full range", "Reverse hyperextension on a bench", "Sumo deadlift"]) LIB_CHECKED.add(n);
 // v425: the owner checked the "Legs and glutes" section again
