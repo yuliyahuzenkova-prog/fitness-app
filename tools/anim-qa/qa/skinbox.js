@@ -1,4 +1,4 @@
-// node qa/skinbox.js <id> <phases> [chromeF|chrome] [defs.js] — skin (not just bones) inside props such as a chair seat or bench: deepest cm per bone (v406)
+// (v457: oriented boxes — tilted pads measured in their own frame) node qa/skinbox.js <id> <phases> [chromeF|chrome] [defs.js] — skin (not just bones) inside props such as a chair seat or bench: deepest cm per bone (v406)
 const {chromium}=require('playwright');const AQ=require('path').resolve(__dirname,'..');const fs=require('fs');
 (async()=>{const [id,phs,fig='chromeF',defs]=process.argv.slice(2);const defsSrc=defs?fs.readFileSync(defs,'utf8'):'module.exports={}';
 const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
@@ -12,7 +12,7 @@ const r=await p.evaluate(async([id,phs,defsSrc])=>{const module={exports:{}};new
  const m=PRO.meshes[0],pos=m.geometry.attributes.position,si=m.geometry.attributes.skinIndex,sw=m.geometry.attributes.skinWeight,v=new T.Vector3(),fn=(m.applyBoneTransform||m.boneTransform).bind(m);
  const dom=[];for(let i=0;i<pos.count;i++){let best=-1,bw=0;for(let k=0;k<4;k++){const w=sw.array[i*4+k];if(w>bw){bw=w;best=si.array[i*4+k];}}dom.push(m.skeleton.bones[best].name.replace('mixamorig:','').replace(/^(Left|Right)/,''));}
  const out=[];for(const ph of phs.split(',').map(Number)){GL.frames={};PRO.plantCache={};glDraw(c,id,ph,0,[]);GL.scene.updateMatrixWorld(true);m.skeleton.update();
-  const boxes=[];for(const [key,list] of Object.entries(GL.pool||{}))if(key==='box')for(const mm of list.slice(0,(GL.used||{})[key]||0)){if(!mm.visible)continue;const bb=new T.Box3().setFromObject(mm);if(!bb.isEmpty())boxes.push(bb);}
-  const agg={};for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i);fn(i,v);v.applyMatrix4(m.matrixWorld);for(const bb of boxes){if(!bb.containsPoint(v))continue;const d=Math.min(v.x-bb.min.x,bb.max.x-v.x,v.y-bb.min.y,bb.max.y-v.y,v.z-bb.min.z,bb.max.z-v.z);agg[dom[i]]=Math.max(agg[dom[i]]||0,d);}}
+  const boxes=[];for(const [key,list] of Object.entries(GL.pool||{}))if(key==='box')for(const mm of list.slice(0,(GL.used||{})[key]||0)){if(!mm.visible)continue;mm.geometry.computeBoundingBox();const gb=mm.geometry.boundingBox;boxes.push({inv:mm.matrixWorld.clone().invert(),gb,sx:new T.Vector3().setFromMatrixColumn(mm.matrixWorld,0).length(),sy:new T.Vector3().setFromMatrixColumn(mm.matrixWorld,1).length(),sz:new T.Vector3().setFromMatrixColumn(mm.matrixWorld,2).length()});}
+  const agg={};for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i);fn(i,v);v.applyMatrix4(m.matrixWorld);for(const bb of boxes){const l=v.clone().applyMatrix4(bb.inv),g=bb.gb;if(!g.containsPoint(l))continue;const d=Math.min((l.x-g.min.x)*bb.sx,(g.max.x-l.x)*bb.sx,(l.y-g.min.y)*bb.sy,(g.max.y-l.y)*bb.sy,(l.z-g.min.z)*bb.sz,(g.max.z-l.z)*bb.sz);agg[dom[i]]=Math.max(agg[dom[i]]||0,d);}}
   out.push('ph '+ph+': '+(Object.entries(agg).map(([k,d])=>k+' '+d.toFixed(1)).join(' ')||'clear'));}
  return out;},[id,phs,defsSrc]);console.log(r.join('\n'));await b.close();})();

@@ -18329,6 +18329,13 @@ function glProps(props, B, an, p) {
       for (const z of [-15, 15]) { for (const x of [x0 + 6, x1 - 6]) rod(L(x, top + 8, z), L(x, 139, z), 2.6, E); rod(L(x0 - 4, 139, z), L(hx + 8, 139, z), 2.6, E); rod(L(hx, 139, z * 1.45), L(hx, hy, z * 1.45), 2.4, E); rod(L(x1 - 6, top + 14, z), L(hx, hy + 6, z * 1.45), 2, E); }
       for (const x of [x0 + 6, x1 - 6, hx]) rod(L(x, 139, -15 * (x === hx ? 1.45 : 1)), L(x, 139, 15 * (x === hx ? 1.45 : 1)), 2.2, E);
       for (const z of [-1, 1]) rod(L(hx - 7, hy, z * 21.75), L(hx + 7, hy, z * 21.75), 1.9, E); } // (the grips: short bars pointing forward, one each side)
+    if (k === "hx45") { const E = M.equip, H = [v[0], v[1]], Ld = [-.7071, .7071], N = [.7071, .7071], P = (sl, t, z = 0) => L(H[0] + Ld[0] * sl + N[0] * t, H[1] + Ld[1] * sl + N[1] * t, z); // 45° back-extension bench (v457): the hip pad just below the hip crease, the footplate square to the legs, a roller over the heels, all on one angled beam that runs down to the floor at the back; a front upright and a floor base
+      const Xl = P(1, 0).sub(P(0, 0)).normalize(), Nn = P(0, 1).sub(P(0, 0)).normalize(), Zz = new T.Vector3(0, 0, 1);
+      { const m = glMesh("box", g.box, M.box); m.receiveShadow = true; glPlace(m, P(21, 9 + 3.5), Xl, Nn.clone().negate(), Zz, 24, 7, 30); } // (the pad: its top along the front of the thighs)
+      { const m = glMesh("box", g.box, M.box); m.receiveShadow = true; glPlace(m, P(64.5, 1), Nn, Xl.clone().negate(), Zz, 30, 3, 34); } // (the footplate under the soles)
+      rod(P(56, -7.5, -15), P(56, -7.5, 15), 4, M.box); rod(P(56, -7.5, -15), P(60, 14, -15), 1.6, E); rod(P(56, -7.5, 15), P(60, 14, 15), 1.6, E); // (the heel roller and its arms)
+      const sEnd = (139 - H[1] - N[1] * 17) / Ld[1]; for (const z of [-12, 12]) { rod(P(4, 17, z), P(sEnd, 17, z), 2.6, E); rod(P(13, 16, z), P(13, 16, z).setY(-139), 2.6, E); } // (the beam to the floor at the back; the front upright)
+      const xF = P(13, 16).x, xB = P(sEnd, 17).x; for (const z of [-16, 16]) rod(new T.Vector3(xB, -139, z), new T.Vector3(xF + 10, -139, z), 2.4, E); for (const x of [xB, xF + 10]) rod(new T.Vector3(x, -139, -16), new T.Vector3(x, -139, 16), 2.4, E); }
     if (k === "lprails") { const E = M.equip; // leg press: the sled's two rails rising at ~28° from under the seat to a frame, on a floor base
       for (const z of [-16, 16]) { rod(L(92, 118, z), L(172, 75, z), 2.2, E); rod(L(172, 75, z), L(172, 140, z), 2.4, E); rod(L(36, 139, z), L(176, 139, z), 2.4, E); rod(L(92, 118, z), L(92, 139, z), 2, E); }
       for (const x of [38, 92, 174]) rod(L(x, 139, -16), L(x, 139, 16), 2, E); rod(L(172, 75, -16), L(172, 75, 16), 2, E); }
@@ -20193,9 +20200,9 @@ const gobT = (p) => ({ ...p, u: 30 + (p.t || 0), f: 140 + (p.t || 0) });
 const ang = (v) => Math.atan2(v[0], v[1]) * 180 / Math.PI;
 const reach = (p, tgt, out = 1) => { const P = sidePoints(p), s = P.sh, dx = tgt[0] - s[0], dy = tgt[1] - s[1], d = Math.min(Math.hypot(dx, dy), SEG.upper + SEG.fore - .5), a1 = Math.acos((SEG.upper * SEG.upper + d * d - SEG.fore * SEG.fore) / (2 * SEG.upper * d)), base = Math.atan2(dx, dy), u = base + out * a1, e = [s[0] + Math.sin(u) * SEG.upper, s[1] + Math.cos(u) * SEG.upper]; return { ...p, u: u * 180 / Math.PI, f: ang([tgt[0] - e[0], tgt[1] - e[1]]) }; };
 // 45° back-extension bench: thighs on an angled pad, heels under a roller
-const HX = { anchor: "hip", at: [100, 78], a: -45, b: -45, fd: -45 };
-const hxProps = [{ slab: [80, 107, 104, 83, 7, 30] }, { box: [44, 110, 9, 8, 12] }, { box: [32, 126, 32, 4, 20] }];
-const HYP = { yaw: -20, armsCrossed: true, noKneel: true, A: { ...HX, t: 150, h: 0, u: 0, f: 0, props: hxProps }, B: { ...HX, t: 45, h: 0, u: 0, f: 0, props: hxProps } };
+const HX = { anchor: "hip", at: [100, 60], a: -45, b: -45, fd: -45 };
+const hxProps = [{ hx45: [100, 60] }]; // (v457: a 45° back-extension bench drawn as one machine)
+const HYP = { yaw: -20, armsCrossed: true, noKneel: true, A: { ...HX, t: 138, h: 0, u: 0, f: 0, props: hxProps }, B: { ...HX, t: 45, h: 0, u: 0, f: 0, props: hxProps } };
 // reverse hyper: chest on a high bench, legs hang and lift
 const rhProps = [{ box: [82, 86, 50, 7] }, { benchlegs: [94, 93, 34] }];
 const RH = { yaw: -20, noKneel: true, hz: 24, hzk: 1, A: { anchor: "hip", at: [80, 77], t: 90, h: 0, a: -10, b: -6, fd: 20, u: 4, f: 4, props: rhProps }, B: { anchor: "hip", at: [80, 77], t: 90, h: 0, a: -84, b: -86, fd: -60, u: 4, f: 4, props: rhProps } };
@@ -20224,7 +20231,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
 }
   Object.assign(ANIMS, {
   hyperext: HYP,
-  hyperext_weight: { ...HYP, A: { ...HYP.A, t: 135, props: [...hxProps, DBW] }, B: { ...HYP.B, props: [...hxProps, DBW] } },
+  hyperext_weight: { ...HYP, A: { ...HYP.A, t: 130, props: [...hxProps, DBW] }, B: { ...HYP.B, props: [...hxProps, DBW] } },
   reverse_hyper: RH,
   bb_row_under: { ...ANIMS.row_barbell, palmUp: true, hz: 17 },
   bb_goodmorning: { ...ANIMS.squat_bar, barBack: true, A: backBar(pose({})), B: backBar(pose({ a: 15, b: -8, t: 68 })) },
