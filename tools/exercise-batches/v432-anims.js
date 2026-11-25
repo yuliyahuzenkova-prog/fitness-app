@@ -75,8 +75,8 @@ module.exports = {
   cable_row_wide: CRW,
   chinup: { ...PU, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13, A: { ...PU.A, u: 180, f: 180 }, B: chinB },
   chinup_neg: { ...PN, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13 },
-  hang_knee: { ...DH, softReach: true /* (v455: the pose's leg is longer than the model's: held dead straight until it fitted, then the knee snapped bent) */, A: DH.A, B: { ...DH.A, t: -6, a: 96, b: 2 } },
-  hang_leg: { ...DH, A: DH.A, B: { ...DH.A, t: -14, a: 86, b: 84 } },
+  hang_knee: { ...DH, ankle: 20, softReach: true /* (v455: the pose's leg is longer than the model's: held dead straight until it fitted, then the knee snapped bent) */, A: DH.A, B: { ...DH.A, t: -6, a: 96, b: 2 } },
+  hang_leg: { ...DH, ankle: 20 /* (v456: toes pointed, the foot carrying on the line of the leg — at 42 the raised feet looked flexed up) */, A: DH.A, B: { ...DH.A, t: -14, a: 86, b: 84 } },
   flexed_hang: { ...PU, frontArms: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: undefined, hz: 13, A: chinB, B: chinB },
   ...EXTRA,
 };
