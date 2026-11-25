@@ -1224,3 +1224,10 @@ I18N_FILL("pl", {
 3417:"Połóż się na plecach, kolana ugięte, stopy płasko na szerokość bioder. Przetocz sztangę z nakładką na biodra i trzymaj ją.",
 3418:"Wykonuj bez obciążenia."
 });
+
+// v440: reverse hyper machine set-up
+I18N_FILL("es", {3419:"Túmbate boca abajo en una máquina de hiperextensión inversa (o en un banco alto), con la cadera en el borde trasero y las piernas colgando. Agárrate a las asas de delante."});
+I18N_FILL("de", {3419:"Leg dich bäuchlings auf ein Reverse-Hyper-Gerät (oder eine hohe Bank), Hüfte an der hinteren Kante, Beine hängen. Halt dich vorn an den Griffen fest."});
+I18N_FILL("fr", {3419:"Allonge-toi à plat ventre sur une machine d'hyperextension inversée (ou un banc haut), hanches au bord arrière, jambes pendantes. Tiens les poignées à l'avant."});
+I18N_FILL("pt", {3419:"Deite de bruços numa máquina de hiperextensão reversa (ou num banco alto), com o quadril na borda de trás e as pernas penduradas. Segure as alças da frente."});
+I18N_FILL("pl", {3419:"Połóż się na brzuchu na maszynie do odwrotnych wyprostów (albo na wysokiej ławce), biodra na tylnej krawędzi, nogi zwisają. Trzymaj uchwyty z przodu."});
