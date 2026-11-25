@@ -20194,7 +20194,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   E.ht_machine_single = { ...HTM, A: { ...HTM.A, a2: HTS.A.a2, b2: HTS.A.b2, fd2: HTS.A.fd2 }, B: { ...HTM.B, a2: HTS.B.a2, b2: HTS.B.b2, fd2: HTS.B.fd2 } };
   E.bb_glute_bridge = { ...GB2, plantAll: false, plantPole: undefined, plantSlide: 0, hz: 20, A: onHip(GB2.A, -10), B: onHip(GB2.B, -10) };
   E.bb_hipthrust = { ...HT, hz: 20, A: onHip(HT.A), B: onHip(HT.B) };
-  E.cable_oh_tri = { ...TO, rope: true, hz: 4, A: { ...TO.A, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] }, B: { ...TO.B, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] } };
+  E.cable_oh_tri = { ...TO, rope: true, hz: 14, hzk: 1 /* (v443: the rope ends apart, elbows beside the head — at 4 the arms folded into each other) */, A: { ...TO.A, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] }, B: { ...TO.B, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] } };
   E.cable_row_under = { ...CRW, palmDown: false, palmUp: true, hz: 15 };
   E.leg_press_wide = { ...LP, fz: 13 };
 }
