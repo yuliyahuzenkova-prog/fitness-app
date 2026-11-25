@@ -18368,19 +18368,19 @@ function glProps(props, B, an, p) {
     }
     if (k === "legpress") { // reclined back pad under the whole back, on two posts
       const hip = V3(B.hip), sh = V3(B.sh), fw = V3(B.fwd).normalize(), ax = sh.clone().sub(hip), Lt = ax.length(); ax.normalize();
-      const back = fw.clone().negate(), a = hip.clone().add(ax.clone().multiplyScalar(-14)).add(back.clone().multiplyScalar(11)), b2 = sh.clone().add(ax.clone().multiplyScalar(Lt * .35)).add(back.clone().multiplyScalar(11));
+      const back = fw.clone().negate(), a = hip.clone().add(ax.clone().multiplyScalar(an && an.lpOff != null ? -22 : -14)) /* (v437: the pad reaches on under the bum) */.add(back.clone().multiplyScalar(11)), b2 = sh.clone().add(ax.clone().multiplyScalar(Lt * .35)).add(back.clone().multiplyScalar(11));
       const [x, y, z] = glBasis(b2.clone().sub(a), back), m = glMesh("box", g.box, M.box); m.receiveShadow = true;
       glPlace(m, a.clone().add(b2).multiplyScalar(.5).add(back.clone().multiplyScalar(3)), x, y, z, 28, a.distanceTo(b2), 6);
       for (const q of [a, a.clone().lerp(b2, .7)]) { const f = q.clone().add(back.clone().multiplyScalar(6)); rod(f, new T.Vector3(f.x, -140, f.z), 1.6); }
     }
-    if (k === "sled") { // the leg-press footplate under both soles
-      let an2 = V3(B.legs[0][1][2]), to2 = V3(B.legs[0][1][3]), kn2 = V3(B.legs[0][1][1]);
-      // the 3D model's legs are longer than the pose's: put the plate under its real soles
-      if (PRO.group && PRO.group.visible && PRO.by) { const wp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld); an2 = wp("LeftFoot").add(wp("RightFoot")).multiplyScalar(.5); to2 = wp("LeftToe_End").add(wp("RightToe_End")).multiplyScalar(.5); kn2 = wp("LeftLeg").add(wp("RightLeg")).multiplyScalar(.5); }
-      const sole = to2.clone().sub(an2), mid2 = an2.clone().add(sole.clone().multiplyScalar(.5));
-      const shin = kn2.clone().sub(an2), nrm = sole.clone().cross(latv).normalize(); if (nrm.dot(shin) > 0) nrm.negate();
-      const [x, y, z] = glBasis(sole, nrm), m = glMesh("box", g.box, M.box); m.receiveShadow = true;
-      glPlace(m, mid2.clone().add(nrm.clone().multiplyScalar(PRO.group && PRO.group.visible ? 6 : 2.5)).setZ(0).add(latv.clone().multiplyScalar(0)), x, y, z, 56, sole.length() + 16, 3);
+    if (k === "sled") { // the leg-press footplate: square to the rails and sliding along them (v437), wherever the feet are on it
+      const R0 = L(92, 118), r3 = L(92.881, 117.527).sub(R0).normalize(), u3 = L(91.527, 117.119).sub(R0).normalize();
+      let an2 = V3(B.legs[0][1][2]), to2 = V3(B.legs[0][1][3]), ball = an2.clone().lerp(to2, .75);
+      if (PRO.group && PRO.group.visible && PRO.by) { const wp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld); an2 = wp("LeftFoot").add(wp("RightFoot")).multiplyScalar(.5); to2 = wp("LeftToe_End").add(wp("RightToe_End")).multiplyScalar(.5); ball = wp("LeftToeBase").add(wp("RightToeBase")).multiplyScalar(.5); }
+      const contact = an && an.lpBall ? ball.clone().sub(R0).dot(r3) + 2.2 : an2.clone().add(to2).multiplyScalar(.5).sub(R0).dot(r3) + (PRO.group && PRO.group.visible ? 4.5 : 1); // (the plate's face along the rails: under the soles, or under the balls of the feet for calf presses)
+      const c = R0.clone().add(r3.clone().multiplyScalar(contact + 1.5)).add(u3.clone().multiplyScalar(28)).setZ(0);
+      const [x, y, z] = glBasis(u3, r3), m = glMesh("box", g.box, M.box); m.receiveShadow = true; glPlace(m, c, x, y, z, 56, 46, 3);
+      for (const zz of [-16, 16]) rod(c.clone().add(u3.clone().multiplyScalar(-20)).add(r3.clone().multiplyScalar(2)).setZ(zz), c.clone().add(u3.clone().multiplyScalar(-28)).setZ(zz), 1.8, M.equip); // (the carriage down to the rails)
     }
     if (k === "wall") {
       // A wall between the camera and the figure turns see-through
@@ -20494,6 +20494,26 @@ LIB_NEW.push(
   ["Hanging leg raise", "reps", "Hang still, then lift your straight legs to hip height without swinging. Lower slowly."],
   ["Flexed-arm hang", "time", "Chin over the bar, palms facing you. Hold the top of a chin-up as long as you can."],
   ["Barbell glute bridge", "weight", "Lying on the floor, padded bar over your hips. Push through your heels and lift until your body is a straight line."]);
+// v437: the leg press as a real machine. The hips stay on the seat; the footplate slides along the rails, always square to them;
+// the feet lie flat on it at a spot that depends on the exercise (high, low, close, wide); knees from the hip-to-ankle distance
+{ const LPM = { hip: [70, 112], rail: [92, 118], r: [0.881, -0.473], lift: 28 }, U = [-0.473, -0.881], N = [-0.881, 0.473], SG = SEG;
+  const at = (s, off) => [LPM.rail[0] + LPM.r[0] * s + U[0] * (LPM.lift + off) + N[0] * 7 - U[0] * 3, LPM.rail[1] + LPM.r[1] * s + U[1] * (LPM.lift + off) + N[1] * 7 - U[1] * 3]; // (ankle: 7 off the plate face, a little below the middle of the sole)
+  const legs = (A) => { const H = LPM.hip, dx = A[0] - H[0], dy = A[1] - H[1], d = Math.min(Math.hypot(dx, dy), SG.thigh + SG.shin - .5), al = Math.acos((SG.thigh * SG.thigh + d * d - SG.shin * SG.shin) / (2 * SG.thigh * d)), b0 = Math.atan2(dx, dy);
+    let best = null; for (const sg of [1, -1]) { const th = b0 + sg * al, K = [H[0] + Math.sin(th) * SG.thigh, H[1] + Math.cos(th) * SG.thigh]; if (!best || K[1] < best.K[1]) best = { th, K }; } // (the knee on the upper side, towards the chest)
+    return { a: best.th * 180 / Math.PI, b: Math.atan2(A[0] - best.K[0], A[1] - best.K[1]) * 180 / Math.PI }; };
+  const sFor = (d, off) => { let lo = -40, hi = 120; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2, A = at(m, off); (Math.hypot(A[0] - LPM.hip[0], A[1] - LPM.hip[1]) < d ? (lo = m) : (hi = m)); } return (lo + hi) / 2; };
+  const FD = Math.atan2(-U[1], U[0]) * 180 / Math.PI, props = [{ legpress: 1 }, { sled: 1 }, { lprails: 1 }];
+  const base = { anchor: "hip", at: LPM.hip, t: -60, u: 58, f: 64, props };
+  const press = (d0, d1, off, n = 5) => Array.from({ length: n }, (_, i) => { const d = d0 + (d1 - d0) * i / (n - 1), A = at(sFor(d, off), off); return { ...base, ...legs(A), fd: FD }; });
+  const mk = (keys, o = {}) => ({ yaw: -30, freeAnkle: true /* (the feet are on the plate, not dangling: no relaxed-foot limit, the heels stay down) */, lpOff: o.off || 0, ...o, keys, A: keys[0], B: keys[keys.length - 1] });
+  ANIMS.leg_press = mk(press(47, 59.5, 0));
+  ANIMS.leg_press_full = mk(press(37, 59.5, 0));
+  ANIMS.leg_press_high = mk(press(44, 59.5, 13), { off: 13 });
+  ANIMS.leg_press_narrow = mk(press(39, 59.5, -4), { off: -4, fz: 1 });
+  ANIMS.leg_press_wide = mk(press(38, 59.5, 0), { fz: 13 });
+  { const off = -23, A = at(sFor(60.5, off), off), lg = legs(A); // calf press: straight legs, the balls of the feet low on the plate, heels off its edge
+    ANIMS.leg_press_calf = mk([142, 129, 116, 103, 92].map((fd) => ({ ...base, ...lg, fd })), { off, lpBall: true }); }
+}
 // v425: the owner checked the "Legs and glutes" section again
 for (const n of ["Dumbbell reverse lunge, short step", "Dumbbell sit-to-stand", "Dumbbell squat to a chair", "Dumbbell step-up on a stair", "Dumbbell sumo squat", "Goblet box squat", "Goblet calf raise", "Goblet reverse lunge, short step", "Goblet sit-to-stand", "Goblet split squat hold", "Goblet squat hold", "Goblet squat to a high box", "Goblet step-up on a stair", "Goblet wall sit"]) LIB_CHECKED.add(n);
 // v418: the owner checked the "Legs and glutes" section of the newer exercises
