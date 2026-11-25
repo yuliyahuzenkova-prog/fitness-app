@@ -17331,8 +17331,8 @@ function proBarGrip(B) {
       }
       // palm square to the bar and the forearm, on the chosen side
       let pn = fd.clone().cross(a).normalize(); if (pn.dot(curlG ? curlRef(Sm, E, fd) : palmTo) < 0) pn.negate();
-      proArmTo(M, L, E, W, poleK.clone().negate(), pn); // (the elbow folds away from the side it points to: the same side every frame)
-      if (B.barReach && pass < 1) { M.group.updateMatrixWorld(true); const err = tgt0.clone().sub(wp(L + "HandMiddle1")).dot(a); if (Math.abs(err) < .3) break; tgt.add(a.clone().multiplyScalar(err)); continue; } break; // (v445: the knuckles sit off the hand's own axis — palm down, they ended up nearer the middle than the grip: aim the arm once more by the error)
+      proArmTo(M, L, E, W, (B.barReach ? new T.Vector3(0, 1, 0).add(d.clone().multiplyScalar(.4)).add(a.clone().multiplyScalar(-side * .4)) : poleK.clone().negate()), pn); // (v451 front raise: the fold direction for a nearly straight arm is the same one the elbow was placed by, so the arm doesn't turn as the elbow straightens) // (the elbow folds away from the side it points to: the same side every frame)
+      if (B.barReach && pass < 1) { M.group.updateMatrixWorld(true); const err = tgt0.clone().sub(wp(L + "HandMiddle1")).dot(a); /* (always the second pass, even for a tiny error: switching it on only past a threshold turned the arm in one frame) */ tgt.add(a.clone().multiplyScalar(err)); continue; } break; // (v445: the knuckles sit off the hand's own axis — palm down, they ended up nearer the middle than the grip: aim the arm once more by the error)
     }
     if (B.barMode === "sh" && SQUAT_UNWIND) { const t = boneTwist(M, L + "Arm"); if (Math.abs(t) > 90) boneRoll(M, L + "Arm", L + "ForeArm", Math.sign(t) * Math.min(SQUAT_UNWIND, Math.abs(t) - 90)); } // (back squat: the hands behind the head wring the upper arm round ~160°; give some of that back so the shoulder keeps its shape)
   }
