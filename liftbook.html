@@ -17055,7 +17055,7 @@ function proWear(D, names, fem) {
     let f = -10;
     if (/^(Hips|Spine|Spine1|UpLeg)$/.test(b)) {
       if (!fem) f = Math.min(117.5 - y, y - 81); // trunks: waistband level around the waist, legs to the upper thigh
-      else { const out = cl((ax - 9) / 6) * (1 - Math.max(0, -nz) * .4); f = Math.min(115.5 - y, y - (88 + 8 * out)); } // briefs: high-cut legs
+      else { const bk = Math.max(0, -nz), out = cl((ax - 9) / 6) * (1 - bk * .85); f = Math.min(115.5 - y, y - (88 + 8 * out - 2.5 * bk)); } // briefs: high-cut legs at the sides; (v492) fuller at the back — the high cut there opened a wedge of skin across the seat in deep hip bends (kneeling stretches)
     }
     if (fem && /^(Head|Neck)$/.test(b) && y > 172) { const z = P[i * 3 + 2]; // hair: a hairline across the forehead, down in front of the ears, behind the ears to the nape (ears left clear)
       const yT = z >= 6 ? 197.6 - 3.2 * cl(ax / 8.5) ** 2 : z >= 1 ? 188 + 8 * (z - 1) / 5 : Math.max(179, 188 - 11 * (1 - z) / 5);
@@ -20864,9 +20864,9 @@ LIB_NEW.push(
 // v480: stretches for the cool-down — kneeling lat stretch with the elbows on a bench (palms together behind the head),
 // standing upper-back stretch (hands clasped in front, pushed away, upper back rounded)
   Object.assign(ANIMS, {
-  lat_bench: { yaw: -30, noKneel: true, hz: 1, palmMid: true, // (v484: elbows planted on the bench edge in both poses — the chest sinks by turning at the shoulders, not by sliding the elbows; the head drops in front of the bench, palms together; toes tucked under, heels up)
-    A: { anchor: "hip", at: [70, 105], t: 93, h: 50, a: 8, b: -105, fd: -95, u: 100, f: -122, props: [{ box: [133, 107.5, 40, 32.5, 15] }] },
-    B: { anchor: "hip", at: [71.8, 105.4], t: 99, h: 58, a: 12, b: -105, fd: -95, u: 112, f: -122, props: [{ box: [133, 107.5, 40, 32.5, 15] }] } },
+  lat_bench: { yaw: -30, noKneel: true, hz: 1, palmMid: true, armUnwindSoft: -.5, /* (v492: the overhead wring partly given back — thin shoulders; thighs nearer upright and the lower back a little rounded — the deep hip fold opened the shorts) */ // (v484: elbows planted on the bench edge in both poses — the chest sinks by turning at the shoulders, not by sliding the elbows; the head drops in front of the bench, palms together; toes tucked under, heels up)
+    A: { anchor: "hip", at: [70, 105], t: 93, h: 50, c: 12, a: -6, b: -105, fd: -95, u: 100, f: -122, props: [{ box: [133, 107.5, 40, 32.5, 15] }] },
+    B: { anchor: "hip", at: [71.8, 105.4], t: 99, h: 58, c: 12, a: -2, b: -105, fd: -95, u: 112, f: -122, props: [{ box: [133, 107.5, 40, 32.5, 15] }] } },
   uback_stretch: { yaw: -40, hz: 2, closeGrip: true, tm: { up: 2.5, pause: 4, down: 2.5 }, period: 10000, // (v483: shows the move — hands clasped at the chest, then pushed forward with the upper back rounded and the chin down, knees soft; held, then back. Every key is in both poses: one only in B never blends in)
     A: pose({ at: [95, 140], t: 0, a: 5, b: -5, c: 0, h: 0, u: 28, f: 140 }),
     B: pose({ at: [95, 140], t: 6, a: 9, b: -9, c: 12, h: 28, u: 86, f: 90 }) },
