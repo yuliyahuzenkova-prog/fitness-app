@@ -20611,7 +20611,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   rope_pushdown: { yaw: -40, palmMid: true, rope: true, hz: 5, A: pose({ t: 12, u: 6, f: 100, props: col(140, 8) }), B: pose({ t: 12, u: 6, f: 22, hz: 14, props: col(140, 8) }) },
   lying_tri_bench: { ...BP, palmMid: true, flare: 0, A: { ...BP.A, u: 190, f: 190 }, B: { ...BP.A, u: 195, f: 298 } },
   bb_skull: { ...BB, hz: 9, palmDown: true, A: { ...BB.A, u: 190, f: 190 }, B: { ...BB.A, u: 195, f: 298 } },
-  pulldown_close: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmMid: true, hz: 7, A: { ...LPD.A, u: 175, f: 178 }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
+  pulldown_close: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmMid: true, hz: 7, A: { ...LPD.A, u: 175, f: 168 /* (v486: elbows a little bent at the top — from straight arms the upper arm spun ~25° in the first moment of the pull, the forearm the other way) */ }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
   pulldown_under: { ...LPD, frontArms: false, wideBar: false, palmFwd: false, palmUp: true, palmUpFront: true, bendHand: "old", hz: 14, A: { ...LPD.A, u: 175, f: 178 }, B: { ...LPD.B, t: -12, u: 8, f: 158 } },
   straight_pd: { yaw: -40, palmDown: true, hz: 14, A: pose({ a: 10, b: -6, t: 22, u: 150, f: 152, props: [...col(185, 10), { handle: 1 }] }), B: pose({ a: 10, b: -6, t: 22, u: 4, f: 6, props: [...col(185, 10), { handle: 1 }] }) },
   cable_row_wide: CRW,
