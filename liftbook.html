@@ -17209,6 +17209,7 @@ function proGripLock(B) {
     const q = new T.Quaternion().setFromUnitVectors(v0, v1), b = M.by[L + "Arm"], bw = new T.Quaternion(), pw = new T.Quaternion(); b.getWorldQuaternion(bw); b.parent.getWorldQuaternion(pw);
     b.quaternion.copy(pw.invert().multiply(q.multiply(bw))); b.updateMatrixWorld(true); }
   M.group.updateMatrixWorld(true);
+  if (M.bar) { const l2 = g("Left"), r2 = g("Right"); if (l2 && r2) { M.bar.c = l2.p.clone().add(r2.p).multiplyScalar(.5); if (M.bar.pair) M.bar.pair = [l2.p, r2.p]; } } // (v473: a barbell follows the hands it was moved with — it had stayed where the hands were before, out at the fingertips)
 }
 // Set a chrome bone's world orientation the way proPose's aim() does: its rest direction onto dir, its rest reference onto ref
 function proAimW(M, n, child, dir, ref, restRef) {
