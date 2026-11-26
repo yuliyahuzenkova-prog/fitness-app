@@ -20543,6 +20543,8 @@ LIB_NEW.push(
 { const set = (id, o) => { if (ANIMS[id]) Object.assign(ANIMS[id], o); };
   set("bb_front_raise", { barHalf: 15, barReach: true }); set("row_barbell", { barTrue: true }); set("bb_row_under", { barTrue: true }); /* (v460: rows keep the grip width as the elbows go back — the knuckles drifted out to 45 cm) */ /* (v445: shoulder-width grip, elbows soft and down, hands kept on the grips) */ set("bench_close", { barHalf: 17, barElbowIn: true, tm: { up: 1.8, down: 2.2, pause: .6 }, period: 5400 }); set("bench_wide", { tm: { up: 1.8, down: 2.2, pause: .6 }, period: 5400 }); /* (v448: a steadier press: 1.8 s up, 2.2 s down) */ set("bench_wide", { barHalf: 40 }); set("incline_bb", { barHalf: 28 }); set("push_press", { barHalf: 25 }); set("seated_bb_press", { barHalf: 25 });
   const SK = ANIMS.bb_skull; if (SK) { const np = (q) => ({ ...q, props: (q.props || []).filter((x) => !x.benchrack) }); Object.assign(SK, { barHalf: 13, barElbowUp: true, barPalm: "rcurl" /* (overhand, held relative to the elbow: no flip as the forearms pass upright) */, A: np(SK.A), B: { ...np(SK.B), u: 192, f: 282 } }); } }
+// v463: the owner checked the "Core" section of the gym exercises (v432)
+for (const n of ["Hanging knee raise", "Hanging leg raise", "Hyperextension holding a weight", "Hyperextension on a 45° bench"]) LIB_CHECKED.add(n);
 // v441: the owner checked the "Legs and glutes" section of the gym exercises (v432)
 // v444: incline presses — the back lies on the backrest (set parallel to the trunk, as far behind it as the flat bench is), and the arms are the flat
 // bench's turned with the trunk: at the bottom elbows below the bench line and forearms upright, at the top arms straight over the shoulders
