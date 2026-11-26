@@ -298,5 +298,7 @@ const UK_CUES = {
   "Hang still, then lift your straight legs to hip height without swinging. Lower slowly.": "Повисни нерухомо, потім підніми прямі ноги до рівня таза без розгойдування. Повільно опусти.",
   "Chin over the bar, palms facing you. Hold the top of a chin-up as long as you can.": "Підборіддя над перекладиною, долоні до себе. Утримуй верхню точку підтягування якомога довше.",
   "In the machine, one foot on the floor, the other knee up. Drive through your heel and squeeze your bum at the top.": "У тренажері: одна стопа на підлозі, інше коліно підняте. Тисни п'ятою й напруж сідниці нагорі.",
-  "Lying on the floor, padded bar over your hips. Push through your heels and lift until your body is a straight line.": "Лежачи на підлозі, штанга з накладкою на тазі. Тисни п'ятами й піднімайся до прямої лінії тіла."
+  "Lying on the floor, padded bar over your hips. Push through your heels and lift until your body is a straight line.": "Лежачи на підлозі, штанга з накладкою на тазі. Тисни п'ятами й піднімайся до прямої лінії тіла.",
+  "Elbows on the bench, hands together behind your head. Sit your hips back and let your chest sink.": "Лікті на лаві, долоні разом за головою. Відведи таз назад і дай грудям опуститися.",
+  "Hands clasped in front at chest height. Push them away and round your upper back.": "Зчеп руки перед собою на рівні грудей. Тягнися ними вперед і округли верх спини."
 };

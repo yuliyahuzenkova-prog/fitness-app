@@ -428,5 +428,8 @@ Object.assign(UK, {
   "+5 s": "+5 с",
   "−5 s": "−5 с",
   "5 seconds more": "На 5 секунд більше",
-  "5 seconds less": "На 5 секунд менше"
+  "5 seconds less": "На 5 секунд менше",
+  "Cool-down stretches": "Розтяжка після тренування",
+  "Easy, slow breathing. Stretch to a gentle pull, never to pain. Tap ▶ for the timer.": "Спокійно й повільно дихай. Тягнись до легкого натягу, ніколи до болю. Натисни ▶, щоб увімкнути таймер.",
+  "stretch": "розтяжка"
 });

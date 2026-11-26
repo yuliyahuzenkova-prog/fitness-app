@@ -312,5 +312,7 @@ const UK_NAMES = {
   "Hanging leg raise": "Підйом прямих ніг у висі",
   "Flexed-arm hang": "Вис на зігнутих руках",
   "Single-leg hip thrust machine": "Хіп-траст у тренажері на одній нозі",
-  "Barbell glute bridge": "Ягідний міст зі штангою"
+  "Barbell glute bridge": "Ягідний міст зі штангою",
+  "Kneeling lat stretch on a bench": "Розтяжка широчайших на колінах біля лави",
+  "Standing upper-back stretch": "Розтяжка верху спини стоячи"
 };
