@@ -419,5 +419,14 @@ Object.assign(UK, {
   "Relax slowly": "Повільно розслабся",
   "Straighten your arms": "Випрями руки",
   "Lift one leg": "Підніми одну ногу",
-  "Rock back slowly": "Повільно відкотися назад"
+  "Rock back slowly": "Повільно відкотися назад",
+  "Get ready": "Готуйся",
+  "Switch sides": "Зміни сторону",
+  "First side": "Перша сторона",
+  "Second side": "Друга сторона",
+  "Start the hold timer": "Запустити таймер утримання",
+  "+5 s": "+5 с",
+  "−5 s": "−5 с",
+  "5 seconds more": "На 5 секунд більше",
+  "5 seconds less": "На 5 секунд менше"
 });
