@@ -18528,7 +18528,7 @@ function glProps(props, B, an, p) {
       const mid0 = wN.clone().add(wF).multiplyScalar(.5), s = wN.clone().sub(wF).normalize(), half = LAT_BAR.half, dn = new T.Vector3(0, -1, 0);
       const eN = mid0.clone().add(s.clone().multiplyScalar(LAT_BAR.flat)), eF = mid0.clone().sub(s.clone().multiplyScalar(LAT_BAR.flat));
       rod(eF, eN, 1.3); rod(eN, mid0.clone().add(s.clone().multiplyScalar(half)).add(dn.clone().multiplyScalar(LAT_BAR.drop)), 1.3); rod(eF, mid0.clone().sub(s.clone().multiplyScalar(half)).add(dn.clone().multiplyScalar(LAT_BAR.drop)), 1.3);
-    } else if (k === "handle") rod(wN.clone().add(latv.clone().multiplyScalar(3)), wF.clone().add(latv.clone().multiplyScalar(-3)), 1.3);
+    } else if (k === "handle") { const ex = an && an.longBar ? 16 : 3; rod(wN.clone().add(latv.clone().multiplyScalar(ex)), wF.clone().add(latv.clone().multiplyScalar(-ex)), 1.3); } // (longBar: a long straight bar reaching past the hands)
   }
 }
 // Technique: tempo with pauses, what to do in each phase, a line showing good form, and the path of the movement
@@ -20205,7 +20205,7 @@ const col = (x, y) => [{ cable: [x - 3, y] }, { column: [x, 0, y, -1, 0] }];
 const BB = gc(ANIMS.bench_bar), BP = gc(ANIMS.bench_press), PP = gc(ANIMS.press_bar), RC = gc(ANIMS.row_cable), PN = gc(ANIMS.pull_neg);
 const incl = (o) => ({ ...o, anchor: "hip", at: [84, 110], t: -40, a: 90, b: 0, fd: 0, props: [...(o.props || []).filter((q) => !q.box && !q.benchlegs && !q.benchrack), { box: [62, 116, 40, 24] }, { slab: [60, 108, 38, 80, 5, 30] }] });
 const HT = ANIMS.hip_thrust;
-const CRW = { ...RC, palmIn: false, closeGrip: false, palmDown: true, hz: 22, A: { ...RC.A, props: [{ cable: [190, 112] }, { handle: 1 }] }, B: { ...RC.B, u: -20, f: 85, props: [{ cable: [190, 112] }, { handle: 1 }] } };
+const CRW = { ...RC, palmIn: false, closeGrip: false, palmDown: true, hz: 30, hzk: 1, flare: .9, longBar: true, A: { ...RC.A, props: [{ cable: [190, 112] }, { handle: 1 }] }, B: { ...RC.B, u: -10, f: 110, props: [{ cable: [190, 112] }, { handle: 1 }] } }; // (v462: wide grip on a long bar, pulled to the lower chest with the elbows out)
 const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.hip_thrust_machine, GB2 = ANIMS.glute_bridge, TO = ANIMS.tri_overhead;
   const onHip = (p, dy = -9) => { const P = sidePoints(p); return reach({ ...p, props: [...(p.props || []), PL] }, [P.hip[0] + 2, P.hip[1] + dy], -1); };
   E.incline_bb = { ...BB, hz: 22, A: incl({ ...BB.A, u: 115, f: 217 }), B: incl({ ...BB.B, u: 190, f: 190 }) };
@@ -20216,7 +20216,7 @@ const EXTRA = {}; { const E = EXTRA, HTS = ANIMS.hip_thrust_single, HTM = ANIMS.
   E.bb_glute_bridge = { ...GB2, plantAll: false, plantPole: undefined, plantSlide: 0, hz: 20, A: onHip(GB2.A, -10), B: onHip(GB2.B, -10) };
   E.bb_hipthrust = { ...HT, hz: 20, A: onHip(HT.A), B: onHip(HT.B) };
   E.cable_oh_tri = { ...TO, rope: true, hz: 14, hzk: 1 /* (v443: the rope ends apart, elbows beside the head — at 4 the arms folded into each other) */, A: { ...TO.A, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] }, B: { ...TO.B, t: 12, props: [{ cable: [28, 70] }, { column: [25, 0, 70, 1, 0] }] } };
-  E.cable_row_under = { ...CRW, palmDown: false, palmUp: true, hz: 15 };
+  E.cable_row_under = { ...CRW, palmDown: false, palmUp: true, hz: 15, flare: 0, B: { ...CRW.B, u: -20, f: 85 } }; // (underhand: shoulder-width, to the belly, elbows by the sides)
   E.leg_press_wide = { ...LP, fz: 13 };
 }
   Object.assign(ANIMS, {
