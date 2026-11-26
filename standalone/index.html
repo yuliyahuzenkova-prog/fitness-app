@@ -16449,6 +16449,7 @@ function lerpPose(A, B, k) {
   const o = { ...A };
   for (const key of Object.keys(B)) {
     if (typeof B[key] === "number" && typeof A[key] === "number") o[key] = A[key] + (B[key] - A[key]) * k;
+    else if (typeof B[key] === "number" && A[key] == null && (key === "c" || key === "h" || key === "hx")) o[key] = B[key] * k; // (v483: a back curve or head tilt given only in B starts from 0 in A — it never blended in at all (upper-back stretch, superman head, crunch curl))
     else if (Array.isArray(B[key]) && typeof B[key][0] === "number" && Array.isArray(A[key])) o[key] = A[key].map((v, i) => v + (B[key][i] - v) * k);
   }
   return o;
@@ -16786,7 +16787,7 @@ curl_db: { yaw: -40, palmUp: true, A: pose({ u: 0, f: 0, props: [{ db: "wrist" }
     B: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: -90, u: 0, f: 0, a2: -86, b2: -92, fd2: -90 } },
   rock_back: { footDown: true, footLean: .8, toeFix: -40, noKneel: true, yaw: 30, plantAll: true,
     A: { anchor: "hip", at: [80, 108], t: 73, a: 0, b: -90, fd: -90, u: 0, f: 0 },
-    B: { anchor: "hip", at: [63, 114.5], t: 84, c: 8, a: 37, b: -90, fd: -90, u: 36, f: 36 } },
+    B: { anchor: "hip", at: [63, 114.5], t: 84, a: 37, b: -90, fd: -90, u: 36, f: 36 } },
   // ---- forearm plank, one leg lifts in turn ----
   plank_lift: { yaw: -25, thumbsUp: true, alt: true, period: 5600, A: pose({ at: [38, 134], a: -77.5, b: -79, t: 77.5, u: 0, f: 90, fd: -60, a2: -77.5, b2: -79, fd2: -60 }), B: pose({ at: [38, 134], a: -77.5, b: -79, t: 77.5, u: 0, f: 90, fd: -60, a2: -95, b2: -98, fd2: -40 }) },
 });
@@ -20879,14 +20880,14 @@ LIB_NEW.push(
   lat_bench: { yaw: -30, noKneel: true, hz: 1,
     A: { anchor: "hip", at: [72, 104], t: 95, h: 35, a: 5, b: -90, fd: 180, u: 95, f: -122, props: [{ box: [132, 108, 40, 32, 15] }] },
     B: { anchor: "hip", at: [68, 106], t: 99, h: 35, a: 12, b: -90, fd: 180, u: 99, f: -121, props: [{ box: [132, 108, 40, 32, 15] }] } },
-  uback_stretch: { yaw: -40, hz: 2,
-    A: pose({ at: [95, 140], t: 2, u: 84, f: 88 }),
-    B: pose({ at: [95, 140], t: 6, c: 14, h: 14, u: 86, f: 90 }) },
+  uback_stretch: { yaw: -40, hz: 2, closeGrip: true, tm: { up: 2.5, pause: 4, down: 2.5 }, period: 10000, // (v483: shows the move — hands clasped at the chest, then pushed forward with the upper back rounded and the chin down, knees soft; held, then back. Every key is in both poses: one only in B never blends in)
+    A: pose({ at: [95, 140], t: 0, a: 5, b: -5, c: 0, h: 0, u: 28, f: 140 }),
+    B: pose({ at: [95, 140], t: 6, a: 9, b: -9, c: 12, h: 28, u: 86, f: 90 }) },
   });
 }
 Object.assign(TECH, {
   lat_bench: { ...TECH.child_pose },
-  uback_stretch: { ...TECH.child_pose }
+  uback_stretch: { lab: ["Reach out slowly", "Return slowly"] }
 });
 Object.assign(GUIDES, {
   latbench: G("Along the sides of your back, the backs of your upper arms and your shoulders.", "Kneel facing a bench (or a chair or couch at home), about an arm's length away. Rest your elbows on the edge, shoulder-width apart.",
