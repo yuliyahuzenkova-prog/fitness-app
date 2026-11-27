@@ -300,5 +300,13 @@ const UK_CUES = {
   "In the machine, one foot on the floor, the other knee up. Drive through your heel and squeeze your bum at the top.": "У тренажері: одна стопа на підлозі, інше коліно підняте. Тисни п'ятою й напруж сідниці нагорі.",
   "Lying on the floor, padded bar over your hips. Push through your heels and lift until your body is a straight line.": "Лежачи на підлозі, штанга з накладкою на тазі. Тисни п'ятами й піднімайся до прямої лінії тіла.",
   "Elbows on the bench, hands together behind your head. Sit your hips back and let your chest sink.": "Лікті на лаві, долоні разом за головою. Відведи таз назад і дай грудям опуститися.",
-  "Hands clasped in front at chest height. Push them away and round your upper back.": "Зчеп руки перед собою на рівні грудей. Тягнися ними вперед і округли верх спини."
+  "Hands clasped in front at chest height. Push them away and round your upper back.": "Зчеп руки перед собою на рівні грудей. Тягнися ними вперед і округли верх спини.",
+  "Pads on the outside of your knees. Push your knees apart, then let them come back slowly.": "Подушки ззовні колін. Розведи коліна, потім повільно зведи.",
+  "Pads on the inside of your knees. Squeeze your knees together, then open slowly.": "Подушки з внутрішнього боку колін. Зведи коліна, потім повільно розведи.",
+  "Pad on the front of your lower shins. Straighten your legs, then lower slowly.": "Валик на передній частині гомілок унизу. Випрями ноги, потім повільно опусти.",
+  "Pad behind your ankles, thigh pad on top. Curl your heels down and back, then return slowly.": "Валик за щиколотками, зверху притискна подушка на стегнах. Зігни ноги, ведучи п'яти вниз і назад, потім повільно поверни.",
+  "Arms out to the sides, elbows soft. Bring the handles together in front of your chest, then open slowly.": "Руки в сторони, лікті м'які. Зведи ручки перед грудьми, потім повільно розведи.",
+  "Chest against the pad, arms forward. Open your arms out to the sides, then bring them back slowly.": "Груди на подушці, руки вперед. Розведи руки в сторони, потім повільно поверни.",
+  "Handles at chest height. Press them forward until your arms are almost straight, then return slowly.": "Ручки на рівні грудей. Вижми їх уперед майже до прямих рук, потім повільно поверни.",
+  "Handles at shoulder height. Press them up until your arms are almost straight, then lower slowly.": "Ручки на рівні плечей. Вижми їх угору майже до прямих рук, потім повільно опусти."
 };

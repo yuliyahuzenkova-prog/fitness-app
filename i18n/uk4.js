@@ -431,5 +431,10 @@ Object.assign(UK, {
   "5 seconds less": "На 5 секунд менше",
   "Cool-down stretches": "Розтяжка після тренування",
   "Easy, slow breathing. Stretch to a gentle pull, never to pain. Tap ▶ for the timer.": "Спокійно й повільно дихай. Тягнись до легкого натягу, ніколи до болю. Натисни ▶, щоб увімкнути таймер.",
-  "stretch": "розтяжка"
+  "stretch": "розтяжка",
+  "Push your knees apart": "Розведи коліна",
+  "Squeeze your knees together": "Зведи коліна",
+  "Straighten your legs": "Випрями ноги",
+  "Curl your heels down": "Зігни ноги, п'яти вниз",
+  "Bring the handles together": "Зведи ручки"
 });

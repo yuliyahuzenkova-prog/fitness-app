@@ -314,5 +314,13 @@ const UK_NAMES = {
   "Single-leg hip thrust machine": "Хіп-траст у тренажері на одній нозі",
   "Barbell glute bridge": "Ягідний міст зі штангою",
   "Kneeling lat stretch on a bench": "Розтяжка широчайших на колінах біля лави",
-  "Standing upper-back stretch": "Розтяжка верху спини стоячи"
+  "Standing upper-back stretch": "Розтяжка верху спини стоячи",
+  "Hip abduction machine": "Відведення ніг у тренажері",
+  "Hip adduction machine": "Зведення ніг у тренажері",
+  "Leg extension machine": "Розгинання ніг у тренажері",
+  "Seated leg curl machine": "Згинання ніг сидячи в тренажері",
+  "Pec deck machine fly": "«Метелик» у тренажері",
+  "Reverse fly machine": "Зворотні розведення в тренажері",
+  "Machine chest press": "Жим від грудей у тренажері",
+  "Machine shoulder press": "Жим над головою в тренажері"
 };
