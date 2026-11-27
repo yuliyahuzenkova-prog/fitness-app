@@ -19426,8 +19426,10 @@ function glProps(props, B, an, p) {
   if (isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.curl && (props || []).some((q) => q.handle || q.vgrip || (q.cable && !(an && an.rope)))) { // (v469: a handle, V-grip or cable end sits in the model's own fists, not at the sketch's wrists — it used to slide through the hands)
     const hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), near = hp("LeftHand").distanceTo(wN) < hp("RightHand").distanceTo(wN) ? "Left" : "Right", gN = proHandGrip(near), gF = two ? proHandGrip(near === "Left" ? "Right" : "Left") : null;
     if (gN) wN = gN.p; if (gF) wF = gF.p; mid = two && gF ? wN.clone().add(wF).multiplyScalar(.5) : wN.clone(); }
+  const hasMach = isMeshStyle() && PRO.chrome && (props || []).some((q) => q.machine); // (v499: a real machine is drawn instead of the sketch's boxes, slab, stack and loose pads)
   for (const pp of props || []) {
     const [k, v] = Object.entries(pp)[0];
+    if (hasMach && ["box", "slab", "column", "legPad", "machArms", "handle"].includes(k)) continue;
     if (k === "box" && an && an.tableAtHands) { // table row: the table's edge sits in the hands, the fingers hooked over it
       const c = mid.clone(), top = c.y + .6, edge = c.x - .4, len = 60, th = 4, wide = Math.max(70, wN.distanceTo(wF) + 30), m = glMesh("box", g.box, M.box);
       glPlace(m, new T.Vector3(edge - len / 2, top - th / 2, c.z), new T.Vector3(1, 0, 0), new T.Vector3(0, 1, 0), new T.Vector3(0, 0, 1), len, th, wide); m.castShadow = m.receiveShadow = true;
@@ -19623,6 +19625,65 @@ function glProps(props, B, an, p) {
       column(v[0], v[2] + 3, v[1], 0, -1); // (a full cable column beside the person, its pulley at chest height)
       const pul = glMesh("sph", g.sph, M.equip); glPlace(pul, anc, new T.Vector3(1, 0, 0), new T.Vector3(0, 1, 0), new T.Vector3(0, 0, 1), 2.6, 2.6, 2.6);
       const hu = new T.Vector3(0, 4.5, 0); rod(mid.clone().sub(hu), mid.clone().add(hu), 1.3, M.equip); rod(anc, mid, .45, M.cable);
+    }
+    if (k === "machine" && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.by) { // (v499) a whole selectorised machine, built around the posed model: padded seat and back (or chest) pad set just clear of the skin, a frame to the floor, a weight stack, and levers on hubs fixed to the frame
+      PRO.group.updateMatrixWorld(true); const typ = v, hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), yv = new T.Vector3(0, 1, 0), fw = V3(B.fwd).setY(0).normalize(), E = M.equip;
+      if (!GL.padMat) GL.padMat = Object.assign(M.equip.clone(), { color: new T.Color(0x23262c), roughness: .85, metalness: .05 });
+      const PM = GL.padMat, floorY = L(0, 140).y, Hp = hp("Hips"), pts = proBodyPts(PRO), X1 = new T.Vector3(1, 0, 0), Z1 = new T.Vector3(0, 0, 1);
+      const hub = (c, r = 2.4) => { const sp = glMesh("sph", g.sph, E); glPlace(sp, c, X1, yv, Z1, r, r, r); };
+      const fl = (c) => new T.Vector3(c.x, floorY, c.z);
+      // a pad (w across, h along u, t thick) pushed along n (its face normal, towards the body) until it just meets the skin
+      const padAt = (c0, n, u, w, h, t, gap = .5, mat = PM) => { n = n.clone().normalize(); u = u.clone().sub(n.clone().multiplyScalar(u.dot(n))).normalize(); const sv = new T.Vector3().crossVectors(n, u);
+        let k = Infinity; for (const q of pts) { const r = q.clone().sub(c0); if (Math.abs(r.dot(u)) > h / 2 + 1 || Math.abs(r.dot(sv)) > w / 2 + 1) continue; const dn = r.dot(n); if (dn > -8 && dn < 30) k = Math.min(k, dn); }
+        if (!isFinite(k)) k = 0; const face = c0.clone().add(n.clone().multiplyScalar(k - gap)), c = face.clone().sub(n.clone().multiplyScalar(t / 2));
+        const m = glMesh("box", g.box, mat); m.castShadow = m.receiveShadow = true; glPlace(m, c, sv, u, n, w, h, t); return { c, face, back: c.clone().sub(n.clone().multiplyScalar(t / 2)), u, sv, n }; };
+      const seat = () => { let lo = Infinity; for (const q of pts) if (Math.abs(q.x - (Hp.x + 2)) < 19 && Math.abs(q.z) < 17 && q.y < Hp.y + 6) lo = Math.min(lo, q.y); const ty = (isFinite(lo) ? lo : Hp.y - 8) - .4, c = new T.Vector3(Hp.x + 2, ty - 3.5, 0); iron(c, X1, yv, Z1, 38, 7, 34, PM);
+        rod(new T.Vector3(c.x, ty - 7, 0), fl(c), 3.2); for (const z of [-13, 13]) rod(new T.Vector3(c.x - 26, floorY + 1.2, z), new T.Vector3(c.x + 4, floorY + 1.2, z), 2); rod(new T.Vector3(c.x - 26, floorY + 1.2, -13), new T.Vector3(c.x - 26, floorY + 1.2, 13), 2); return ty; };
+      const backPad = (ty, tilt = 8, bw = 32) => { const th = rad(tilt), n = fw.clone().multiplyScalar(Math.cos(th)).add(yv.clone().multiplyScalar(Math.sin(th))), u = yv.clone().multiplyScalar(Math.cos(th)).sub(fw.clone().multiplyScalar(Math.sin(th)));
+        const c0 = new T.Vector3(Hp.x, ty, 0).add(u.clone().multiplyScalar(30)).sub(fw.clone().multiplyScalar(14)), P = padAt(c0, n, u, bw, 50, 6);
+        const bot = P.back.clone().sub(P.u.clone().multiplyScalar(22)); rod(bot, new T.Vector3(bot.x, ty - 6, 0), 2.4); rod(new T.Vector3(bot.x, ty - 6, 0), new T.Vector3(Hp.x + 2, ty - 6, 0), 2.4); return P; };
+      const stack = (sx, sz, nx, nz) => column(sx, sz, 60, nx, nz, false);
+      const grip = (Lg, len = 12) => { const gr = proHandGrip(Lg); if (!gr) return null; const e = gr.kn.clone().multiplyScalar(len / 2); rod(gr.p.clone().sub(e), gr.p.clone().add(e), 1.5, PM); return { p: gr.p, top: e.y >= 0 ? gr.p.clone().add(e) : gr.p.clone().sub(e), e }; };
+      const Kl = hp("LeftLeg"), Kr = hp("RightLeg"), Km = Kl.clone().add(Kr).multiplyScalar(.5), Am = hp("LeftFoot").add(hp("RightFoot")).multiplyScalar(.5);
+      const shinRoller = (back) => { // a roller across both lower shins (in front, or behind the ankles), on a lever from a hub beside the knees on the stack side
+        const sh = Am.clone().sub(Km).normalize(), toe = hp("LeftToeBase").sub(hp("LeftFoot")), fr0 = toe.sub(sh.clone().multiplyScalar(toe.dot(sh))).normalize(), fr = back ? fr0.clone().negate() : fr0, ref = Am.clone().sub(sh.clone().multiplyScalar(6)), r = 3.8;
+        let k = 0; for (const q of pts) { const d = q.clone().sub(ref); if (Math.abs(d.dot(sh)) > r + 4) continue; if (Math.abs(d.z) > 30) continue; k = Math.max(k, d.dot(fr)); }
+        const c = ref.clone().add(fr.clone().multiplyScalar(k + r + .4)), zN = Math.min(Kl.z, Kr.z) - 11, zF = Math.max(Kl.z, Kr.z) + 7, a = new T.Vector3(c.x, c.y, zN), b = new T.Vector3(c.x, c.y, zF);
+        rod(a, b, r, PM); const hb = new T.Vector3(Km.x, Km.y, zN - 1); hub(hb, 2.8); rod(hb, a, 1.8); return hb; };
+      if (typ === "abd" || typ === "add") {
+        const ty = seat(); backPad(ty, 16); stack(186, -42, -1, 0); for (const z of [-9, 9]) rod(new T.Vector3(Hp.x - 24, floorY + 1.2, z), L(150, 139, z), 2.2); rod(L(150, 139, -9), L(180, 139, -42), 2.2);
+        const yl = ty - 10, pv = new T.Vector3(Hp.x + 10, yl, 0); hub(pv, 3); rod(pv, fl(pv), 2.6); rod(pv, new T.Vector3(pv.x, ty - 7, 0), 2.6);
+        for (const Lg of ["Left", "Right"]) { const K = hp(Lg + "Leg"), Hj = hp(Lg + "UpLeg"), out = new T.Vector3(0, 0, Math.sign(K.z - Hp.z) || 1), n = typ === "abd" ? out.clone().negate() : out.clone();
+          const c0 = Hj.clone().lerp(K, .86).sub(n.clone().multiplyScalar(8)), P = padAt(c0, n, yv, 16, 14, 4.5), pz = P.back.clone().sub(yv.clone().multiplyScalar(5)), foot = pz.clone().add(n.clone().multiplyScalar(-7)).setY(yl); foot.x -= 4; rod(pz, foot, 1.8); rod(foot, pv, 2); }
+      }
+      if (typ === "legext" || typ === "legcurl") {
+        const ty = seat(), BP = backPad(ty, typ === "legcurl" ? 18 : 10); stack(40, -46, 1, 0); const hb = shinRoller(typ === "legcurl");
+        const zf = hb.z - 4, fr = new T.Vector3(Hp.x + 16, ty - 18, zf); rod(hb, new T.Vector3(hb.x, hb.y, zf), 2.4); rod(new T.Vector3(hb.x, hb.y, zf), fr, 2.4); rod(fr, new T.Vector3(Hp.x - 18, ty - 18, zf), 2.4); rod(new T.Vector3(Hp.x - 18, ty - 18, zf), fl(new T.Vector3(Hp.x - 18, 0, zf)), 2.4); rod(new T.Vector3(Hp.x, ty - 18, zf), new T.Vector3(Hp.x, ty - 18, 0), 2.2);
+        if (typ === "legcurl") { const Hm = hp("LeftUpLeg").add(hp("RightUpLeg")).multiplyScalar(.5), P = padAt(Hm.clone().lerp(Km, .8).add(yv.clone().multiplyScalar(14)), yv.clone().negate(), fw, 30, 12, 6); const e = P.c.clone().add(P.sv.clone().multiplyScalar(-Math.sign(P.sv.z || 1) * 17)); rod(e, new T.Vector3(e.x, e.y, hb.z), 2); rod(new T.Vector3(e.x, e.y, hb.z), hb, 2); }
+      }
+      if (typ === "calf") { const ty = seat(); const Hm = hp("LeftUpLeg").add(hp("RightUpLeg")).multiplyScalar(.5), P = padAt(Hm.clone().lerp(Km, .85).add(yv.clone().multiplyScalar(14)), yv.clone().negate(), fw, 34, 12, 6), zs = Math.max(Math.abs(Kl.z), Math.abs(Kr.z)) + 12;
+        for (const sz of [-1, 1]) { const e = new T.Vector3(P.c.x, P.c.y, sz * zs); rod(new T.Vector3(P.c.x, P.c.y, sz * 15), e, 2); rod(e, fl(e), 2.4); } stack(150, -44, -1, 0); }
+      if (typ === "pecdeck" || typ === "revfly" || typ === "row") {
+        const ty = seat(); let ux;
+        if (typ === "pecdeck") { backPad(ty, 4); ux = Hp.x - 26; } else { const ch = hp("Spine2"), P = padAt(ch.clone().add(fw.clone().multiplyScalar(16)).sub(yv.clone().multiplyScalar(9)), fw.clone().negate(), yv, typ === "row" ? 20 : 24, 24, 6), bot = P.back.clone().sub(yv.clone().multiplyScalar(14)); rod(bot, fl(bot), 2.6); rod(new T.Vector3(bot.x - 18, floorY + 1.2, 0), new T.Vector3(bot.x + 18, floorY + 1.2, 0), 2.2); ux = P.back.x + 22; }
+        const sL = hp("LeftArm"), sR = hp("RightArm");
+        if (typ === "row") { const sw = (q) => sidePoints(q).wrist, wa = sw(an.A), wb = sw(an.B), pvS = [(wa[0] + wb[0]) / 2, Math.min(wa[1], wb[1]) - 44];
+          for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (!G) continue; const sz = Math.sign(G.p.z - Hp.z) || 1, pv = L(pvS[0], pvS[1]).setZ(G.p.z + sz * 5); hub(pv, 2.8); rod(pv, G.top, 1.9); rod(pv, new T.Vector3(pv.x, pv.y, sz * 42), 2.2); rod(new T.Vector3(pv.x, pv.y, sz * 42), fl(new T.Vector3(pv.x, 0, sz * 42)), 2.6); }
+          stack(84, -62, 0, 1); }
+        else { const topY = Math.max(sL.y, sR.y) + 30; for (const z of [-24, 24]) rod(fl(new T.Vector3(ux, 0, z)), new T.Vector3(ux, topY, z), 2.6); rod(new T.Vector3(ux, topY, -24), new T.Vector3(ux, topY, 24), 2.4);
+          for (const [Lg, S0] of [["Left", sL], ["Right", sR]]) { const G = grip(Lg, 14); if (!G) continue; const pv = new T.Vector3(S0.x, topY, S0.z); hub(pv, 3); rod(new T.Vector3(ux, topY, Math.sign(S0.z - Hp.z) * 24), pv, 2.4); const over = new T.Vector3(G.top.x, topY, G.top.z); rod(pv, over, 2); rod(over, G.top, 1.8); }
+          stack(ux - 4, -50, 0, 1); }
+      }
+      if (typ === "chestpress" || typ === "shoulderpress") {
+        const ty = seat(); backPad(ty, 6, 24); const sw = (q) => sidePoints(q).wrist, wa = sw(an.A), wb = sw(an.B);
+        const pvS = typ === "chestpress" ? [(wa[0] + wb[0]) / 2, Math.min(wa[1], wb[1]) - 46] : [Math.min(wa[0], wb[0]) - 46, (wa[1] + wb[1]) / 2];
+        for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (!G) continue; const sz = Math.sign(G.p.z - Hp.z) || 1, pv = L(pvS[0], pvS[1]).setZ(G.p.z + sz * 6), zo = sz * (Math.abs(G.p.z) + 12);
+          hub(pv, 3); rod(pv, G.top, 2); rod(pv, new T.Vector3(pv.x, pv.y, zo), 2.4); rod(new T.Vector3(pv.x, pv.y, zo), fl(new T.Vector3(pv.x, 0, zo)), 2.8); }
+        stack(30, -52, 1, 0); }
+      if (typ === "lycurl") { const ch = hp("Spine1"), ax = ch.clone().sub(Hp).setY(0).normalize(), mid = Hp.clone().lerp(ch, .5), P = padAt(mid.clone().sub(yv.clone().multiplyScalar(12)), yv, ax, 21, 80, 8);
+        for (const d of [-30, 30]) { const e = P.back.clone().add(P.u.clone().multiplyScalar(d)); rod(e, fl(e), 2.6); rod(new T.Vector3(e.x, floorY + 1.2, -14), new T.Vector3(e.x, floorY + 1.2, 14), 2.2); }
+        const hb = shinRoller(true), fe = Hp.clone().sub(ax.clone().multiplyScalar(10)).setY(P.back.y).setZ(hb.z); rod(hb, fe, 2.4); rod(fe, new T.Vector3(fe.x, P.back.y, 0), 2.2);
+        for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (G) rod(G.p, fl(G.p), 1.8); } stack(10, -46, 1, 0); }
     }
     if ((k === "smith" || k === "crossCables" || k === "ankleCable" || k === "landmine") && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.by) { // (v498) Smith machine rails, a cable crossover's two cables, an ankle-cuff cable, a T-bar (landmine) bar — placed from the posed model
       PRO.group.updateMatrixWorld(true); const hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), yv = new T.Vector3(0, 1, 0), floorY = L(0, 140).y, topY = L(0, Array.isArray(v) ? v[0] : -12).y;
@@ -20538,7 +20599,7 @@ const SAFETY = {
 function guideSheetHtml(name) {
   const info = exInfo(name), g = info && GUIDES[info.guide];
   const ex = findPlanExercise(name), f = S.intake.done ? bodyFlags(S.intake) : {};
-  const notes = g ? g.tags.filter((t) => f[t]).map((t) => SAFETY[t]) : [];
+  const notes = g ? g.tags.filter((t) => f[t] && SAFETY[t]).map((t) => SAFETY[t]) : []; // (v499: a tag with no note of its own (posture) showed "undefined")
   return `<div class="sheet-bg" data-act="guideclose"></div>
   <div class="sheet" tabindex="-1" role="dialog" aria-modal="true" aria-label="How to do ${esc(name)}">
     <div class="row spread"><span class="label">How to do it</span><button class="btn ghost small" data-act="guideclose" aria-label="Close">Close ✕</button></div>
@@ -21894,6 +21955,10 @@ LIB_NEW.push(
    set("row_barbell", { barTrue: true, barElbowBack: true }); set("bb_row_under", { barTrue: true, barElbowBack: true }); /* (v466: elbows straight back over the hands) */ /* (v460: rows keep the grip width as the elbows go back — the knuckles drifted out to 45 cm) */ /* (v445: shoulder-width grip, elbows soft and down, hands kept on the grips) */ set("bench_close", { barHalf: 17, barElbowIn: true, tm: { up: 1.8, down: 2.2, pause: .6 }, period: 5400 }); set("bench_wide", { tm: { up: 1.8, down: 2.2, pause: .6 }, period: 5400 }); /* (v448: a steadier press: 1.8 s up, 2.2 s down) */ set("bench_wide", { barHalf: 40 }); set("incline_bb", { barHalf: 28 }); set("push_press", { barHalf: 25 }); set("seated_bb_press", { barHalf: 25 });
   const SK = ANIMS.bb_skull; if (SK) { const np = (q) => ({ ...q, props: (q.props || []).filter((x) => !x.benchrack) }); Object.assign(SK, { barHalf: 13, barElbowUp: true, barPalm: "rcurl" /* (overhand, held relative to the elbow: no flip as the forearms pass upright) */, A: np(SK.A), B: { ...np(SK.B), u: 192, f: 282 } }); } }
 // v496: the owner checked everything — no exercise shows "New" any more (later additions start without it too, until one is pushed to LIB_NEW after this line)
+// v499: the machines drawn as real ones (prop "machine"; the sketch's boxes/pads stay for the 2D view)
+for (const [id, m] of [["hip_abd", "abd"], ["hip_add", "add"], ["leg_ext_m", "legext"], ["leg_curl_m", "legcurl"], ["pec_deck", "pecdeck"], ["rev_fly", "revfly"], ["chest_press_m", "chestpress"], ["shoulder_press_m", "shoulderpress"], ["machine_row", "row"], ["seated_calf_m", "calf"], ["lying_leg_curl", "lycurl"]]) { const an = ANIMS[id]; if (!an) continue;
+  for (const k of ["A", "M", "B"]) if (an[k]) an[k] = { ...an[k], props: [...(an[k].props || []).filter((q) => !q.machine), { machine: m }] }; }
+for (const id of ["rev_fly", "machine_row"]) if (ANIMS[id]) ANIMS[id].fz = 12; { const H = ANIMS.hip_add; if (H) { H.B = { ...H.B, legSpread: 14 }; } const A = ANIMS.hip_abd; if (A) A.A = { ...A.A, legSpread: 14 }; } /* (v499: knees stop a pad-width apart — together, the two pads met inside the thighs) */ // (v499: knees either side of the chest pad's post)
 // v497: phase labels for the machines
 for (const [id, lab] of [["hip_abd", ["Push your knees apart", "Return slowly"]], ["hip_add", ["Squeeze your knees together", "Return slowly"]], ["leg_ext_m", ["Straighten your legs", "Lower slowly"]], ["leg_curl_m", ["Curl your heels down", "Return slowly"]], ["pec_deck", ["Bring the handles together", "Return slowly"]], ["cable_fly", ["Bring the handles together", "Return slowly"]], ["cable_crunch", ["Crunch down", "Return slowly"]]]) TECH[id] = { ...TECH[id], lab };
 const NEW_SINCE_V496 = new Set(["Hip abduction machine", "Hip adduction machine", "Leg extension machine", "Seated leg curl machine", "Pec deck machine fly", "Reverse fly machine", "Machine chest press", "Machine shoulder press", "Smith machine squat", "Smith machine calf raise", "Seated calf raise machine", "Lying leg curl machine", "Standing cable chest fly", "Chest-supported machine row", "Cable glute kickback", "Kneeling cable crunch", "T-bar row"]); /* (v497 machines: still New until checked) */
