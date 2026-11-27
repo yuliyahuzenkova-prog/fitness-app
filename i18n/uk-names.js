@@ -322,5 +322,14 @@ const UK_NAMES = {
   "Pec deck machine fly": "«Метелик» у тренажері",
   "Reverse fly machine": "Зворотні розведення в тренажері",
   "Machine chest press": "Жим від грудей у тренажері",
-  "Machine shoulder press": "Жим над головою в тренажері"
+  "Machine shoulder press": "Жим над головою в тренажері",
+  "Smith machine squat": "Присідання в тренажері Сміта",
+  "Smith machine calf raise": "Підйом на носки в тренажері Сміта",
+  "Seated calf raise machine": "Підйом на носки сидячи в тренажері",
+  "Lying leg curl machine": "Згинання ніг лежачи в тренажері",
+  "Standing cable chest fly": "Зведення рук на блоках стоячи",
+  "Chest-supported machine row": "Тяга в тренажері з упором грудьми",
+  "Cable glute kickback": "Відведення ноги назад на нижньому блоці",
+  "Kneeling cable crunch": "Скручування на колінах з канатом",
+  "T-bar row": "Т-тяга"
 };

@@ -436,5 +436,6 @@ Object.assign(UK, {
   "Squeeze your knees together": "Зведи коліна",
   "Straighten your legs": "Випрями ноги",
   "Curl your heels down": "Зігни ноги, п'яти вниз",
-  "Bring the handles together": "Зведи ручки"
+  "Bring the handles together": "Зведи ручки",
+  "Crunch down": "Скрутись униз"
 });

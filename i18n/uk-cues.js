@@ -308,5 +308,14 @@ const UK_CUES = {
   "Arms out to the sides, elbows soft. Bring the handles together in front of your chest, then open slowly.": "Руки в сторони, лікті м'які. Зведи ручки перед грудьми, потім повільно розведи.",
   "Chest against the pad, arms forward. Open your arms out to the sides, then bring them back slowly.": "Груди на подушці, руки вперед. Розведи руки в сторони, потім повільно поверни.",
   "Handles at chest height. Press them forward until your arms are almost straight, then return slowly.": "Ручки на рівні грудей. Вижми їх уперед майже до прямих рук, потім повільно поверни.",
-  "Handles at shoulder height. Press them up until your arms are almost straight, then lower slowly.": "Ручки на рівні плечей. Вижми їх угору майже до прямих рук, потім повільно опусти."
+  "Handles at shoulder height. Press them up until your arms are almost straight, then lower slowly.": "Ручки на рівні плечей. Вижми їх угору майже до прямих рук, потім повільно опусти.",
+  "Bar on your upper back, feet a little in front of the bar. Sit down between your heels, then stand up.": "Гриф на верху спини, стопи трохи попереду грифа. Присідай між п'ятами, потім вставай.",
+  "Bar on your upper back. Rise onto your toes, pause, lower your heels slowly.": "Гриф на верху спини. Піднімися на носки, затримайся, повільно опусти п'яти.",
+  "Pad on top of your knees. Push up onto your toes, pause, lower your heels slowly.": "Подушка зверху на колінах. Піднімися на носки, затримайся, повільно опусти п'яти.",
+  "Lie face down, roller behind your ankles. Curl your heels toward your bum, then lower slowly.": "Ляж обличчям униз, валик за щиколотками. Підтягни п'яти до сідниць, потім повільно опусти.",
+  "Handles from both sides at chest height, elbows soft. Bring your hands together in front of your chest, then open slowly.": "Ручки з обох боків на рівні грудей, лікті м'які. Зведи руки перед грудьми, потім повільно розведи.",
+  "Chest on the pad. Pull the handles back, elbows close to your body, then return slowly.": "Груди на подушці. Тягни ручки назад, лікті близько до тіла, потім повільно поверни.",
+  "Cuff on your ankle, hands on the frame. Push the leg straight back, squeeze your bum, return slowly. Reps per leg.": "Манжета на щиколотці, руки на рамі. Відведи ногу назад, напруж сідницю, повільно поверни. Повторення на кожну ногу.",
+  "Kneel facing the high pulley, rope by your head. Curl your ribs toward your hips, then rise slowly.": "Стань на коліна обличчям до верхнього блока, канат біля голови. Скручуйся, ведучи ребра до таза, потім повільно піднімись.",
+  "Straddle the bar, hinge forward with a flat back. Pull the handle to your chest, then lower slowly.": "Стань над грифом, нахились уперед з рівною спиною. Тягни рукоять до грудей, потім повільно опусти."
 };
