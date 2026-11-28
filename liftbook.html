@@ -19625,9 +19625,9 @@ function glProps(props, B, an, p) {
         let k = Infinity; for (const q of pts) { const r = q.clone().sub(c0); if (Math.abs(r.dot(u)) > h / 2 + 1 || Math.abs(r.dot(sv)) > w / 2 + 1) continue; const dn = r.dot(n); if (dn > -8 && dn < 30) k = Math.min(k, dn); }
         if (!isFinite(k)) k = 0; const face = c0.clone().add(n.clone().multiplyScalar(k - gap)), c = face.clone().sub(n.clone().multiplyScalar(t / 2));
         const m = glMesh("box", g.box, mat); m.castShadow = m.receiveShadow = true; glPlace(m, c, sv, u, n, w, h, t); return { c, face, back: c.clone().sub(n.clone().multiplyScalar(t / 2)), u, sv, n }; };
-      const seat = () => { let lo = Infinity; for (const q of pts) if (Math.abs(q.x - (Hp.x + 2)) < 19 && Math.abs(q.z) < 17 && q.y < Hp.y + 6 && q.y > Hp.y - 16) lo = Math.min(lo, q.y); /* (v514: only the buttocks and the backs of the thighs — a calf tucked in under the seat on the reverse fly put the seat 10 cm under her) */
+      const seat = () => { let lo = Infinity; for (const q of pts) if (Math.abs(q.x - Hp.x) < 16 && Math.abs(q.z) < 17 && q.y < Hp.y + 6 && q.y > Hp.y - 16) lo = Math.min(lo, q.y); /* (v514: only the buttocks and the backs of the thighs — a calf tucked in under the seat on the reverse fly put the seat 10 cm under her) */
         { const ck = GL.seatLo || (GL.seatLo = new WeakMap()), key = PRO.group.uuid + "|" + Hp.x.toFixed(1) + "|" + Hp.y.toFixed(1), was = an && ck.get(an); if (was && was.key === key) lo = Math.min(lo, was.lo); if (an && isFinite(lo)) ck.set(an, { key, lo }); } // (v506: the seat keeps the lowest height it has been given for this exercise and figure — set from each frame's lowest body point, it rose and fell with the legs)
-        const ty = (isFinite(lo) ? lo : Hp.y - 8) - .4, c = new T.Vector3(Hp.x + 2, ty - 3.5, 0); iron(c, X1, yv, Z1, 38, 7, 34, PM);
+        const ty = (isFinite(lo) ? lo : Hp.y - 8) - .4, c = new T.Vector3(Hp.x, ty - 3.5, 0); iron(c, X1, yv, Z1, 34, 7, 34, PM); /* (v515: the cushion ends short of the backs of the knees, and its height is taken from under the buttocks only — the calves tucked in at its front edge set it 6 cm low) */
         rod(new T.Vector3(c.x, ty - 7, 0), fl(c), 3.2); for (const z of [-13, 13]) rod(new T.Vector3(c.x - 26, floorY + 1.2, z), new T.Vector3(c.x + 4, floorY + 1.2, z), 2); rod(new T.Vector3(c.x - 26, floorY + 1.2, -13), new T.Vector3(c.x - 26, floorY + 1.2, 13), 2); return ty; };
       const backPad = (ty, tilt = 8, bw = 32) => { const th = rad(tilt), n = fw.clone().multiplyScalar(Math.cos(th)).add(yv.clone().multiplyScalar(Math.sin(th))), u = yv.clone().multiplyScalar(Math.cos(th)).sub(fw.clone().multiplyScalar(Math.sin(th)));
         const c0 = new T.Vector3(Hp.x, ty, 0).add(u.clone().multiplyScalar(30)).sub(fw.clone().multiplyScalar(14)), P = padAt(c0, n, u, bw, 50, 6);
@@ -19871,8 +19871,8 @@ function tempo(ph, id) {
 function gripOf(p) {
   const props = (p && p.props) || [], kinds = props.map((pp) => Object.keys(pp)[0]);
   if (props.some((pp) => pp.db === "far")) return { near: false, far: true }; // one weight in the far hand
-  const near = kinds.some((k) => /^(db|plate|barfrom|handle|cable|line|hbar|bandpost|vgrip|sidecable|doorband|chestplate)$/.test(k));
-  return { near, far: near && (p.u2 == null || kinds.some((k) => /^(plate|handle|line|hbar|bandpost|vgrip|sidecable|chestplate)$/.test(k))) }; // (doorband with u2: one arm only)
+  const near = kinds.some((k) => /^(db|plate|barfrom|handle|cable|line|hbar|bandpost|vgrip|sidecable|doorband|chestplate|machArms|machine)$/.test(k)); /* (v515: a machine's handles are held too — on the reverse fly the hands opened round them) */
+  return { near, far: near && (p.u2 == null || kinds.some((k) => /^(plate|handle|line|hbar|bandpost|vgrip|sidecable|chestplate|machArms|machine)$/.test(k))) }; // (doorband with u2: one arm only)
 }
 // The same pose on the other side: reflected left to right
 function mirrorBody(B) {
