@@ -19644,48 +19644,55 @@ function glProps(props, B, an, p) {
       const backPad = (ty, tilt = 8, bw = 32) => { const th = rad(tilt), n = fw.clone().multiplyScalar(Math.cos(th)).add(yv.clone().multiplyScalar(Math.sin(th))), u = yv.clone().multiplyScalar(Math.cos(th)).sub(fw.clone().multiplyScalar(Math.sin(th)));
         const c0 = new T.Vector3(Hp.x, ty, 0).add(u.clone().multiplyScalar(30)).sub(fw.clone().multiplyScalar(14)), P = padAt(c0, n, u, bw, 50, 6);
         const bot = P.back.clone().sub(P.u.clone().multiplyScalar(22)); rod(bot, new T.Vector3(bot.x, ty - 6, 0), 2.4); rod(new T.Vector3(bot.x, ty - 6, 0), new T.Vector3(Hp.x + 2, ty - 6, 0), 2.4); return P; };
-      const stack = (sx, sz, nx, nz) => column(sx, sz, 60, nx, nz, false);
+      const prog = (() => { if (!an || !an.A || !an.B || !p) return 0; let best = 0, t = 0; for (const q in an.B) { const a = an.A[q], b = an.B[q], c = p[q]; if (typeof a === "number" && typeof b === "number" && typeof c === "number" && Math.abs(b - a) > best) { best = Math.abs(b - a); t = (c - a) / (b - a); } } return Math.max(0, Math.min(1, t)); })(), lift = prog * 14; // (v503: how far through the lift the pose is, 0 at the start pose and 1 at the end pose — the selected plates ride up by that much)
+      const SX = Hp.x + 2, fy = floorY + 1.2;
+      // (v503) the weight stack stands beside the seat on the far side, joined to the seat frame along the floor and at frame height; a pulley at its top front, the cable down the front and on to the machine's lever
+      const tower = (wx, yb, route, cy = yb, wz = 46) => { const cx = wx + 100, cz = -wz, nz = 1, P = (al, y, sd) => L(cx - nz * sd, y, cz + nz * al); column(cx, cz, 60, 0, nz, false, 2.4, lift);
+        rod(P(12, 139, -11), P(12, 139, 11), 2.2); rod(P(12, 139, 0), P(12, -44, 0), 2.4); rod(P(12, -44, 0), P(-6, -44, 0), 2.2); const pt = P(15, -40, 0), pb = P(15, -cy, 0); hub(pt, 2.3); hub(pb, 2.1);
+        rod(P(-6, -40, 0), pt, .45, M.cable); rod(pt, pb, .45, M.cable); let q = pb; for (const r of route || []) { rod(q, r, .45, M.cable); q = r; }
+        rod(new T.Vector3(SX - 12, fy, 0), P(12, 139, 0), 2.4); rod(new T.Vector3(SX, yb, 0), P(12, -yb, 0), 2.4); return P; };
+      const tie = (q) => { const z = Math.sign(q.z) * 13 || 13; rod(new T.Vector3(q.x, fy, q.z), new T.Vector3(Math.max(SX - 26, Math.min(SX + 4, q.x)), fy, z), 2.2); }; // a floor rail from a foot of the frame to the seat's base
       const grip = (Lg, len = 12) => { const gr = proHandGrip(Lg); if (!gr) return null; const e = gr.kn.clone().multiplyScalar(len / 2); rod(gr.p.clone().sub(e), gr.p.clone().add(e), 1.5, PM); return { p: gr.p, top: e.y >= 0 ? gr.p.clone().add(e) : gr.p.clone().sub(e), e }; };
       const Kl = hp("LeftLeg"), Kr = hp("RightLeg"), Km = Kl.clone().add(Kr).multiplyScalar(.5), Am = hp("LeftFoot").add(hp("RightFoot")).multiplyScalar(.5);
       const shinRoller = (back) => { // a roller across both lower shins (in front, or behind the ankles), on a lever from a hub beside the knees on the stack side
-        const sh = Am.clone().sub(Km).normalize(), toe = hp("LeftToeBase").sub(hp("LeftFoot")), fr0 = toe.sub(sh.clone().multiplyScalar(toe.dot(sh))).normalize(), fr = back ? fr0.clone().negate() : fr0, ref = Am.clone().sub(sh.clone().multiplyScalar(6)), r = 3.8;
-        let k = 0; for (const q of pts) { const d = q.clone().sub(ref); if (Math.abs(d.dot(sh)) > r + 4) continue; if (Math.abs(d.z) > 30) continue; k = Math.max(k, d.dot(fr)); }
+        const sh = Am.clone().sub(Km).normalize(), toe = hp("LeftToeBase").sub(hp("LeftFoot")), fr0 = toe.sub(sh.clone().multiplyScalar(toe.dot(sh))).normalize(), fr = back ? fr0.clone().negate() : fr0, ref = Am.clone().sub(sh.clone().multiplyScalar(7.5)), r = 3.8;
+        let k = 0; for (const q of pts) { const d = q.clone().sub(ref), sd = d.dot(sh); if (sd < -(r + 4) || sd > 2) continue; if (Math.abs(d.z) > 30) continue; k = Math.max(k, d.dot(fr)); } // (v503: only the lower shin — the foot is left out, or a straight leg's toes pushed the roller off the end)
         const c = ref.clone().add(fr.clone().multiplyScalar(k + r + .4)), zN = Math.min(Kl.z, Kr.z) - 11, zF = Math.max(Kl.z, Kr.z) + 7, a = new T.Vector3(c.x, c.y, zN), b = new T.Vector3(c.x, c.y, zF);
         rod(a, b, r, PM); const hb = new T.Vector3(Km.x, Km.y, zN - 1); hub(hb, 2.8); rod(hb, a, 1.8); return hb; };
       if (typ === "abd" || typ === "add") {
-        const ty = seat(); backPad(ty, 16); stack(186, -42, -1, 0); for (const z of [-9, 9]) rod(new T.Vector3(Hp.x - 24, floorY + 1.2, z), L(150, 139, z), 2.2); rod(L(150, 139, -9), L(180, 139, -42), 2.2);
-        const yl = ty - 10, pv = new T.Vector3(Hp.x + 10, yl, 0); hub(pv, 3); rod(pv, fl(pv), 2.6); rod(pv, new T.Vector3(pv.x, ty - 7, 0), 2.6);
+        const ty = seat(); backPad(ty, 16);
+        const yl = ty - 10, pv = new T.Vector3(Hp.x + 10, yl, 0); hub(pv, 3); tower(SX - 14, ty - 7, [new T.Vector3(SX - 2, ty - 7, 6), pv]); rod(pv, fl(pv), 2.6); rod(pv, new T.Vector3(pv.x, ty - 7, 0), 2.6);
         for (const Lg of ["Left", "Right"]) { const K = hp(Lg + "Leg"), Hj = hp(Lg + "UpLeg"), out = new T.Vector3(0, 0, Math.sign(K.z - Hp.z) || 1), n = typ === "abd" ? out.clone().negate() : out.clone();
           const c0 = Hj.clone().lerp(K, .86).sub(n.clone().multiplyScalar(8)), P = padAt(c0, n, yv, 16, 14, 4.5), pz = P.back.clone().sub(yv.clone().multiplyScalar(5)), foot = pz.clone().add(n.clone().multiplyScalar(-7)).setY(yl); foot.x -= 4; rod(pz, foot, 1.8); rod(foot, pv, 2); }
       }
       if (typ === "legext" || typ === "legcurl") {
-        const ty = seat(), BP = backPad(ty, typ === "legcurl" ? 18 : 10); stack(40, -46, 1, 0); const hb = shinRoller(typ === "legcurl");
+        const ty = seat(), BP = backPad(ty, typ === "legcurl" ? 18 : 10); const hb = shinRoller(typ === "legcurl"); tower(SX - 14, ty - 7, [new T.Vector3(Hp.x + 16, ty - 18, 4), new T.Vector3(Hp.x + 16, ty - 18, hb.z - 4)]);
         const zf = hb.z - 4, fr = new T.Vector3(Hp.x + 16, ty - 18, zf); rod(hb, new T.Vector3(hb.x, hb.y, zf), 2.4); rod(new T.Vector3(hb.x, hb.y, zf), fr, 2.4); rod(fr, new T.Vector3(Hp.x - 18, ty - 18, zf), 2.4); rod(new T.Vector3(Hp.x - 18, ty - 18, zf), fl(new T.Vector3(Hp.x - 18, 0, zf)), 2.4); rod(new T.Vector3(Hp.x, ty - 18, zf), new T.Vector3(Hp.x, ty - 18, 0), 2.2);
         if (typ === "legcurl") { const Hm = hp("LeftUpLeg").add(hp("RightUpLeg")).multiplyScalar(.5), P = padAt(Hm.clone().lerp(Km, .8).add(yv.clone().multiplyScalar(14)), yv.clone().negate(), fw, 30, 12, 6); const e = P.c.clone().add(P.sv.clone().multiplyScalar(-Math.sign(P.sv.z || 1) * 17)); rod(e, new T.Vector3(e.x, e.y, hb.z), 2); rod(new T.Vector3(e.x, e.y, hb.z), hb, 2); }
       }
       if (typ === "calf") { const ty = seat(); const Hm = hp("LeftUpLeg").add(hp("RightUpLeg")).multiplyScalar(.5), P = padAt(Hm.clone().lerp(Km, .85).add(yv.clone().multiplyScalar(14)), yv.clone().negate(), fw, 34, 12, 6), zs = Math.max(Math.abs(Kl.z), Math.abs(Kr.z)) + 12;
-        for (const sz of [-1, 1]) { const e = new T.Vector3(P.c.x, P.c.y, sz * zs); rod(new T.Vector3(P.c.x, P.c.y, sz * 15), e, 2); rod(e, fl(e), 2.4); } stack(150, -44, -1, 0); }
+        for (const sz of [-1, 1]) { const e = new T.Vector3(P.c.x, P.c.y, sz * zs); rod(new T.Vector3(P.c.x, P.c.y, sz * 15), e, 2); rod(e, fl(e), 2.4); tie(e); } tower(SX - 14, ty - 7, [new T.Vector3(P.c.x, P.c.y, zs)]); }
       if (typ === "pecdeck" || typ === "revfly" || typ === "row") {
         const ty = seat(); let ux;
-        if (typ === "pecdeck") { backPad(ty, 4); ux = Hp.x - 26; } else { const ch = hp("Spine2"), P = padAt(ch.clone().add(fw.clone().multiplyScalar(16)).sub(yv.clone().multiplyScalar(9)), fw.clone().negate(), yv, typ === "row" ? 20 : 24, 24, 6), bot = P.back.clone().sub(yv.clone().multiplyScalar(14)); rod(bot, fl(bot), 2.6); rod(new T.Vector3(bot.x - 18, floorY + 1.2, 0), new T.Vector3(bot.x + 18, floorY + 1.2, 0), 2.2); ux = P.back.x + 22; }
+        if (typ === "pecdeck") { backPad(ty, 4); ux = Hp.x - 26; } else { const ch = hp("Spine2"), P = padAt(ch.clone().add(fw.clone().multiplyScalar(16)).sub(yv.clone().multiplyScalar(9)), fw.clone().negate(), yv, typ === "row" ? 20 : 24, 24, 6), bot = P.back.clone().sub(yv.clone().multiplyScalar(14)); rod(bot, fl(bot), 2.6); rod(new T.Vector3(bot.x - 18, floorY + 1.2, 0), new T.Vector3(bot.x + 18, floorY + 1.2, 0), 2.2); rod(new T.Vector3(bot.x - 18, fy, 0), new T.Vector3(SX + 4, fy, 0), 2.2); ux = P.back.x + (typ === "revfly" ? 38 : 22); } /* (v503: the reverse fly's frame stands beyond the reach of the hands — the arms swept through its uprights) */
         const sL = hp("LeftArm"), sR = hp("RightArm");
         if (typ === "row") { const sw = (q) => sidePoints(q).wrist, wa = sw(an.A), wb = sw(an.B), pvS = [(wa[0] + wb[0]) / 2, Math.min(wa[1], wb[1]) - 44];
-          for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (!G) continue; const sz = Math.sign(G.p.z - Hp.z) || 1, pv = L(pvS[0], pvS[1]).setZ(G.p.z + sz * 5); hub(pv, 2.8); rod(pv, G.top, 1.9); rod(pv, new T.Vector3(pv.x, pv.y, sz * 42), 2.2); rod(new T.Vector3(pv.x, pv.y, sz * 42), fl(new T.Vector3(pv.x, 0, sz * 42)), 2.6); }
-          stack(84, -62, 0, 1); }
+          for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (!G) continue; const sz = Math.sign(G.p.z - Hp.z) || 1, pv = L(pvS[0], pvS[1]).setZ(G.p.z + sz * 5); hub(pv, 2.8); rod(pv, G.top, 1.9); rod(pv, new T.Vector3(pv.x, pv.y, sz * 42), 2.2); rod(new T.Vector3(pv.x, pv.y, sz * 42), fl(new T.Vector3(pv.x, 0, sz * 42)), 2.6); tie(new T.Vector3(pv.x, 0, sz * 42)); }
+          { const q = L(pvS[0], pvS[1]); tower(Hp.x - 50, ty - 7, [new T.Vector3(q.x, ty - 7, 42), new T.Vector3(q.x, q.y, 42)]); } }
         else { const topY = Math.max(sL.y, sR.y) + 30; for (const z of [-24, 24]) rod(fl(new T.Vector3(ux, 0, z)), new T.Vector3(ux, topY, z), 2.6); rod(new T.Vector3(ux, topY, -24), new T.Vector3(ux, topY, 24), 2.4);
           for (const [Lg, S0] of [["Left", sL], ["Right", sR]]) { const G = grip(Lg, 14); if (!G) continue; const pv = new T.Vector3(S0.x, topY, S0.z); hub(pv, 3); rod(new T.Vector3(ux, topY, Math.sign(S0.z - Hp.z) * 24), pv, 2.4); const over = new T.Vector3(G.top.x, topY, G.top.z); rod(pv, over, 2); rod(over, G.top, 1.8); }
-          stack(ux - 4, -50, 0, 1); }
+          if (ux < SX) for (const z of [-24, 24]) tie(new T.Vector3(ux, 0, z)); /* (in front, where the feet are, the frame stands on its own floor bar) */ { const P = tower(Hp.x - 50, ty - 7, [new T.Vector3(ux, topY, 24)], topY); rod(P(12, -topY, 0), new T.Vector3(ux, topY, 24), 2.2); } }
       }
       if (typ === "chestpress" || typ === "shoulderpress") {
         const ty = seat(); backPad(ty, 6, 24); const sw = (q) => sidePoints(q).wrist, wa = sw(an.A), wb = sw(an.B);
         const pvS = typ === "chestpress" ? [(wa[0] + wb[0]) / 2, Math.min(wa[1], wb[1]) - 46] : [Math.min(wa[0], wb[0]) - 46, (wa[1] + wb[1]) / 2];
         for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (!G) continue; const sz = Math.sign(G.p.z - Hp.z) || 1, pv = L(pvS[0], pvS[1]).setZ(G.p.z + sz * 6), zo = sz * (Math.abs(G.p.z) + 12);
-          hub(pv, 3); rod(pv, G.top, 2); rod(pv, new T.Vector3(pv.x, pv.y, zo), 2.4); rod(new T.Vector3(pv.x, pv.y, zo), fl(new T.Vector3(pv.x, 0, zo)), 2.8); }
-        stack(30, -52, 1, 0); }
+          hub(pv, 3); rod(pv, G.top, 2); rod(pv, new T.Vector3(pv.x, pv.y, zo), 2.4); rod(new T.Vector3(pv.x, pv.y, zo), fl(new T.Vector3(pv.x, 0, zo)), 2.8); tie(new T.Vector3(pv.x, 0, zo)); }
+        { const q = L(pvS[0], pvS[1]); tower(Hp.x - 50, ty - 7, [new T.Vector3(q.x, q.y, 30)], q.y); } }
       if (typ === "lycurl") { const ch = hp("Spine1"), ax = ch.clone().sub(Hp).setY(0).normalize(), mid = Hp.clone().lerp(ch, .5), P = padAt(mid.clone().sub(yv.clone().multiplyScalar(12)), yv, ax, 21, 80, 8);
         for (const d of [-30, 30]) { const e = P.back.clone().add(P.u.clone().multiplyScalar(d)); rod(e, fl(e), 2.6); rod(new T.Vector3(e.x, floorY + 1.2, -14), new T.Vector3(e.x, floorY + 1.2, 14), 2.2); }
         const hb = shinRoller(true), fe = Hp.clone().sub(ax.clone().multiplyScalar(10)).setY(P.back.y).setZ(hb.z); rod(hb, fe, 2.4); rod(fe, new T.Vector3(fe.x, P.back.y, 0), 2.2);
-        for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (G) rod(G.p, fl(G.p), 1.8); } stack(10, -46, 1, 0); }
+        for (const Lg of ["Left", "Right"]) { const G = grip(Lg); if (G) rod(G.p, fl(G.p), 1.8); } { const yb = P.back.y - 2; tower(Hp.x - 30, yb, [new T.Vector3(fe.x, yb, 6), new T.Vector3(fe.x, yb, hb.z)]); } }
     }
     if ((k === "smith" || k === "crossCables" || k === "ankleCable" || k === "landmine" || k === "frameGrip") && isMeshStyle() && PRO.chrome && PRO.group && PRO.group.visible && PRO.by) { // (v498) Smith machine rails, a cable crossover's two cables, an ankle-cuff cable, a T-bar (landmine) bar — placed from the posed model
       PRO.group.updateMatrixWorld(true); const hp = (n) => new T.Vector3().setFromMatrixPosition(PRO.by[n].matrixWorld), yv = new T.Vector3(0, 1, 0), floorY = L(0, 140).y, topY = L(0, Array.isArray(v) ? v[0] : -12).y;
