@@ -19403,12 +19403,12 @@ function glProps(props, B, an, p) {
   const iron = (c, X, Y, Z, sx, sy, sz, mat = M.equip) => { const m = glMesh("box", g.box, mat); m.castShadow = m.receiveShadow = true; glPlace(m, c, X, Y, Z, sx, sy, sz); };
   // A cable column (or a weight-stack tower): two uprights on floor feet, a stack of iron plates on guide rods, and (track) the
   // adjustable pulley carriage at height yP in front, with the cable running up the track, over the top and down to the stack
-  const column = (cx, cz, yP, nx, nz, track = true) => {
+  const column = (cx, cz, yP, nx, nz, track = true, ur = 2.4, lift = 0) => { // (v502 ur: the uprights' radius; lift: how far the selected plates ride up the guide rods)
     const E = M.equip, C = M.cable, P = (al, y, sd) => L(cx + nx * al - nz * sd, y, cz + nz * al + nx * sd);
     const Xn = P(1, 0, 0).sub(P(0, 0, 0)).normalize(), Yu = new T.Vector3(0, 1, 0), Zs = new T.Vector3().crossVectors(Xn, Yu).normalize();
-    for (const sd of [-11, 11]) { rod(P(-6, 140, sd), P(-6, -44, sd), 2.4, E); rod(P(-24, 139, sd), P(12, 139, sd), 2.2, E); }
+    for (const sd of [-11, 11]) { rod(P(-6, 140, sd), P(-6, -44, sd), ur, E); rod(P(-24, 139, sd), P(12, 139, sd), 2.2, E); }
     rod(P(-6, -44, -11), P(-6, -44, 11), 2.6, E); rod(P(-24, 139, -11), P(-24, 139, 11), 2, E);
-    for (let i = 0; i < 11; i++) iron(P(-6, 137.6 - i * 4.1, 0), Xn, Yu, Zs, 8, 3.6, 17);
+    for (let i = 0; i < 11; i++) iron(P(-6, 137.6 - i * 4.1 - (i >= 6 ? lift : 0), 0), Xn, Yu, Zs, 8, 3.6, 17); if (lift > .05) rod(P(-6, 137.6 - 6 * 4.1, 0), P(-6, 137.6 - 10 * 4.1 - lift, 0), .5, M.cable); // (the selector rod shows below the lifted plates)
     for (const sd of [-4.5, 4.5]) rod(P(-6, 94, sd), P(-6, -42, sd), .6, C);
     if (!track) return;
     rod(P(1.2, 136, 0), P(1.2, -40, 0), 1.6, E); rod(P(1.2, -40, 0), P(-6, -40, 0), 1.6, E);
@@ -19452,7 +19452,9 @@ function glProps(props, B, an, p) {
         const s = F.s.clone().normalize(), u = F.u.clone().normalize(), z = new T.Vector3().crossVectors(s, u).normalize(), c = an0.clone().sub(u.clone().multiplyScalar(F.h + .9)).add(s.clone().multiplyScalar(len * .25));
         glPlace(glMesh("box", g.box, E), c, s, u, z, len * 1.5 + 6, 1.4, 12); rod(c.clone().sub(u.clone().multiplyScalar(.7)), new T.Vector3(c.x + 4, -134, c.z * .3), 1.6, E); } // a footplate under each sole, on a strut to the frame
     }
-    if (k === "column") column(v[0], v[1], v[2], v[3], v[4]); // cable column: [x, z, pulley height, toward-person x, z]
+    if (k === "column") { let lift = 0; const ac = (props || []).find((q) => q.ankleCable); // (v502: an ankle cable lifts the stack by as much as the cable has been pulled out since the start pose)
+      if (ac && an && an.A && p) { const pu = ac.ankleCable, d = (q) => { const a = sidePoints(q); const w = a.ankle2 || a.ankle; return Math.hypot(w[0] - pu[0], w[1] - pu[1]); }; lift = Math.max(0, d(p) - d(an.A)); }
+      column(v[0], v[1], v[2], v[3], v[4], true, v[5] || 2.4, lift); } // cable column: [x, z, pulley height, toward-person x, z, upright radius]
     if (k === "rhmachine") { const E = M.equip, [x0, top, x1, hx, hy] = v; // reverse hyper machine (v440): a padded platform on a sturdy frame, legs hang off the back end, handles in front at chest height
       for (const z of [-15, 15]) { for (const x of [x0 + 6, x1 - 6]) rod(L(x, top + 8, z), L(x, 139, z), 2.6, E); rod(L(x0 - 4, 139, z), L(hx + 8, 139, z), 2.6, E); rod(L(hx, 139, z * 1.45), L(hx, hy, z * 1.45), 2.4, E); rod(L(x1 - 6, top + 14, z), L(hx, hy + 6, z * 1.45), 2, E); }
       for (const x of [x0 + 6, x1 - 6, hx]) rod(L(x, 139, -15 * (x === hx ? 1.45 : 1)), L(x, 139, 15 * (x === hx ? 1.45 : 1)), 2.2, E);
@@ -21963,7 +21965,7 @@ LIB_NEW.push(
 for (const [id, m] of [["hip_abd", "abd"], ["hip_add", "add"], ["leg_ext_m", "legext"], ["leg_curl_m", "legcurl"], ["pec_deck", "pecdeck"], ["rev_fly", "revfly"], ["chest_press_m", "chestpress"], ["shoulder_press_m", "shoulderpress"], ["machine_row", "row"], ["seated_calf_m", "calf"], ["lying_leg_curl", "lycurl"]]) { const an = ANIMS[id]; if (!an) continue;
   for (const k of ["A", "M", "B"]) if (an[k]) an[k] = { ...an[k], props: [...(an[k].props || []).filter((q) => !q.machine), { machine: m }] }; }
 for (const id of ["rev_fly", "machine_row"]) if (ANIMS[id]) ANIMS[id].fz = 12; { const H = ANIMS.hip_add; if (H) { H.B = { ...H.B, legSpread: 14 }; } const A = ANIMS.hip_abd; if (A) A.A = { ...A.A, legSpread: 14 }; } /* (v499: knees stop a pad-width apart — together, the two pads met inside the thighs) */ // (v499: knees either side of the chest pad's post)
-{ const C = ANIMS.cable_kickback, CKX = 149.3; if (C) { C.palmDown = false; C.palmMid = true; C.thumbsUp = true; C.hz = 13.5; C.hzk = 1; C.handFix = 1; /* (v501: both hands round the column's uprights, held still) */ const mv = (q) => (q.column ? { column: [CKX, ...q.column.slice(1)] } : q.ankleCable ? { ankleCable: [CKX - 3, q.ankleCable[1]] } : q); for (const k of ["A", "B"]) C[k] = { ...C[k], props: C[k].props.filter((q) => !q.frameGrip).map(mv) }; } } /* (the column a little further off, so the forearms stay clear of its uprights) */ // (v500: hands on a grip bar fixed to the cable column)
+{ const C = ANIMS.cable_kickback, CKX = 149.3; if (C) { C.palmDown = false; C.palmMid = true; C.thumbsUp = true; C.hz = 13.5; C.hzk = 1; C.handFix = 1; C.B = { ...C.B, t: C.A.t }; /* (v502: the trunk keeps its lean, so the arms holding the uprights stay still) */ /* (v501: both hands round the column's uprights, held still) */ const mv = (q) => (q.column ? { column: [CKX, ...q.column.slice(1, 5), 1.5] } : q.ankleCable ? { ankleCable: [CKX - 3, q.ankleCable[1]] } : q); for (const k of ["A", "B"]) C[k] = { ...C[k], props: C[k].props.filter((q) => !q.frameGrip).map(mv) }; } } /* (the column a little further off, so the forearms stay clear of its uprights) */ // (v500: hands on a grip bar fixed to the cable column)
 // v497: phase labels for the machines
 for (const [id, lab] of [["hip_abd", ["Push your knees apart", "Return slowly"]], ["hip_add", ["Squeeze your knees together", "Return slowly"]], ["leg_ext_m", ["Straighten your legs", "Lower slowly"]], ["leg_curl_m", ["Curl your heels down", "Return slowly"]], ["pec_deck", ["Bring the handles together", "Return slowly"]], ["cable_fly", ["Bring the handles together", "Return slowly"]], ["cable_crunch", ["Crunch down", "Return slowly"]]]) TECH[id] = { ...TECH[id], lab };
 const NEW_SINCE_V496 = new Set(["Hip abduction machine", "Hip adduction machine", "Leg extension machine", "Seated leg curl machine", "Pec deck machine fly", "Reverse fly machine", "Machine chest press", "Machine shoulder press", "Smith machine squat", "Smith machine calf raise", "Seated calf raise machine", "Lying leg curl machine", "Standing cable chest fly", "Chest-supported machine row", "Cable glute kickback", "Kneeling cable crunch", "T-bar row"]); /* (v497 machines: still New until checked) */
